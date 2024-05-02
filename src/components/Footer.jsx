@@ -49,11 +49,7 @@ export function Footer() {
               <div className="mt-3">Televisiones</div>
               <div className="flex gap-2 py-1.5 pr-1.5 mt-1.5 text-yellow-400 bg-zinc-900">
                 <div>Ver todos los productos</div>
-                <img
-                  loading="lazy"
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/636cfcf25cb7b5247df40dfd25211469e924ee05555e20c7e7a80af8a16ae5c2?"
-                  className="shrink-0 w-5 aspect-square"
-                />
+
               </div>
             </div>
             <div className="flex flex-col self-stretch pb-1.5 text-sm font-medium leading-5 text-gray-400 text-center">
