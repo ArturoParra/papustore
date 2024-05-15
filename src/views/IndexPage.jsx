@@ -1,14 +1,13 @@
 import { Footer } from "../components/Footer"
 import { Header } from "../components/Header"
-import { Shop } from "./Shop"
-
+import { Ofertas } from "../components/Ofertas"
 
 export const IndexPage = () => {
   return (
     <>
-    <Header/>
-    <Shop/>
-    <Footer/>
+      <Header/>
+      <Ofertas/>
+      <Footer/>
     </>
   )
 }
