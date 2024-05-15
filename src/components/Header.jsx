@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import logo from "../assets/logo-papustore.png";
-import { ClipLoader } from "react-spinners";
 
 export function Header() {
   const iconoDrop = (
@@ -121,7 +120,6 @@ export function Header() {
           {iconoCarrito}
           {IconoCorazon}
           {iconoUsuario}
-          {iconoFlecha}
         </div>
       </div>
     </header>

@@ -9,9 +9,9 @@ export default {
     extend: {
 
       colors:{
-        'naranja': '#EE7210',
-        'crema': '#FFCC66',
-        'negro': '#140D0D',
+        'primary': '#EE7210',
+        'secondary': '#FFCC66',
+        'fondo': '#140D0D',
       }
 
     },
