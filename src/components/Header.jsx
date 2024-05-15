@@ -7,9 +7,9 @@ import logo from "../assets/logo-papustore.png";
 // Importacion para iconos
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
-
-// Importacion para manejo de media querys
+import logo from "../assets/logo-papustore.png";
 import { useMediaQuery } from "@react-hook/media-query";
+
 
 export function Header() {
     // Definicion del tamaño de pantalla lg
