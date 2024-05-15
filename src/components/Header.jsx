@@ -1,128 +1,125 @@
-import React, { useState } from "react";
+// Importaciones para manejo de estados
+import { useState } from "react";
+
+// Importacion para logo
+import logo from "../assets/logo-papustore.png";
+
+// Importacion para iconos
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
-import logo from "../assets/logo-papustore.png";
-import { ClipLoader } from "react-spinners";
+
+// Importacion para manejo de media querys
+import { useMediaQuery } from "@react-hook/media-query";
 
 export function Header() {
-  const iconoDrop = (
-    <FontAwesomeIcon className="text-black text-lg pl-2 pb-0.5 mb-auto" icon={fas.faSortDown} />
-  );
-  const iconoFlecha = <FontAwesomeIcon className="text-black text-lg pb-0.5" icon={fas.faArrowRight} />;
-  const iconoLupa = <FontAwesomeIcon className="text-black text-lg" icon={fas.faSearch} />;
-  const iconoCarrito = <FontAwesomeIcon className="text-white text-3xl" icon={fas.faCartShopping} />;
-  const IconoCorazon = <FontAwesomeIcon className="text-white text-3xl" icon={fas.faHeart} />;
-  const iconoUsuario = <FontAwesomeIcon className="text-white text-3xl" icon={fas.faUser} />;
+    // Definicion del tamaño de pantalla lg
+    const lg = useMediaQuery("(min-width: 1024px)");
 
-  const categorias = [
-    "Categorias",
-    "Celulares",
-    "Laptops",
-    "Perfumes",
-    "Cuidado de la piel",
-    "Comestibles",
-    "Decoracion del hogar",
-    "Muebles",
-    "Tops",
-    "Vestidos de Mujer",
-    "Zapatos de Mujer",
-    "Camisas de Hombre",
-    "Zapatos de Hombre",
-    "Relojes de Hombre",
-    "Relojes de Mujer",
-    "Bolsos de Mujer",
-    "Joyas de Mujer",
-    "Gafas de Sol",
-    "Automóviles",
-    "Motocicletas",
-    "Iluminación",
-  ];
+    // Definicion de los iconos
+    const IconoLupa = <FontAwesomeIcon icon={fas.faSearch} />;
+    const IconoHerramientas = <FontAwesomeIcon icon={fas.faGripLines} />;
+    const IconoCatego = <FontAwesomeIcon icon={fas.faLayerGroup} />;
+    const IconoCarrito = <FontAwesomeIcon icon={fas.faCartShopping} />;
+    const IconoCorazon = <FontAwesomeIcon icon={fas.faHeart} />;
+    const IconoUsuario = <FontAwesomeIcon icon={fas.faUser} />;
 
-  const [busqueda, setInputValue] = useState("");
-  const [mostrarCategorias, setMostrarCategorias] = useState(false);
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
-  const [hoveredItem, setHoveredItem] = useState(null);
+    
+    // Definicion del estado para el icono de herramientas
+    const [MostrarHerramientas, SetMostrarHerramientas] = useState(false);
 
-  const escribiendo = (event) => {
-    setInputValue(event.target.value);
-  };
+    const ClicHerramientas = () => {
+        SetMostrarHerramientas(!MostrarHerramientas);
+    };
 
-  const toggleCategorias = () => {
-    setMostrarCategorias(!mostrarCategorias);
-  };
+    // Funciones para los clics en cada una de las herramientas
+    const HandleCategoria = () =>
+    {
+        SetMostrarHerramientas(!MostrarHerramientas)
+    }
 
-  const seleccionarCategoria = (categoria) => {
-    setCategoriaSeleccionada(categoria);
-    setMostrarCategorias(false);
-  };
-
-  const handleMouseEnter = (category) => {
-    setHoveredItem(category);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredItem(categoriaSeleccionada);
-  };
-
-  // Establecer la primera categoría como categoría seleccionada por defecto
-  useState(() => {
-    setCategoriaSeleccionada(categorias[0]);
-  }, []);
+    // Definicion de los iconos de herramientas
+    const Iconos =
+    [
+        {Nombre: IconoCatego, onclick: HandleCategoria},
+        {Nombre: IconoCarrito, onclick: HandleCategoria},
+        {Nombre: IconoCorazon, onclick: HandleCategoria},
+        {Nombre: IconoUsuario, onclick: HandleCategoria}
+    ]
 
   return (
-    <header className="flex justify-center items-center px-16 py-5 w-full bg-zinc-900 max-md:px-5 max-md:max-w-ful">
-      <div className="flex gap-5 justify-between w-full max-w-[1320px] max-md:flex-wrap max-md:max-w-full">
-        <div className="flex gap-2 justify-center text-3xl font-bold tracking-tighter text-white whitespace-nowrap">
-          <img src={logo} alt="PapuStore" />
-        </div>
+    <header className="flex flex-col xss:bg-black xs:bg-red-300 sm:bg-slate-400 md:bg-orange-400 lg:bg-violet-300 xl:bg-fuchsia-400">
 
-        <div className="relative">
-          <div
-            className="flex gap-2 justify-center px-6 py-3.5 bg-gray-100 rounded-xl max-md:px-5 cursor-pointer"
-            onClick={toggleCategorias}
-          >
-            <div className="flex items-center">
-              <span className="spinner-text">{categoriaSeleccionada}</span>
-              {iconoDrop}
-            </div>
-          </div>
-          {mostrarCategorias && (
-            <div className="absolute bg-white shadow-lg rounded-lg py-2 mt-1 w-56">
-              {categorias.map((categoria, index) => (
-                <div
-                  key={index}
-                  className="px-4 py-0.5 hover:bg-yellow-200 hover:font-bold cursor-pointer flex justify-between items-center"
-                  onClick={() => seleccionarCategoria(categoria)}
-                  onMouseEnter={() => handleMouseEnter(categoria)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <span className={`${hoveredItem === categoria ? "highlighted" : ""}`}>
-                    {categoria}
-                  </span>
-                  {hoveredItem === categoria && iconoFlecha}
+        {/* Dividir tres */}
+        {lg ? 
+        (
+            <div className="flex justify-between items-center lg:px-12 lg:py-2">
+                <div>
+                    <img src={logo} alt="papustore" className="lg:w-20 lg:h-10"/>
                 </div>
-              ))}
+
+                <div className="relative">
+                    <div className="justify-center bg-white px-5 py-2 rounded-xl cursor-pointer">
+                        
+                            <span> Categorias </span>
+                        
+                    </div>
+                </div>
+
+
+                {/* Se renderiza para pantallas mayores a 360 pixeles */}
+                <div className="flex items-center bg-white rounded-xl font-bold p-2 w-2/5 text-sm">
+                    <input type="text" placeholder="Realizar una busqueda..." className="w-full outline-none rounded-xl px-2"/>
+                    {IconoLupa}
+                </div>
+
+
+
+                {/* Icono de herramientas */}
+                <div className="flex justify-between my-auto gap-4 text-white lg:text-2xl">
+                    {IconoCarrito}
+                    {IconoCorazon}
+                    {IconoUsuario}
+                </div>
             </div>
-          )}
-        </div>
-
-        <div className="flex gap-2 w-2/5 px-5 py-3.5 text-sm leading-5 bg-white rounded-xl shadow-lg text-black max-md:flex-wrap font-bold items-center">
-          <input
-            type="text"
-            placeholder="Realizar una búsqueda..."
-            value={busqueda}
-            onChange={escribiendo}
-            className="w-full outline-none placeholder-slate-400"
-          />
-          {iconoLupa}
-        </div>
-
-        <div className="flex gap-8 justify-between my-auto">
-          {iconoCarrito}
-          {IconoCorazon}
-          {iconoUsuario}
-          {iconoFlecha}
-        </div>
+        ) 
+        :
+        (
+            <div className="flex justify-between items-center xss:px-1 xss:py-0.5 xs:px-1.5 xs:py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2">
+                <div>
+                    <img src={logo} alt="papustore" className="xss:w-14 xss:h-8 xs:w-12 xs:h-6 sm:w-14 sm:h-8 md:w-16 md:h-8"/>
+                </div>
+                {/* Se renderiza para pantallas mayores a 360 pixeles */}
+                <div className="flex items-center bg-white rounded-xl font-bold xss:p-1 xss:w-2/3 xss:text-[9px] xs:p-1 xs:w-2/3 xs:text-xs sm:p-1.5 sm:w-2/3 sm:text-sm md:p-2 md:w-3/4 md:text-sm">
+                    <input type="text" placeholder="Busqueda" className="w-full outline-none rounded-xl xss:px-0.5 xs:px-0.5 sm:px-1 md:px-1.5"/>
+                    {IconoLupa}
+                </div>
+                
+                {/* Icono de herramientas */}
+                <div className="text-white xss:text-md xs:text-lg sm:text-2xl md:text-2xl" onClick={ClicHerramientas}>
+                    {IconoHerramientas}
+                </div>
+            </div>
+        )
+        }
+      
+      
+      {/* Herramientas para el usuario */}
+      <div>
+        {
+            MostrarHerramientas &&
+            (
+            <div className="flex justify-between items-center text-white xss:px-1 xss:text-xs xs:px-2 xs:text-md sm:px-3 sm:text-lg md:px-4 md:text-lg">
+                {
+                    Iconos.map((Icono, Indice) =>
+                    (
+                        <div key={Indice} className="cursor-pointer hover:text-yellow-300">
+                            {Icono.Nombre}
+                        </div>
+                    ))
+                }
+            </div>
+            )
+        }
       </div>
     </header>
   );
