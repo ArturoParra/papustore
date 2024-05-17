@@ -7,8 +7,8 @@ import logo from "../assets/logo-papustore.png";
 // Importacion para iconos
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
-import logo from "../assets/logo-papustore.png";
 import { useMediaQuery } from "@react-hook/media-query";
+import { Link } from "react-router-dom";
 
 
 export function Header() {
@@ -54,7 +54,7 @@ export function Header() {
         (
             <div className="flex justify-between items-center lg:px-12 lg:py-2">
                 <div>
-                    <img src={logo} alt="papustore" className="lg:w-20 lg:h-10"/>
+                    <Link to="/"><img src={logo} alt="papustore" className="lg:w-20 lg:h-10"/></Link>
                 </div>
 
                 <div className="relative">
@@ -64,7 +64,6 @@ export function Header() {
                         
                     </div>
                 </div>
-
 
                 {/* Se renderiza para pantallas mayores a 360 pixeles */}
                 <div className="flex items-center bg-white rounded-xl font-bold p-2 w-2/5 text-sm">
@@ -76,9 +75,9 @@ export function Header() {
 
                 {/* Icono de herramientas */}
                 <div className="flex justify-between my-auto gap-4 text-white lg:text-2xl">
-                    {IconoCarrito}
-                    {IconoCorazon}
-                    {IconoUsuario}
+                    <Link to="/carrito">{IconoCarrito}</Link>
+                    <Link to="/favoritos">{IconoCorazon}</Link>
+                    <Link to="/perfil">{IconoUsuario}</Link>
                 </div>
             </div>
         ) 
