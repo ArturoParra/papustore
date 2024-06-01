@@ -1,23 +1,29 @@
 import React, { createContext, useContext, useState } from "react";
-import ReactSlider from 'react-slider'
+import ReactSlider from "react-slider";
 import "../styles/Slider.css";
 
 const SidebarContext = createContext();
 
-export const SidebarFiltros = ({ children }) => {
+export const SidebarFiltros = ({ children, onFilterChange, onSliderChange }) => {
+  
   const [expanded, setExpanded] = useState(false);
-  const [precioSlider, setPrecioSlider] = useState(200);
+  const [filter, setFilter] = useState('');
 
   const handleChange = (value, index) => {
-    const [minvalue, maxvalue] = value
-    console.log(`Nuevo valor en el índice ${index}: ${minvalue}, ${maxvalue}`);
+    onSliderChange(value)
     // Aquí puedes hacer lo que quieras con el valor y el índice
   };
 
+  const handleCheckboxChange = (event) => {
+    const newFilter = event.target.value; // Captura el texto del label
+    setFilter(newFilter); // Actualiza el estado en el hijo
+    onFilterChange(newFilter); // Llama a la función del padre para actualizar el estado en el padre
+  };
+
   return (
-    <aside className="z-100 relative h-full">
+    <aside className="z-100 relative h-full inline">
       <nav className="flex flex-col bg-white border-r shadow-sm h-full">
-        <div className="p-4 pb-2 flex justify-between items-center">
+        <div className="p-4 pb-2 flex justify-between items-center lg:hidden">
           <button
             className="p-2 rounded-lg bg-gray-400 hover:bg-gray-800"
             onClick={() => setExpanded((curr) => !curr)}
@@ -26,22 +32,26 @@ export const SidebarFiltros = ({ children }) => {
           </button>
         </div>
 
-        <SidebarContext.Provider value={{ expanded }}>
+        <SidebarContext.Provider value={{ expanded, handleCheckboxChange }}>
           <ul
-            className={`absolute h-screen z-40 flex-1 px-3 w-1/3 transform transition duration-500 ${
-              expanded ? "bg-slate-200 translate-x-0" : "bg-none -translate-x-full"
+            className={`absolute h-screen z-40 flex-1 px-3 w-1/3 transform transition duration-500 lg:static lg:translate-x-0 lg:justify-normal lg:px-3 lg:w-full lg:bg-slate-200 lg:rounded-lg ${
+              expanded
+                ? "bg-slate-200 translate-x-0"
+                : "bg-none -translate-x-full"
             }`}
           >
             <div className="my-2 flex justify-between">
               <h4 className="font-semibold text-xl">Filtros</h4>
               <button
-                className=" p-2 rounded-lg bg-gray-400 hover:bg-gray-800"
+                className=" p-2 rounded-lg bg-gray-400 hover:bg-gray-800 lg:hidden"
                 onClick={() => setExpanded((curr) => !curr)}
               >
                 cerrar
               </button>
             </div>
-            {children}
+            {React.Children.map(children, (child) => 
+              React.cloneElement(child, { handleCheckboxChange })
+            )}
 
             <ReactSlider
               className="horizontal-slider"
@@ -56,7 +66,7 @@ export const SidebarFiltros = ({ children }) => {
               minDistance={0}
               withTracks={true}
               onChange={handleChange}
-            /> 
+            />
 
             <div class="flex justify-between">
               <span>0</span>
@@ -69,7 +79,8 @@ export const SidebarFiltros = ({ children }) => {
   );
 };
 
-export const SidebarItem = ({ texto }) => {
+
+export const SidebarItem = ({ texto, handleCheckboxChange }) => {
   const { expanded } = useContext(SidebarContext);
   return (
     <li className={`relative flex items-center py-2 px-3 my-1 w-52 ml-3`}>
@@ -77,12 +88,26 @@ export const SidebarItem = ({ texto }) => {
         <input
           id="default-checkbox"
           type="checkbox"
-          value=""
-          className={` w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 `}
+          value={texto}
+          className={` appearance-none w-4 h-4 border border-gray-300 rounded bg-gray-100 checked:bg-primary checked:border-primary focus:outline-none `}
+          onChange={handleCheckboxChange}
         />
-        <label
-          className={` ms-2 text-sm font-medium text-gray-900`}
-        >
+        <style jsx>{`
+          input[type="checkbox"] {
+            position: relative;
+          }
+          input[type="checkbox"]:checked::after {
+            content: "\\2713"; /* Unicode para el checkmark */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white; /* Color of the checkmark */
+            font-size: 0.75rem; /* Adjust size as needed */
+            line-height: 1; /* Ensure line height does not affect alignment */
+          }
+        `}</style>
+        <label className={` ms-2 text-sm font-medium text-gray-900`}>
           {texto}
         </label>
       </span>
@@ -93,3 +118,4 @@ export const SidebarItem = ({ texto }) => {
     </li>
   );
 };
+
