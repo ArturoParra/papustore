@@ -1,18 +1,35 @@
 import React, { useState } from 'react';
 import { Header } from '../components/Header'
 import { Footer } from '../components/Footer'
+import { useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 
 export const VistaProducto = () => {
   const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const location = useLocation();
 
-  const images = [
-    'https://via.placeholder.com/400',
-    'https://via.placeholder.com/401',
-    'https://via.placeholder.com/402',
-    'https://via.placeholder.com/403',
-    'https://via.placeholder.com/404'
-  ];
+  //! Esto probablemente habrá que cambiarlo
+  //TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
+  const {title, description, price, discountPercentage, realPrice, rating, images} = location.state || {};
+
+
+  fetch('/api/index.php')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Error de red');
+    }
+    return response.text();
+  })
+  .then(data => {
+    console.log(data); // Aquí verás la respuesta del servidor PHP en la consola del navegador
+  })
+  .catch(error => {
+    console.error('Hubo un problema con la petición fetch:', error);
+  });
+
+  const imagenes = images
   
   const handleQuantityChange = (amount) => {
     setQuantity((prevQuantity) => Math.max(1, prevQuantity + amount));
@@ -54,7 +71,7 @@ export const VistaProducto = () => {
                 </button>
               </div>
               <div className="flex justify-center space-x-2 overflow-x-auto">
-                {images.map((image, index) => (
+                {imagenes.map((image, index) => (
                   <img
                     key={index}
                     src={image}
@@ -66,15 +83,15 @@ export const VistaProducto = () => {
               </div>
             </div>
             <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pl-8">
-              <h1 className="text-2xl font-bold">2020 Apple MacBook Pro with Apple M1 Chip</h1>
-              <p className="text-gray-600">13-inch, 8GB RAM, 256GB SSD Storage - Space Gray</p>
+              <h1 className="text-2xl font-bold">{title}</h1>
+              <p className="text-gray-600">{description}</p>
               <div className="flex items-center my-4">
                 <div className="flex items-center text-orange-500">
-                  <span className="mr-2">4.7 Rating</span>
+                  <span className="mr-2">{rating} </span>
                 </div>
               </div>
-              <div className="text-3xl font-bold mb-2">$1699 <span className="text-gray-500 line-through">$1999.00</span></div>
-              <div className="text-green-500 font-bold mb-2">21% OFF</div>
+              <div className="text-3xl font-bold mb-2">$ {realPrice} <span className="text-gray-500 line-through">$ {price}</span></div>
+              <div className="text-green-500 font-bold mb-2">{discountPercentage}% OFF</div>
               <div className="mb-4">
                 <span className="text-gray-600">DISPONIBILIDAD:</span> <span className="text-green-500">DISPONIBLE</span>
               </div>

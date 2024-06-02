@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { SidebarFiltros, SidebarItem } from "../components/SidebarFiltros";
 import { Producto } from "../components/Producto";
+//TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
 import { products } from "../data/db.json";
 
 export const Shop = () => {
   const [filter, setFilter] = useState([]);
+  //TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
+  //TODO: borrar el JSON del proyecto
   const [data, setData] = useState(products);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9; // Adjust as needed
+  const itemsPerPage = 18; // Adjust as needed
 
   const handleFilterChange = (newFilter) => {
     if (filter.includes(newFilter)) {
@@ -24,18 +27,19 @@ export const Shop = () => {
 
   const onSliderChange = (value) => {
     const [maxval, minval] = value;
-    console.log(`valor minimo ${minval}`);
-    console.log(`valor maximo ${maxval}`);
+    console.log(`valor minimo ${minval}`)
+    console.log(`valor maximo ${maxval}`)
   };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Calculate the items for the current page
   const startIdx = (currentPage - 1) * itemsPerPage;
-  const paginatedData = data.slice(startIdx, startIdx + itemsPerPage);
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const paginatedData = data.slice(startIdx, startIdx + itemsPerPage)
+  const totalPages = Math.ceil(data.length / itemsPerPage)
 
   return (
     <>
@@ -59,7 +63,7 @@ export const Shop = () => {
           </div>
           <div className="min-h-24 rounded-lg hidden lg:inline lg:col-span-1"></div>
         </div>
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center m-4">
           <button
             disabled={currentPage === 1}
             onClick={() => handlePageChange(currentPage - 1)}
@@ -70,7 +74,7 @@ export const Shop = () => {
             <button
               key={i}
               className={`px-2 py-1 mx-1 ${
-                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+                currentPage === i + 1 ? "rounded-md bg-primary text-white" : "rounded-md bg-gray-200"
               }`}
               onClick={() => handlePageChange(i + 1)}
             >
