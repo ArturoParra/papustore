@@ -4,6 +4,7 @@ import { IndexPage } from './views/IndexPage'
 import { ShoppingCart } from './views/ShoppingCart'
 import { UserProfile } from './views/UserProfile'
 import { Wishlist } from './views/Wishlist'
+import { VistaProducto } from './views/VistaProducto'
 
 
 export const AppRouter = () => {
@@ -14,6 +15,7 @@ export const AppRouter = () => {
             <Route path='/carrito' element={<ShoppingCart/>}/>
             <Route path='/perfil' element={<UserProfile/>}/>
             <Route path='/favoritos' element={<Wishlist/>}/>
+            <Route path='/producto' element={<VistaProducto/>}/>
         </Routes>
     </BrowserRouter>
   )

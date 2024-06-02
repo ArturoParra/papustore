@@ -8,7 +8,7 @@ export const IndexPage = () => {
   return (
     <>
       <Header/>
-      <Ofertas/>
+      <Shop/>
       <Footer/>
     </>
   )
