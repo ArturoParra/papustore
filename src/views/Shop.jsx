@@ -85,8 +85,8 @@ export const Shop = () => {
       
   }, [filter,maxPrice,minPrice]);
 
-  
-  /* data.map((item) => (
+  /*
+  data.map((item) => (
     console.log(item.brand)
   )) */
 
@@ -126,6 +126,37 @@ export const Shop = () => {
               <SidebarItem texto="Mobile accessories" value="mobile-accessories" />
               <p className="text-base font-light text-primary">Brand</p>
               <SidebarItem texto="Apple" value="Apple" />
+              <SidebarItem texto="Essence" value="Essence" />
+              <SidebarItem texto="Glamour Beauty" value="Glamour Beauty" />
+              <SidebarItem texto="Velvet Touch" value="Velvet Touch" />
+              <SidebarItem texto="Chic Cosmetics" value="Chic Cosmetics" />
+              <SidebarItem texto="Nail Couture" value="Nail Couture" />
+              <SidebarItem texto="Calvin Klein" value="Calvin Klein" />
+              <SidebarItem texto="Chanel" value="Chanel" />
+              <SidebarItem texto="Dior" value="Dior" />
+              <SidebarItem texto="Dolce & Gabbana" value="Dolce & Gabbana" />
+              <SidebarItem texto="Gucci" value="Gucci" />
+              <SidebarItem texto="Annibale Colombo" value="Annibale Colombo" />
+              <SidebarItem texto="Furniture Co." value="Furniture Co." />
+              <SidebarItem texto="Knoll" value="Knoll" />
+              <SidebarItem texto="Bath Trends" value="Bath Trends" />
+              <SidebarItem texto="Asus" value="Asus" />
+              <SidebarItem texto="Huawei" value="Huawei" />
+              <SidebarItem texto="Lenovo" value="Lenovo" />
+              <SidebarItem texto="Dell" value="Dell" />
+              <SidebarItem texto="Fashion Trends" value="Fashion Trends" />
+              <SidebarItem texto="Gigabyte" value="Gigabyte" />
+              <SidebarItem texto="Classic Wear" value="Classic Wear" />
+              <SidebarItem texto="Casual Comfort" value="Casual Comfort" />
+              <SidebarItem texto="Urban Chic" value="Urban Chic" />
+              <SidebarItem texto="Nike" value="Nike" />
+              <SidebarItem texto="Puma" value="Puma" />
+              <SidebarItem texto="Off White" value="Off White" />
+              <SidebarItem texto="Fashion Timepieces" value="Fashion Timepieces" />
+              <SidebarItem texto="Longines" value="Longines" />
+              <SidebarItem texto="Rolex" value="Rolex" />
+              <SidebarItem texto="Amazon" value="Amazon" />
+              <SidebarItem texto="Otras marcas" value="" />
 
               
             <div className="flex justify-between mb-3">
