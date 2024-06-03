@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
-export const ProductView = () => {
+export const VistaProducto = () => {
   const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const location = useLocation();

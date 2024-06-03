@@ -7,9 +7,9 @@ import { Shop } from "./Shop"
 export const IndexPage = () => {
   return (
     <>
-      <Header/>
+      {/* <Header/> */}
       <Shop/>
-      <Footer/>
+      {/* <Footer/> */}
     </>
   )
 }
