@@ -13,9 +13,11 @@ export const VistaProducto = () => {
   
   //! Esto probablemente habrá que cambiarlo
   //TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
-  const {title, description, price, discountPercentage, realPrice, rating, images} = location.state || {};
+  const {title, description, price, discountPercentage, realPrice, rating, images, dimensions, brand, weight, warrantyInformation, shippingInformation, availabilityStatus, returnPolicy} = location.state || {};
+  const {width, height, depth} = dimensions
 
   const IconoFlecha = <FontAwesomeIcon icon = {fas.faArrowLeft}/>
+  const IconoEstrella = <FontAwesomeIcon icon = {fas.faStar}/>
 
   fetch('/api/index.php')
   .then(response => {
@@ -89,17 +91,16 @@ export const VistaProducto = () => {
 
               <Link to="/tienda"><p className="font-semibold">{IconoFlecha} BACK TO SHOP</p></Link>
               <h1 className="text-2xl font-bold">{title}</h1>
-              <p className="text-gray-600">{description}</p>
 
               <div className="flex items-center my-4">
                 <div className="flex items-center text-orange-500">
-                  <span className="mr-2">{rating} </span>
+                  <span className="mr-2">{IconoEstrella} {rating}</span>
                 </div>
               </div>
               <div className="text-3xl font-bold mb-2">$ {realPrice} <span className="text-gray-500 line-through">$ {price}</span></div>
               <div className="text-green-500 font-bold mb-2">{discountPercentage}% OFF</div>
               <div className="mb-4">
-                <span className="text-gray-600">AVAILABILITY:</span> <span className="text-green-500">IN STOCK</span>
+                <span className="text-gray-600">AVAILABILITY:</span> <span className="text-green-500">{availabilityStatus}</span>
               </div>
               <div className="mb-4">
                 <span className="text-gray-600">CATEGORY:</span> <span className="text-gray-900">Electronic Devices</span>
@@ -138,27 +139,37 @@ export const VistaProducto = () => {
               <div className="col-span-2">
                 <h3 className="text-lg font-bold mb-2">Description</h3>
                 <p className="text-gray-600">
-                  The most powerful MacBook Pro ever is here. With the blazing-fast M1 Pro or M1 Max, the first Apple silicon designed for professionals, you get groundbreaking performance and amazing battery life. Add to that a stunning Liquid Retina XDR display, the best camera and audio ever in a Mac notebook, and all the ports you need. The first notebook of its kind, this MacBook Pro is a beast. The M1 Pro takes the exceptional performance of the M1 architecture to a new level for pro users.
+                  {description}
+                </p>
+                <p className="my-2 text-gray-600" >
+                  Brand: {brand}
+                </p>
+                <h3 className="text-lg font-bold mt-2">Dimensions</h3>
+                <p className="text-gray-600">
+                  Width: {width}
                 </p>
                 <p className="text-gray-600">
-                  Even the most ambitious projects are easily handled with up to 10 CPU cores, up to 16 GPU cores, a 16-core Neural Engine, and dedicated encode and decode media engines that support H.264, HEVC, and ProRes codecs.
+                  Height: {height}
+                </p>
+                <p className="text-gray-600">
+                  Depth: {depth}
+                </p>
+                <p className="text-gray-600">
+                  Weight: {weight}
                 </p>
               </div>
               <div>
                 <h3 className="text-lg font-bold mb-2">Features</h3>
                 <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                  <li>Free 1-year warranty</li>
                   <li>Free fast shipping and delivery</li>
-                  <li>100% money-back guarantee</li>
                   <li>24/7 customer support</li>
                   <li>Secure payment method</li>
+                  <li>Warranty Information: {warrantyInformation}</li>
+                  <li>Return Policy: {returnPolicy}</li>
                 </ul>
                 <h3 className="text-lg font-bold mt-4 mb-2">Shipping Information</h3>
                 <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                  <li>Courier: 2-4 days, free shipping</li>
-                  <li>Local Shipping: up to a week, $19.00</li>
-                  <li>UPS Ground Shipping: 4-6 days, $29.00</li>
-                  <li>Unishop Global Export: 3-4 days, $39.00</li>
+                  <li>{shippingInformation}</li>
                 </ul>
               </div>
             </div>
