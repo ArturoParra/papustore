@@ -4,13 +4,15 @@ import "../styles/Slider.css";
 
 const SidebarContext = createContext();
 
-export const SidebarFiltros = ({ children, onFilterChange, onSliderChange }) => {
+export const SidebarFiltros = ({ children, onFilterChange, onSliderChange, maxValue, minValue }) => {
   
   const [expanded, setExpanded] = useState(false);
-  const [filter, setFilter] = useState('');
+  const [filter, setFilter] = useState([]);
 
   const handleChange = (value, index) => {
+    
     onSliderChange(value)
+    console.log(value)
     // Aquí puedes hacer lo que quieras con el valor y el índice
   };
 
@@ -57,10 +59,12 @@ export const SidebarFiltros = ({ children, onFilterChange, onSliderChange }) => 
               className="horizontal-slider"
               thumbClassName="example-thumb"
               trackClassName="example-track"
-              defaultValue={[0, 100]}
+              defaultValue={[minValue, maxValue]}
+              min={minValue}
+              max={maxValue}
               ariaLabel={["Middle thumb", "Rightmost thumb"]}
               renderThumb={(props, state) => (
-                <div {...props}>${state.valueNow}</div>
+                <div {...props}>||</div>
               )}
               pearling
               minDistance={0}
@@ -68,9 +72,9 @@ export const SidebarFiltros = ({ children, onFilterChange, onSliderChange }) => 
               onChange={handleChange}
             />
 
-            <div class="flex justify-between">
-              <span>0</span>
-              <span>100</span>
+            <div class="flex justify-between mt-3">
+              <span>$ {minValue}</span>
+              <span>$ {maxValue}</span>
             </div>
           </ul>
         </SidebarContext.Provider>
@@ -80,7 +84,7 @@ export const SidebarFiltros = ({ children, onFilterChange, onSliderChange }) => 
 };
 
 
-export const SidebarItem = ({ texto, handleCheckboxChange }) => {
+export const SidebarItem = ({ value, texto, handleCheckboxChange }) => {
   const { expanded } = useContext(SidebarContext);
   return (
     <li className={`relative flex items-center py-2 px-3 my-1 w-52 ml-3`}>
@@ -88,7 +92,7 @@ export const SidebarItem = ({ texto, handleCheckboxChange }) => {
         <input
           id="default-checkbox"
           type="checkbox"
-          value={texto}
+          value={value}
           className={` appearance-none w-4 h-4 border border-gray-300 rounded bg-gray-100 checked:bg-primary checked:border-primary focus:outline-none `}
           onChange={handleCheckboxChange}
         />
