@@ -12,7 +12,6 @@ export const SidebarFiltros = ({ children, onFilterChange, onSliderChange, maxVa
   const handleChange = (value, index) => {
     
     onSliderChange(value)
-    console.log(value)
     // Aquí puedes hacer lo que quieras con el valor y el índice
   };
 
