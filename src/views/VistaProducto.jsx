@@ -3,7 +3,8 @@ import { Header } from '../components/Header'
 import { Footer } from '../components/Footer'
 import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 export const VistaProducto = () => {
   const [quantity, setQuantity] = useState(1);
@@ -14,6 +15,7 @@ export const VistaProducto = () => {
   //TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
   const {title, description, price, discountPercentage, realPrice, rating, images} = location.state || {};
 
+  const IconoFlecha = <FontAwesomeIcon icon = {fas.faArrowLeft}/>
 
   fetch('/api/index.php')
   .then(response => {
@@ -83,6 +85,7 @@ export const VistaProducto = () => {
               </div>
             </div>
             <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pl-8">
+              <Link to="/tienda"><p className="font-semibold">{IconoFlecha} BACK TO SHOP</p></Link>
               <h1 className="text-2xl font-bold">{title}</h1>
               <p className="text-gray-600">{description}</p>
               <div className="flex items-center my-4">

@@ -19,11 +19,10 @@ export const Producto = ({producto}) => {
 
   const productoActualizado = {...producto, realPrice}
 
-  console.log(productoActualizado)
-
   return (
     <>
       <div className="border border-slate-200 rounded-md p-3 shadow-md ">
+          {/*TODO: centrar la imagen*/}
         <Link to="/producto" state={productoActualizado}>
           <img className="object-cover" src={thumbnail} alt="imagen guitarra" />
         </Link>
