@@ -45,9 +45,6 @@ export const Shop = () => {
     let res2 = []
     let res3 = []
 
-    const pricefilter = onSliderChange
-    console.log(pricefilter)
-
     if (filters.length === 0) {
       return data;
     }else{
