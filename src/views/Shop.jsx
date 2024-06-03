@@ -14,16 +14,25 @@ export const Shop = () => {
   //TODO: borrar el JSON del proyecto
   const [data, setData] = useState(products);
 
+
+  const [dataFiltrado, setdataFiltrado] = useState([])
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9; // Adjust as needed
+  let filtrado = []
+
+  // Calculate the items for the current page
+  const startIdx = (currentPage - 1) * itemsPerPage;
+  //TODO: hacer pasar data por un filtro y luego por la paginación
+  //TODO: condicionar que arreglo se va a mostra (el filtrado o el original) también debería probar esto dentro del useEffect de los filtros
+  const paginatedData = dataFiltrado.slice(startIdx, startIdx + itemsPerPage)
+  const totalPages = Math.ceil(dataFiltrado.length / itemsPerPage)
+
   const values = Object.values(data).map(obj => obj.price);
   const maxValue = Math.max(...values)
   const minValue = Math.min(...values)
 
-  const [dataFiltrado, setdataFiltrado] = useState([])
-  const [currentPage, setCurrentPage] = useState(1);
   const [maxPrice, setmaxPrice] = useState(maxValue)
   const [minPrice, setminPrice] = useState(minValue)
-  const itemsPerPage = 9; // Adjust as needed
-  let filtrado = []
 
   const handleFilterChange = (newFilter) => {
     setFilter((prevFilter) => {
@@ -35,6 +44,7 @@ export const Shop = () => {
     });
   };
 
+
   const intersection = (array1, array2) => {
     return array1.filter(value => array2.includes(value));
   };  
@@ -43,30 +53,24 @@ export const Shop = () => {
 
     let res = []
     let res2 = []
-    let res3 = []
+    let res3 = [] 
+
+    res3 = Object.values(data).filter(item =>{
+      const realPrice = item.price - (item.price * (item.discountPercentage / 100))
+      return realPrice >= minPrice && realPrice <= maxPrice
+    })
+    //TODO: página de error si no hay productos que coinciden y tener mínimo una página siempre
 
     if (filters.length === 0) {
-      return data;
+      return res3;
     }else{
-      res = Object.values(data).filter(item =>(filters.includes(item.category) || filters.includes(item.brand))||(filters.includes(item.category) && filters.includes(item.brand)))
+      res = Object.values(data).filter(item =>(filters.includes(item.category) || filters.includes(item.brand)))
       res2 = Object.values(data).filter(item =>(filters.includes(item.category) && filters.includes(item.brand)))
-      res3 = Object.values(data).filter(item =>(filters.includes(item.category) && filters.includes(item.brand)))
       res = res2.length > 0 ? intersection(res,res2) : res
     }
+    res = res.length == 0 ? res3 : intersection(res,res3)
     return res
   }
-
-  useEffect(() => {
-
-      filtrado = FuncionFiltrado(data,filter)
-      setdataFiltrado(filtrado)
-      
-  }, [filter,data]);
-
-  
-  /* data.map((item) => (
-    console.log(item.brand)
-  )) */
 
   const onSliderChange = (value) => {
     const [minval, maxval] = value;
@@ -74,17 +78,26 @@ export const Shop = () => {
     setminPrice(minval)
   };
 
+  useEffect(() => {
+
+    filtrado = FuncionFiltrado(data,filter)
+    setdataFiltrado(filtrado)
+      
+  }, [filter,maxPrice,minPrice]);
+
+  
+  /* data.map((item) => (
+    console.log(item.brand)
+  )) */
+
+  
+
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Calculate the items for the current page
-  const startIdx = (currentPage - 1) * itemsPerPage;
-  //TODO: hacer pasar data por un filtro y luego por la paginación
-  //TODO: condicionar que arreglo se va a mostra (el filtrado o el original) también debería probar esto dentro del useEffect de los filtros
-  const paginatedData = dataFiltrado.slice(startIdx, startIdx + itemsPerPage)
-  const totalPages = Math.ceil(dataFiltrado.length / itemsPerPage)
+  
 
   return (
     <>
