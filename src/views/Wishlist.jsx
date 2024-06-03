@@ -13,35 +13,35 @@ export const Wishlist = () => {
       name: 'Bose Sport Earbuds - Wireless Earphones - Bluetooth In Ear Headphones for Workouts and Running, Triple Black',
       price: 999,
       originalPrice: 1299,
-      stock: 'DISPONIBLE',
+      stock: 'IN STOCK',
       imageUrl: 'https://via.placeholder.com/50',
     },
     {
       name: 'Simple Mobile 5G LTE Galaxy 12 Mini 512GB Gaming Phone',
       price: 2300,
       originalPrice: null,
-      stock: 'DISPONIBLE',
+      stock: 'IN STOCK',
       imageUrl: 'https://via.placeholder.com/50',
     },
     {
       name: 'Portable Washing Machine, 11lbs capacity Model 18NMF1AM',
       price: 70,
       originalPrice: null,
-      stock: 'DISPONIBLE',
+      stock: 'IN STOCK',
       imageUrl: 'https://via.placeholder.com/50',
     },
     {
       name: 'TOZO T6 True Wireless Earbuds Bluetooth Headphones Touch Control with Wireless Charging Case IPX8 Waterproof Stereo Earphones in-Ear',
       price: 220,
       originalPrice: 250,
-      stock: 'NO DISPONIBLE',
+      stock: 'OUT OF STOCK',
       imageUrl: 'https://via.placeholder.com/50',
     },
     {
       name: 'Wyze Cam Pan v2 1080p Pan/Tilt/Zoom Wi-Fi Indoor Smart Home Camera with Color Night Vision, 2-Way Audio',
       price: 1499.99,
       originalPrice: null,
-      stock: 'DISPONIBLE',
+      stock: 'IN STOCK',
       imageUrl: 'https://via.placeholder.com/50',
     },
   ];
@@ -56,10 +56,10 @@ export const Wishlist = () => {
             <table className="min-w-full text-left">
               <thead>
                 <tr>
-                  <th className="py-2 px-4">PRODUCTOS</th>
-                  <th className="py-2 px-4 text-center">PRECIO</th>
-                  <th className="py-2 px-4 text-center">DISPONIBLE</th>
-                  <th className="py-2 px-4 text-center">ACCIONES</th>
+                  <th className="py-2 px-4">PRODUCTS</th>
+                  <th className="py-2 px-4 text-center">PRICE</th>
+                  <th className="py-2 px-4 text-center">STOCK</th>
+                  <th className="py-2 px-4 text-center">ACTIONS</th>
                 </tr>
               </thead>
               <tbody>
@@ -80,18 +80,18 @@ export const Wishlist = () => {
                       </div>
                     </td>
                     <td className="py-2 px-4 text-center">
-                      <span className={product.stock === 'DISPONIBLE' ? 'text-green-500' : 'text-red-500'}>
+                      <span className={product.stock === 'IN STOCK' ? 'text-green-500' : 'text-red-500'}>
                         {product.stock}
                       </span>
                     </td>
                     <td className="py-2 px-4 flex flex-col space-y-2 items-center">
                       <button
                         className={`flex items-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
-                          product.stock === 'NO DISPONIBLE' ? 'bg-gray-500 cursor-not-allowed' : ''
+                          product.stock === 'OUT OF STOCK' ? 'bg-gray-500 cursor-not-allowed' : ''
                         }`}
-                        disabled={product.stock === 'NO DISPONIBLE'}
+                        disabled={product.stock === 'OUT OF STOCK'}
                       >
-                        AGREGAR AL CARRITO {IconoCarrito}
+                        ADD TO CART {IconoCarrito}
                       </button>
                       <button className="text-gray-600">✖</button>
                     </td>
