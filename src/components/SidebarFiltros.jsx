@@ -22,7 +22,7 @@ export const SidebarFiltros = ({ children, onFilterChange, onSliderChange, maxVa
   };
 
   return (
-    <aside className="z-100 relative h-full inline">
+    <aside className="z-100 relative h-full inline max-w-max max-h-max">
       <nav className="flex flex-col bg-white border-r shadow-sm h-full">
         <div className="p-4 pb-2 flex justify-between items-center lg:hidden">
           <button
@@ -35,7 +35,7 @@ export const SidebarFiltros = ({ children, onFilterChange, onSliderChange, maxVa
 
         <SidebarContext.Provider value={{ expanded, handleCheckboxChange }}>
           <ul
-            className={`absolute h-screen z-40 flex-1 px-3 w-1/3 transform transition duration-500 lg:static lg:translate-x-0 lg:justify-normal lg:px-3 lg:w-full lg:bg-slate-200 lg:rounded-lg ${
+            className={`absolute max-h-max z-40 flex-1 px-3 max-w-max  transform transition duration-500 lg:static lg:translate-x-0 lg:justify-normal lg:px-3 lg:bg-slate-200 lg:rounded-lg ${
               expanded
                 ? "bg-slate-200 translate-x-0"
                 : "bg-none -translate-x-full"
@@ -71,7 +71,7 @@ export const SidebarFiltros = ({ children, onFilterChange, onSliderChange, maxVa
               onChange={handleChange}
             />
 
-            <div class="flex justify-between mt-3">
+            <div class="flex justify-between my-3">
               <span>$ {minValue}</span>
               <span>$ {maxValue}</span>
             </div>
@@ -86,7 +86,7 @@ export const SidebarFiltros = ({ children, onFilterChange, onSliderChange, maxVa
 export const SidebarItem = ({ value, texto, handleCheckboxChange }) => {
   const { expanded } = useContext(SidebarContext);
   return (
-    <li className={`relative flex items-center py-2 px-3 my-1 w-52 ml-3`}>
+    <li className={`relative flex items-center py-2 px-3 my-1 ml-3`}>
       <span className={` overflow-hidden transition-all `}>
         <input
           id="default-checkbox"
