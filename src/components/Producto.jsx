@@ -21,13 +21,13 @@ export const Producto = ({producto}) => {
 
   return (
     <>
-      <div className="border border-slate-200 rounded-md p-3 shadow-md ">
+      <div className="border border-slate-200 rounded-md p-3 shadow-md max-h-fit content-end justify-items-stretch">
           {/*TODO: centrar la imagen*/}
         <Link to="/producto" state={productoActualizado}>
-          <img className="object-cover" src={thumbnail} alt="imagen guitarra" />
+          <img className="object-cover mx-auto my-auto" src={thumbnail} alt="imagen guitarra" />
         </Link>
 
-        <div className="w-2/3">
+        <div className="pt-2">
           <Link to="/producto" state={producto}>
             <h3 className="text-black text-lg font-semibold uppercase">{title}</h3>
           </Link>
