@@ -32,8 +32,8 @@ export const Producto = ({producto}) => {
             <h3 className="text-black text-lg font-semibold uppercase">{title}</h3>
           </Link>
           <p className="text-green-600 text-l font-bold">%{discountPercentage} OFF</p>
-          <p className="font-black text-slate-500 text-base line-through">$ {price}</p>
-          <p className="font-black text-primary text-xl">$ {CalcularPrecio(price,discountPercentage)}</p>
+          <p className="font-black text-slate-500 text-base line-through">$ {price} USD</p>
+          <p className="font-black text-primary text-xl">$ {CalcularPrecio(price,discountPercentage)} USD</p>
           <div className="my-2">
             <button
               type="button"

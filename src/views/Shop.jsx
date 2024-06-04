@@ -14,7 +14,7 @@ export const Shop = () => {
 
   const [dataFiltrado, setdataFiltrado] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12; // Adjust as needed
+  const itemsPerPage = 18; // Adjust as needed
   let filtrado = [];
 
   // Calculate the items for the current page
