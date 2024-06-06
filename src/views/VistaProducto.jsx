@@ -19,7 +19,7 @@ export const VistaProducto = () => {
   const IconoFlecha = <FontAwesomeIcon icon = {fas.faArrowLeft}/>
   const IconoEstrella = <FontAwesomeIcon icon = {fas.faStar}/>
 
-  fetch('/api/index.php')
+  fetch('/api/conexion.php')
   .then(response => {
     if (!response.ok) {
       throw new Error('Error de red');
@@ -97,7 +97,8 @@ export const VistaProducto = () => {
                   <span className="mr-2">{IconoEstrella} {rating}</span>
                 </div>
               </div>
-              <div className="text-3xl font-bold mb-2">$ {realPrice} <span className="text-gray-500 line-through">$ {price}</span></div>
+              <div className="text-xl text-gray-500 line-through">$ {price} USD</div>
+              <div className="text-3xl font-bold mb-2">$ {realPrice} USD</div>
               <div className="text-green-500 font-bold mb-2">{discountPercentage}% OFF</div>
               <div className="mb-4">
                 <span className="text-gray-600">AVAILABILITY:</span> <span className="text-green-500">{availabilityStatus}</span>
