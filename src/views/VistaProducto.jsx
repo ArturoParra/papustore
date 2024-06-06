@@ -1,37 +1,77 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from '../components/Header'
 import { Footer } from '../components/Footer'
 import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import { data } from 'autoprefixer';
 
 export const VistaProducto = () => {
-  const [quantity, setQuantity] = useState(1);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const location = useLocation();
-  
+  const [BackRes, setBackRes] = useState([])
+
+//   Datos de la BD
+  const [nombre, setNombre] = useState('')
+
   //! Esto probablemente habrá que cambiarlo
   //TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
-  const {title, description, price, discountPercentage, realPrice, rating, images, dimensions, brand, weight, warrantyInformation, shippingInformation, availabilityStatus, returnPolicy} = location.state || {};
+  const {id, title, description, price, discountPercentage, realPrice, rating, images, dimensions, brand, weight, warrantyInformation, shippingInformation, availabilityStatus, returnPolicy} = location.state || {};
   const {width, height, depth} = dimensions
 
   const IconoFlecha = <FontAwesomeIcon icon = {fas.faArrowLeft}/>
   const IconoEstrella = <FontAwesomeIcon icon = {fas.faStar}/>
 
-  fetch('/api/conexion.php')
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Error de red');
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const res = await fetch('/api/index.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    functionName: 'consulta',
+                    id:id            
+                })
+            });
+
+            if (!res.ok) {
+              throw new Error('Error en la solicitud fetch');
+            }
+
+            // Manejar la respuesta aquí
+            const data = await res.text();
+
+            // Procesar los datos recibidos
+            // Por ejemplo, si recibes datos en formato JSON, puedes hacer lo siguiente:
+            return JSON.parse(data); // Convertir la cadena JSON a objeto
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    const getData = async () => {
+      const res = await fetchData()
+      const [producto] = res
+      const {nombre} = producto
+      setNombre(nombre)
+      setBackRes(res)
     }
-    return response.text();
-  })
-  .then(data => {
-    console.log(data); // Aquí verás la respuesta del servidor PHP en la consola del navegador
-  })
-  .catch(error => {
-    console.error('Hubo un problema con la petición fetch:', error);
-  });
+
+    getData()
+
+}, []); // Dependencia vacía para que el efecto se ejecute solo una vez
+
+useEffect(() => {
+  console.log(BackRes)
+}, [BackRes])
+
+/* const [producto] = BackRes
+const {nombre} = producto
+ */
 
   const imagenes = images
   
@@ -90,7 +130,7 @@ export const VistaProducto = () => {
             <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pl-8">
 
               <Link to="/tienda"><p className="font-semibold">{IconoFlecha} BACK TO SHOP</p></Link>
-              <h1 className="text-2xl font-bold">{title}</h1>
+              <h1 className="text-2xl font-bold">{title}{nombre}</h1>
 
               <div className="flex items-center my-4">
                 <div className="flex items-center text-orange-500">
@@ -102,9 +142,6 @@ export const VistaProducto = () => {
               <div className="text-green-500 font-bold mb-2">{discountPercentage}% OFF</div>
               <div className="mb-4">
                 <span className="text-gray-600">AVAILABILITY:</span> <span className="text-green-500">{availabilityStatus}</span>
-              </div>
-              <div className="mb-4">
-                <span className="text-gray-600">CATEGORY:</span> <span className="text-gray-900">Electronic Devices</span>
               </div>
               <div className="flex items-center mb-4">
                 <button
