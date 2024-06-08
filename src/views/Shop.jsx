@@ -5,6 +5,7 @@ import { Producto } from "../components/Producto";
 import { products } from "../data/db.json";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import "../styles/Radio.css";
 
 export const Shop = () => {
   const [filter, setFilter] = useState([]);
@@ -13,7 +14,9 @@ export const Shop = () => {
   const [data, setData] = useState(products);
 
   const [dataFiltrado, setdataFiltrado] = useState([]);
+  const [dataOrdenado, setdataOrdenado] = useState(products)
   const [currentPage, setCurrentPage] = useState(1);
+  const [criterio, setCriterio] = useState("");
   const itemsPerPage = 18; // Adjust as needed
   let filtrado = [];
 
@@ -21,8 +24,8 @@ export const Shop = () => {
   const startIdx = (currentPage - 1) * itemsPerPage;
   //TODO: hacer pasar data por un filtro y luego por la paginación
   //TODO: condicionar que arreglo se va a mostra (el filtrado o el original) también debería probar esto dentro del useEffect de los filtros
-  const paginatedData = dataFiltrado.slice(startIdx, startIdx + itemsPerPage);
-  const totalPages = Math.ceil(dataFiltrado.length / itemsPerPage);
+  const paginatedData = dataOrdenado.slice(startIdx, startIdx + itemsPerPage);
+  const totalPages = Math.ceil(dataOrdenado.length / itemsPerPage);
 
   const values = Object.values(data).map((obj) => obj.price);
   const maxValue = Math.max(...values);
@@ -51,8 +54,9 @@ export const Shop = () => {
     let res3 = [];
 
     // Filtrar productos por precio
-    res3 = Object.values(data).filter(item => {
-      const realPrice = item.price - (item.price * (item.discountPercentage / 100));
+    res3 = Object.values(data).filter((item) => {
+      const realPrice =
+        item.price - item.price * (item.discountPercentage / 100);
       return realPrice >= minPrice && realPrice <= maxPrice;
     });
 
@@ -60,29 +64,31 @@ export const Shop = () => {
       return res3;
     } else {
       // Filtrar productos que coincidan con la categoría o marca seleccionada
-      res = Object.values(data).filter(item => (
-        filters.includes(item.category) || filters.includes(item.brand)
-      ));
+      res = Object.values(data).filter(
+        (item) =>
+          filters.includes(item.category) || filters.includes(item.brand)
+      );
       // Filtrar productos que coincidan tanto con la categoría como con la marca
-      res2 = Object.values(data).filter(item => (
-        filters.includes(item.category) && filters.includes(item.brand)
-      ));
+      res2 = Object.values(data).filter(
+        (item) =>
+          filters.includes(item.category) && filters.includes(item.brand)
+      );
       res = res2.length > 0 ? intersection(res, res2) : res;
 
       // Filtrar los productos sin la propiedad "brand" si "Otras marcas" está activo
       if (filters.includes("")) {
-        const sinMarca = Object.values(data).filter(item => (
-          !item.hasOwnProperty("brand")
-        ));
+        const sinMarca = Object.values(data).filter(
+          (item) => !item.hasOwnProperty("brand")
+        );
         // Si solo "Otras marcas" está activo, mostrar todos los productos sin marca
         if (filters.length === 1) {
           res = sinMarca;
         } else {
           // Filtrar productos sin marca que coincidan con las otras categorías seleccionadas
-          const categoriaFiltro = filters.filter(f => f !== "");
-          const sinMarcaFiltrado = sinMarca.filter(item => (
+          const categoriaFiltro = filters.filter((f) => f !== "");
+          const sinMarcaFiltrado = sinMarca.filter((item) =>
             categoriaFiltro.includes(item.category)
-          ));
+          );
           res = intersection(res, sinMarcaFiltrado);
         }
       }
@@ -97,56 +103,46 @@ export const Shop = () => {
     return res;
   };
 
-
-  /* const FuncionFiltrado = (data, filters) => {
-    let res = [];
-    let res2 = [];
-    let res3 = [];
-
-    res3 = Object.values(data).filter((item) => {
-      const realPrice =
-        item.price - item.price * (item.discountPercentage / 100);
-      return realPrice >= minPrice && realPrice <= maxPrice;
-    });
-    //TODO: página de error si no hay productos que coinciden y tener mínimo una página siempre
-
-    if (filters.length === 0) {
-      return res3;
-    } else {
-      res = Object.values(data).filter(
-        (item) =>
-          filters.includes(item.category) || filters.includes(item.brand)
-      );
-      res2 = Object.values(data).filter(
-        (item) =>
-          filters.includes(item.category) && filters.includes(item.brand)
-      );
-      res = res2.length > 0 ? intersection(res, res2) : res;
+  const ordenarProductos = (criterio) => {
+    setCriterio(criterio);
+    let productosOrdenados;
+    if (criterio === "asc") {
+      productosOrdenados = [...dataFiltrado].sort((a, b) => a.price - b.price);
+    } else if (criterio === "desc") {
+      productosOrdenados = [...dataFiltrado].sort((a, b) => b.price - a.price);
+    } else if (criterio === "destacados") {
+      productosOrdenados = [...dataFiltrado].sort((a, b) => b.rating - a.rating);
+    } else if (criterio === "non") {
+      productosOrdenados = [...dataFiltrado]
     }
-    res = res.length == 0 ? res3 : intersection(res, res3);
-    return res;
-  }; */
+    return productosOrdenados
+  };
 
   const onSliderChange = (value) => {
-    const [minval, maxval] = value;
-    setmaxPrice(maxval);
-    setminPrice(minval);
+    const [minval, maxval] = value
+    setmaxPrice(maxval)
+    setminPrice(minval)
   };
 
   useEffect(() => {
-    filtrado = FuncionFiltrado(data, filter);
-    setdataFiltrado(filtrado);
-  }, [filter, maxPrice, minPrice]);
+    filtrado = FuncionFiltrado(data,filter)
+    console.log(filter)
+    console.log(criterio)
+    setdataFiltrado(filtrado)
+    
+  }, [filter, maxPrice, minPrice])
 
-  /*
-  data.map((item) => (
-    console.log(item.brand)
-  )) */
+  useEffect(() => {
+    console.log(dataFiltrado)
+    const temp = ordenarProductos(criterio)
+    temp != undefined ? setdataOrdenado(temp): console.log("no ha modificaciones")
+  }, [dataFiltrado, criterio])
+  
 
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+    setCurrentPage(newPage)
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }
 
   return (
     <>
@@ -161,6 +157,47 @@ export const Shop = () => {
               maxValue={maxValue}
               minValue={minValue}
             >
+              <p className="text-base font-light text-primary">Order By</p>
+              <div className="p-4">
+                <form>
+                <input
+                    type="radio"
+                    id="pascen"
+                    value="non"
+                    checked={criterio === 'non'}
+                    onChange={() => ordenarProductos("non")}
+                  />
+                  <label htmlFor="pascen"> Original</label>
+                  <br></br>
+                  <input
+                    type="radio"
+                    id="pascen"
+                    value="asc"
+                    checked={criterio === 'asc'}
+                    onChange={() => ordenarProductos("asc")}
+                  />
+                  <label htmlFor="pascen"> Price: Low to High</label>
+                  <br></br>
+                  <input
+                    type="radio"
+                    id="pdesc"
+                    value="desc"
+                    checked={criterio === 'desc'}
+                    onChange={() => ordenarProductos("desc")}
+                  />
+                  <label htmlFor="pdesc"> Price: High to Low</label>
+                  <br></br>
+                  <input
+                    type="radio"
+                    id="destacados"
+                    value="destacados"
+                    checked={criterio === 'destacados'}
+                    onChange={() => ordenarProductos("destacados")}
+                  />
+                  <label htmlFor="destacados"> Best Reviewed</label>
+                  <br></br>
+                </form>
+              </div>
               <p className="text-base font-light text-primary">Category</p>
               <SidebarItem texto="Laptops" value="laptops" />
               <SidebarItem texto="Beauty" value="beauty" />
@@ -222,7 +259,7 @@ export const Shop = () => {
               </div>
             </SidebarFiltros>
           </div>
-          <div className="min-h-24 grid-flow-row-dense content-start rounded-lg lg:col-span-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 p-2">
+          <div className="min-h-24 mt-12 grid-flow-row-dense content-start rounded-lg lg:col-span-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 p-2">
             {paginatedData.map((item) => (
               <Producto key={item.id} producto={item} />
             ))}

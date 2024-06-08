@@ -23,7 +23,7 @@ export const SidebarFiltros = ({ children, onFilterChange, onSliderChange, maxVa
 
   return (
     <aside className="z-100 relative h-full inline max-w-max max-h-max">
-      <nav className="flex flex-col bg-white border-r shadow-sm h-full">
+      <nav className="flex flex-col mt-8 xs:mt-9 sm:mt-10 md:mt-11 lg:mt-14 border-r shadow-sm h-full">
         <div className="p-4 pb-2 flex justify-between items-center lg:hidden">
           <button
             className="p-2 rounded-lg bg-gray-400 hover:bg-gray-800"
@@ -35,7 +35,7 @@ export const SidebarFiltros = ({ children, onFilterChange, onSliderChange, maxVa
 
         <SidebarContext.Provider value={{ expanded, handleCheckboxChange }}>
           <ul
-            className={`absolute overflow-y-auto max-h-screen lg:max-h-max z-40 flex-1 px-3 max-w-max transform transition duration-500 lg:static lg:translate-x-0 lg:justify-normal lg:px-3 lg:bg-slate-200 lg:rounded-lg ${
+            className={`overflow-y-auto fixed max-h-screen lg:max-h-max z-40 flex-1 px-3 max-w-max transform transition duration-500 lg:static lg:translate-x-0 lg:justify-normal lg:px-3 lg:bg-slate-200 lg:rounded-lg ${
               expanded
                 ? "bg-slate-200 translate-x-0"
                 : "bg-none -translate-x-full"

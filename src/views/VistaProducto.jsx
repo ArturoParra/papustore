@@ -44,6 +44,7 @@ export const VistaProducto = () => {
 
             // Manejar la respuesta aquí
             const data = await res.text();
+            console.log(data)
 
             // Procesar los datos recibidos
             // Por ejemplo, si recibes datos en formato JSON, puedes hacer lo siguiente:
@@ -54,12 +55,33 @@ export const VistaProducto = () => {
     };
 
     const getData = async () => {
-      const res = await fetchData()
-      const [producto] = res
-      const {nombre} = producto
-      setNombre(nombre)
-      setBackRes(res)
-    }
+      try {
+        const res = await fetchData();
+        
+        if (!Array.isArray(res)) {
+          throw new Error("La respuesta no es un array");
+        }
+    
+        const [producto] = res;
+        
+        if (!producto || typeof producto !== 'object') {
+          throw new Error("El objeto producto no es válido");
+        }
+        
+        const { nombre } = producto;
+        
+        if (!nombre) {
+          throw new Error("La propiedad nombre no existe en el objeto producto");
+        }
+        
+        setNombre(nombre);
+        setBackRes(res);
+      } catch (error) {
+        console.error("Error al obtener los datos:", error);
+        // Manejar el error adecuadamente, por ejemplo, mostrando un mensaje al usuario
+      }
+    };
+    
 
     getData()
 
@@ -68,10 +90,6 @@ export const VistaProducto = () => {
 useEffect(() => {
   console.log(BackRes)
 }, [BackRes])
-
-/* const [producto] = BackRes
-const {nombre} = producto
- */
 
   const imagenes = images
   
@@ -90,8 +108,9 @@ const {nombre} = producto
   return (
     <>
       <Header />
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 mt-14">
         <div className="bg-white p-4 md:p-8 rounded-lg shadow-md w-full max-w-4xl">
+        <Link to="/tienda"><p className="font-semibold">{IconoFlecha} BACK TO SHOP</p></Link>
           <div className="flex flex-wrap md:flex-nowrap">
             <div className="w-full md:w-1/2">
               <div className="relative mb-4 flex items-center justify-center">
@@ -116,6 +135,7 @@ const {nombre} = producto
                 </button>
               </div>
               <div className="flex justify-center space-x-2 overflow-x-auto">
+              
                 {imagenes.map((image, index) => (
                   <img
                     key={index}
@@ -129,7 +149,7 @@ const {nombre} = producto
             </div>
             <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pl-8">
 
-              <Link to="/tienda"><p className="font-semibold">{IconoFlecha} BACK TO SHOP</p></Link>
+              
               <h1 className="text-2xl font-bold">{title}{nombre}</h1>
 
               <div className="flex items-center my-4">
