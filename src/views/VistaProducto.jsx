@@ -1,32 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { Header } from '../components/Header'
-import { Footer } from '../components/Footer'
-import { useLocation } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
-import { data } from 'autoprefixer';
+import React, { useEffect, useState } from 'react'; // Importa React, useEffect y useState desde la biblioteca 'react'
+import { Header } from '../components/Header' // Importa el componente Header desde '../components/Header'
+import { Footer } from '../components/Footer' // Importa el componente Footer desde '../components/Footer'
+import { useLocation } from 'react-router-dom'; // Importa el hook useLocation desde 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Importa el componente FontAwesomeIcon desde '@fortawesome/react-fontawesome'
+import { fas } from "@fortawesome/free-solid-svg-icons"; // Importa el conjunto de iconos sólidos de FontAwesome desde "@fortawesome/free-solid-svg-icons"
+import { Link } from "react-router-dom"; // Importa el componente Link desde 'react-router-dom'
+import { data } from 'autoprefixer'; // Importa 'data' desde 'autoprefixer'
 
 export const VistaProducto = () => {
-  const [quantity, setQuantity] = useState(1)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const location = useLocation();
-  const [BackRes, setBackRes] = useState([])
+  const [quantity, setQuantity] = useState(1) // Estado para la cantidad del producto
+  const [currentImageIndex, setCurrentImageIndex] = useState(0) // Estado para el índice de la imagen actual
+  const location = useLocation(); // Hook useLocation para obtener la ubicación actual
+  const [BackRes, setBackRes] = useState([]) // Estado para almacenar la respuesta de la solicitud al servidor
 
-//   Datos de la BD
-  const [nombre, setNombre] = useState('')
+  // Datos de la BD
+  const [nombre, setNombre] = useState('') // Estado para el nombre del producto
 
   //! Esto probablemente habrá que cambiarlo
   //TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
-  const {id, title, description, price, discountPercentage, realPrice, rating, images, dimensions, brand, weight, warrantyInformation, shippingInformation, availabilityStatus, returnPolicy} = location.state || {};
-  const {width, height, depth} = dimensions
+  const {id, title, description, price, discountPercentage, realPrice, rating, images, dimensions, brand, weight, warrantyInformation, shippingInformation, availabilityStatus, returnPolicy} = location.state || {}; // Desestructuración de las propiedades del objeto location.state
+  const {width, height, depth} = dimensions // Desestructuración de las propiedades de dimensions
 
-  const IconoFlecha = <FontAwesomeIcon icon = {fas.faArrowLeft}/>
-  const IconoEstrella = <FontAwesomeIcon icon = {fas.faStar}/>
+  const IconoFlecha = <FontAwesomeIcon icon = {fas.faArrowLeft}/> // Icono de flecha izquierda
+  const IconoEstrella = <FontAwesomeIcon icon = {fas.faStar}/> // Icono de estrella
 
   useEffect(() => {
+    // Función asincrónica para obtener datos del servidor
     const fetchData = async () => {
         try {
+            // Realizar la solicitud al servidor
             const res = await fetch('/api/index.php', {
                 method: 'POST',
                 headers: {
@@ -43,7 +45,7 @@ export const VistaProducto = () => {
             }
 
             // Manejar la respuesta aquí
-            const data = await res.text();
+            const data = await res.text(); // Leer la respuesta como texto
             console.log(data)
 
             // Procesar los datos recibidos
@@ -54,53 +56,56 @@ export const VistaProducto = () => {
         }
     };
 
+    // Función para obtener los datos del servidor
     const getData = async () => {
       try {
-        const res = await fetchData();
+        const res = await fetchData(); // Obtener datos del servidor
         
         if (!Array.isArray(res)) {
           throw new Error("La respuesta no es un array");
         }
     
-        const [producto] = res;
+        const [producto] = res; // Obtener el primer elemento del array de respuesta
         
         if (!producto || typeof producto !== 'object') {
           throw new Error("El objeto producto no es válido");
         }
         
-        const { nombre } = producto;
+        const { nombre } = producto; // Obtener el nombre del producto del objeto
         
         if (!nombre) {
           throw new Error("La propiedad nombre no existe en el objeto producto");
         }
         
-        setNombre(nombre);
-        setBackRes(res);
+        setNombre(nombre); // Establecer el nombre del producto en el estado
+        setBackRes(res); // Establecer la respuesta del servidor en el estado
       } catch (error) {
         console.error("Error al obtener los datos:", error);
         // Manejar el error adecuadamente, por ejemplo, mostrando un mensaje al usuario
       }
     };
     
+    getData(); // Llamar a la función para obtener los datos del servidor
 
-    getData()
+  }, []); // Dependencia vacía para que el efecto se ejecute solo una vez
 
-}, []); // Dependencia vacía para que el efecto se ejecute solo una vez
+  useEffect(() => {
+    console.log(BackRes); // Imprimir la respuesta del servidor en la consola
+  }, [BackRes]); // Ejecutar el efecto cuando cambie BackRes
 
-useEffect(() => {
-  console.log(BackRes)
-}, [BackRes])
-
-  const imagenes = images
+  const imagenes = images // Asignar las imágenes a la variable 'imagenes'
   
+  // Función para cambiar la cantidad del producto
   const handleQuantityChange = (amount) => {
     setQuantity((prevQuantity) => Math.max(1, prevQuantity + amount));
   };
 
+  // Función para mostrar la siguiente imagen
   const handleNextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
 
+  // Función para mostrar la imagen anterior
   const handlePreviousImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
   };
@@ -134,6 +139,7 @@ useEffect(() => {
                   &gt;
                 </button>
               </div>
+              {/* Caroussel de imagenes */}
               <div className="flex justify-center space-x-2 overflow-x-auto">
               
                 {imagenes.map((image, index) => (
@@ -149,7 +155,7 @@ useEffect(() => {
             </div>
             <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pl-8">
 
-              
+              {/* Informacioin general del producto */}
               <h1 className="text-2xl font-bold">{title}{nombre}</h1>
 
               <div className="flex items-center my-4">
@@ -178,6 +184,7 @@ useEffect(() => {
                   +
                 </button>
               </div>
+              {/* Botones para agregar al carrito, agregar a la wishlist y comprar ahora */}
               <div className="flex items-center space-x-4 mb-4">
                 <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                   ADD TO CART
@@ -191,7 +198,7 @@ useEffect(() => {
               </div>
             </div>
           </div>
-          {/* Additional Section */}
+          {/* Info adicional */}
           <div className="mt-8">
             <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="col-span-2">
