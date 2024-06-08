@@ -7,26 +7,29 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import "../styles/Radio.css";
 
+// Componente principal de la tienda
 export const Shop = () => {
+  // Estado para los filtros aplicados
   const [filter, setFilter] = useState([]);
+  // Estado para los datos del producto (inicialmente del archivo JSON)
   //TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
   //TODO: borrar el JSON del proyecto
   const [data, setData] = useState(products);
-
   const [dataFiltrado, setdataFiltrado] = useState([]);
-  const [dataOrdenado, setdataOrdenado] = useState(products)
+  const [dataOrdenado, setdataOrdenado] = useState(products);
   const [currentPage, setCurrentPage] = useState(1);
   const [criterio, setCriterio] = useState("");
-  const itemsPerPage = 18; // Adjust as needed
+  const itemsPerPage = 18; // Número de productos por página
   let filtrado = [];
 
-  // Calculate the items for the current page
+  // Cálculo de los índices para la paginación
   const startIdx = (currentPage - 1) * itemsPerPage;
   //TODO: hacer pasar data por un filtro y luego por la paginación
   //TODO: condicionar que arreglo se va a mostra (el filtrado o el original) también debería probar esto dentro del useEffect de los filtros
   const paginatedData = dataOrdenado.slice(startIdx, startIdx + itemsPerPage);
   const totalPages = Math.ceil(dataOrdenado.length / itemsPerPage);
 
+  // Cálculo del valor máximo y mínimo de los precios
   const values = Object.values(data).map((obj) => obj.price);
   const maxValue = Math.max(...values);
   const minValue = Math.min(...values);
@@ -34,6 +37,7 @@ export const Shop = () => {
   const [maxPrice, setmaxPrice] = useState(maxValue);
   const [minPrice, setminPrice] = useState(minValue);
 
+  // Manejador para cambios en los filtros
   const handleFilterChange = (newFilter) => {
     setFilter((prevFilter) => {
       if (prevFilter.includes(newFilter)) {
@@ -44,10 +48,12 @@ export const Shop = () => {
     });
   };
 
+  // Función para encontrar la intersección entre dos arreglos
   const intersection = (array1, array2) => {
     return array1.filter((value) => array2.includes(value));
   };
 
+  // Función para filtrar los productos según los filtros aplicados
   const FuncionFiltrado = (data, filters) => {
     let res = [];
     let res2 = [];
@@ -103,6 +109,7 @@ export const Shop = () => {
     return res;
   };
 
+  // Función para ordenar los productos según un criterio
   const ordenarProductos = (criterio) => {
     setCriterio(criterio);
     let productosOrdenados;
@@ -113,54 +120,59 @@ export const Shop = () => {
     } else if (criterio === "destacados") {
       productosOrdenados = [...dataFiltrado].sort((a, b) => b.rating - a.rating);
     } else if (criterio === "non") {
-      productosOrdenados = [...dataFiltrado]
+      productosOrdenados = [...dataFiltrado];
     }
-    return productosOrdenados
+    return productosOrdenados;
   };
 
+  // Manejador para cambios en el slider de precios
   const onSliderChange = (value) => {
-    const [minval, maxval] = value
-    setmaxPrice(maxval)
-    setminPrice(minval)
+    const [minval, maxval] = value;
+    setmaxPrice(maxval);
+    setminPrice(minval);
   };
 
+  // Efecto para filtrar los datos cuando cambian los filtros o los precios
   useEffect(() => {
-    filtrado = FuncionFiltrado(data,filter)
-    console.log(filter)
-    console.log(criterio)
-    setdataFiltrado(filtrado)
-    
-  }, [filter, maxPrice, minPrice])
+    filtrado = FuncionFiltrado(data, filter);
+    console.log(filter);
+    console.log(criterio);
+    setdataFiltrado(filtrado);
+  }, [filter, maxPrice, minPrice]);
 
+  // Efecto para ordenar los datos filtrados cuando cambian
   useEffect(() => {
-    console.log(dataFiltrado)
-    const temp = ordenarProductos(criterio)
-    temp != undefined ? setdataOrdenado(temp): console.log("no ha modificaciones")
-  }, [dataFiltrado, criterio])
-  
+    console.log(dataFiltrado);
+    const temp = ordenarProductos(criterio);
+    temp != undefined ? setdataOrdenado(temp) : console.log("no hay modificaciones");
+  }, [dataFiltrado, criterio]);
 
+  // Manejador para el cambio de página
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage)
+    setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+  };
 
   return (
     <>
+      {/* Renderización del header */}
       <Header />
       <div className="lg:p-2">
         <div className="grid gap-4 lg:grid-cols-12">
           <div className="min-h-24 rounded-lg hidden lg:inline lg:col-span-1"></div>
           <div className="min-h-24 rounded-lg lg:col-span-2 lg:inline">
+            {/* SIdebar de filtros */}
             <SidebarFiltros
               onFilterChange={handleFilterChange}
               onSliderChange={onSliderChange}
               maxValue={maxValue}
               minValue={minValue}
             >
+              {/* Radio buttons de ordenamiento */}
               <p className="text-base font-light text-primary">Order By</p>
               <div className="p-4">
                 <form>
-                <input
+                  <input
                     type="radio"
                     id="pascen"
                     value="non"
@@ -198,6 +210,7 @@ export const Shop = () => {
                   <br></br>
                 </form>
               </div>
+              {/* Filtros de categorías */}
               <p className="text-base font-light text-primary">Category</p>
               <SidebarItem texto="Laptops" value="laptops" />
               <SidebarItem texto="Beauty" value="beauty" />
@@ -205,17 +218,12 @@ export const Shop = () => {
               <SidebarItem texto="Furniture" value="furniture" />
               <SidebarItem texto="Groceries" value="groceries" />
               <SidebarItem texto="Home Decoration" value="home-decoration" />
-              <SidebarItem
-                texto="Kitchen Accessories"
-                value="kitchen-accessories"
-              />
+              <SidebarItem texto="Kitchen Accessories" value="kitchen-accessories"/>
               <SidebarItem texto="Men's shirts" value="mens-shirts" />
               <SidebarItem texto="Men's shoes" value="mens-shoes" />
               <SidebarItem texto="Men's watches" value="mens-watches" />
-              <SidebarItem
-                texto="Mobile accessories"
-                value="mobile-accessories"
-              />
+              <SidebarItem texto="Mobile accessories" value="mobile-accessories"/>
+              {/* Filtros de marcas */}
               <p className="text-base font-light text-primary">Brand</p>
               <SidebarItem texto="Apple" value="Apple" />
               <SidebarItem texto="Essence" value="Essence" />
@@ -244,21 +252,19 @@ export const Shop = () => {
               <SidebarItem texto="Nike" value="Nike" />
               <SidebarItem texto="Puma" value="Puma" />
               <SidebarItem texto="Off White" value="Off White" />
-              <SidebarItem
-                texto="Fashion Timepieces"
-                value="Fashion Timepieces"
-              />
+              <SidebarItem texto="Fashion Timepieces" value="Fashion Timepieces"/>
               <SidebarItem texto="Longines" value="Longines" />
               <SidebarItem texto="Rolex" value="Rolex" />
               <SidebarItem texto="Amazon" value="Amazon" />
               <SidebarItem texto="Otras marcas" value="" />
-
+              {/* Campos para desplegar los precios a filtrar */}
               <div className="flex justify-between mb-3">
                 <p>Min: $ {minPrice}</p>
                 <p>Max: $ {maxPrice}</p>
               </div>
             </SidebarFiltros>
           </div>
+          {/* Mapeado de la grid de productos */}
           <div className="min-h-24 mt-12 grid-flow-row-dense content-start rounded-lg lg:col-span-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 p-2">
             {paginatedData.map((item) => (
               <Producto key={item.id} producto={item} />
@@ -266,6 +272,7 @@ export const Shop = () => {
           </div>
           <div className="min-h-24 rounded-lg hidden lg:inline lg:col-span-1"></div>
         </div>
+        {/* Paginación */}
         <div className="flex justify-center m-4">
           <button
             disabled={currentPage === 1}
@@ -294,6 +301,7 @@ export const Shop = () => {
           </button>
         </div>
       </div>
+      {/* Renderización del Footer */}
       <Footer />
     </>
   );

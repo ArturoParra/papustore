@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
+import React, { useState } from 'react'; // Importa React y el hook useState
+import { Header } from '../components/Header'; // Importa el componente Header
+import { Footer } from '../components/Footer'; // Importa el componente Footer
 
+// Componente UserProfile
 export const UserProfile = () => {
   return (
     <>
-      <Header />
+      <Header /> {/* Renderiza el componente Header */}
+      {/* Contenedor principal */}
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-4xl">
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Account Settings Section */}
+            {/* Sección de Configuración de la Cuenta */}
             <div className="w-full md:w-1/2">
-              <h2 className="text-xl font-bold mb-4">ACCOUNT SETTINGS</h2>
+              <h2 className="text-xl font-bold mb-4">ACCOUNT SETTINGS</h2> {/* Título de la sección */}
+              {/* Formulario para configurar la cuenta */}
               <div className="flex items-center mb-4">
                 <img
                   src="https://via.placeholder.com/100"
@@ -23,7 +26,9 @@ export const UserProfile = () => {
                   <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Display Name"/>
                 </div>
               </div>
+              {/* Campos para ingresar datos de la cuenta */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Cada campo de entrada */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">FULL NAME</label>
                   <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Full Name"/>
@@ -56,17 +61,21 @@ export const UserProfile = () => {
                   <label className="block text-sm font-medium text-gray-700">ZIP CODE</label>
                   <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Zip Code"/>
                 </div>
+                
               </div>
+              {/* Botón para guardar cambios */}
               <div className="mt-4">
                 <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                   SAVE CHANGES
                 </button>
               </div>
             </div>
-            {/* Shipping Address Section */}
+            {/* Sección de Dirección de Envío */}
             <div className="w-full md:w-1/2">
-              <h2 className="text-xl font-bold mb-4">SHIPPING ADDRESS</h2>
+              <h2 className="text-xl font-bold mb-4">SHIPPING ADDRESS</h2> {/* Título de la sección */}
+              {/* Formulario para ingresar la dirección de envío */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Cada campo de entrada */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">FIRST NAME</label>
                   <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="First Name"/>
@@ -108,6 +117,7 @@ export const UserProfile = () => {
                   <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Phone Number"/>
                 </div>
               </div>
+              {/* Botón para guardar cambios */}
               <div className="mt-4">
                 <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                   SAVE CHANGES
@@ -117,7 +127,7 @@ export const UserProfile = () => {
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer /> {/* Renderiza el componente Footer */}
     </>
   );
 };
