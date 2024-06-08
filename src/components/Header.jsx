@@ -47,7 +47,7 @@ export function Header() {
     ]
 
   return (
-    <header className="flex flex-col xss:bg-black xs:bg-red-300 sm:bg-slate-400 md:bg-orange-400 lg:bg-violet-500 xl:bg-fuchsia-400">
+    <header className="flex top-0 left-0 fixed w-full z-50 mb-14 flex-col xss:bg-black xs:bg-red-300 sm:bg-slate-400 md:bg-orange-400 lg:bg-violet-500 xl:bg-fuchsia-400">
 
         {/* Dividir tres */}
         {lg ? 
