@@ -1,33 +1,35 @@
-import React, { createContext, useContext, useState } from "react";
-import ReactSlider from "react-slider";
-import "../styles/Slider.css";
+import React, { createContext, useContext, useState } from "react";  // Importaciones necesarias de React
+import ReactSlider from "react-slider";  // Importación del componente ReactSlider
+import "../styles/Slider.css";  // Importación del archivo de estilos CSS
 
-const SidebarContext = createContext();
+const SidebarContext = createContext();  // Creación del contexto para manejar el estado del sidebar
 
+// Componente principal SidebarFiltros
 export const SidebarFiltros = ({ children, onFilterChange, onSliderChange, maxValue, minValue }) => {
-  
+  // Estado local para manejar la expansión del sidebar y los filtros seleccionados
   const [expanded, setExpanded] = useState(false);
   const [filter, setFilter] = useState([]);
 
+  // Función para manejar cambios en el slider
   const handleChange = (value, index) => {
-    
-    onSliderChange(value)
-    // Aquí puedes hacer lo que quieras con el valor y el índice
+    onSliderChange(value);  // Llama a la función onSliderChange pasada como prop
   };
 
+  // Función para manejar cambios en los checkboxes
   const handleCheckboxChange = (event) => {
-    const newFilter = event.target.value; // Captura el texto del label
-    setFilter(newFilter); // Actualiza el estado en el hijo
-    onFilterChange(newFilter); // Llama a la función del padre para actualizar el estado en el padre
+    const newFilter = event.target.value;  // Captura el valor del checkbox seleccionado
+    setFilter(newFilter);  // Actualiza el estado local de filtros
+    onFilterChange(newFilter);  // Llama a la función onFilterChange pasada como prop
   };
 
   return (
+    // Contenedor principal del sidebar
     <aside className="z-100 relative h-full inline max-w-max max-h-max">
       <nav className="flex flex-col mt-8 xs:mt-9 sm:mt-10 md:mt-11 lg:mt-14 border-r shadow-sm h-full">
         <div className="p-4 pb-2 flex justify-between items-center lg:hidden">
           <button
             className="p-2 rounded-lg bg-gray-400 hover:bg-gray-800"
-            onClick={() => setExpanded((curr) => !curr)}
+            onClick={() => setExpanded((curr) => !curr)}  // Alterna el estado de expansión del sidebar
           >
             =
           </button>
@@ -45,33 +47,33 @@ export const SidebarFiltros = ({ children, onFilterChange, onSliderChange, maxVa
               <h4 className="font-semibold text-xl">Filtros</h4>
               <button
                 className=" p-2 rounded-lg bg-gray-400 hover:bg-gray-800 lg:hidden"
-                onClick={() => setExpanded((curr) => !curr)}
+                onClick={() => setExpanded((curr) => !curr)}  // Alterna el estado de expansión del sidebar
               >
                 cerrar
               </button>
             </div>
             {React.Children.map(children, (child) => 
-              React.cloneElement(child, { handleCheckboxChange })
+              React.cloneElement(child, { handleCheckboxChange })  // Pasa la función handleCheckboxChange a cada hijo
             )}
 
             <ReactSlider
               className="horizontal-slider"
               thumbClassName="example-thumb"
               trackClassName="example-track"
-              defaultValue={[minValue, maxValue]}
-              min={minValue}
-              max={maxValue}
-              ariaLabel={["Middle thumb", "Rightmost thumb"]}
+              defaultValue={[minValue, maxValue]}  // Valores iniciales del slider
+              min={minValue}  // Valor mínimo del slider
+              max={maxValue}  // Valor máximo del slider
+              ariaLabel={["Middle thumb", "Rightmost thumb"]}  // Etiquetas de accesibilidad para los thumbs
               renderThumb={(props, state) => (
                 <div {...props}>||</div>
               )}
               pearling
               minDistance={0}
               withTracks={true}
-              onChange={handleChange}
+              onChange={handleChange}  // Manejador de cambios del slider
             />
 
-            <div class="flex justify-between my-3">
+            <div className="flex justify-between my-3">
               <span>$ {minValue}</span>
               <span>$ {maxValue}</span>
             </div>
@@ -82,9 +84,9 @@ export const SidebarFiltros = ({ children, onFilterChange, onSliderChange, maxVa
   );
 };
 
-
+// Componente SidebarItem para representar cada filtro individual
 export const SidebarItem = ({ value, texto, handleCheckboxChange }) => {
-  const { expanded } = useContext(SidebarContext);
+  const { expanded } = useContext(SidebarContext);  // Utiliza el contexto SidebarContext para acceder al estado de expansión
   return (
     <li className={`relative flex items-center py-2 px-3 my-1 ml-3`}>
       <span className={` overflow-hidden transition-all `}>
@@ -93,7 +95,7 @@ export const SidebarItem = ({ value, texto, handleCheckboxChange }) => {
           type="checkbox"
           value={value}
           className={` appearance-none w-4 h-4 border border-gray-300 rounded bg-gray-100 checked:bg-primary checked:border-primary focus:outline-none `}
-          onChange={handleCheckboxChange}
+          onChange={handleCheckboxChange}  // Manejador de cambios para el checkbox
         />
         <style jsx>{`
           input[type="checkbox"] {
@@ -105,13 +107,13 @@ export const SidebarItem = ({ value, texto, handleCheckboxChange }) => {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: white; /* Color of the checkmark */
-            font-size: 0.75rem; /* Adjust size as needed */
-            line-height: 1; /* Ensure line height does not affect alignment */
+            color: white; /* Color del checkmark */
+            font-size: 0.75rem; /* Tamaño del checkmark */
+            line-height: 1; /* Asegura que la altura de línea no afecte la alineación */
           }
         `}</style>
         <label className={` ms-2 text-sm font-medium text-gray-900`}>
-          {texto}
+          {texto}  {/* Texto del label */}
         </label>
       </span>
 
@@ -121,4 +123,3 @@ export const SidebarItem = ({ value, texto, handleCheckboxChange }) => {
     </li>
   );
 };
-

@@ -3,6 +3,7 @@ import JustValidate from 'just-validate';
 import { Header } from '../components/Header';  
 import { Footer } from '../components/Footer';  
 
+// Componente principal FormularioInicio
 export const FormularioInicio = () => {
   const [isSignUp, setIsSignUp] = useState(false);  
   const signupValidator = useRef(null);
@@ -86,7 +87,9 @@ export const FormularioInicio = () => {
 
   return (
     <>
+      {/* Renderiza el componente Header */}
       <Header />
+
 
       <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
         <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
@@ -95,6 +98,7 @@ export const FormularioInicio = () => {
             <div
               className={`cursor-pointer ${!isSignUp ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-600'}`}
               onClick={() => handleTabChange(false)}  
+
             >
               SIGN IN
             </div>
@@ -106,6 +110,7 @@ export const FormularioInicio = () => {
             </div>
           </div>
 
+          {/* Renderiza el formulario de SIGN UP si isSignUp es verdadero, de lo contrario renderiza el formulario de SIGN IN */}
           {isSignUp ? (
             <form id="signup-form" className="space-y-4">
               <div>
@@ -119,7 +124,6 @@ export const FormularioInicio = () => {
                   placeholder="Name"
                 />
               </div>
-
               <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
                   EMAIL ADDRESS
@@ -143,7 +147,6 @@ export const FormularioInicio = () => {
                   placeholder="8+ Characters"
                 />
               </div>
-
               <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirm-password">
                   CONFIRM PASSWORD
@@ -166,7 +169,8 @@ export const FormularioInicio = () => {
                   YOU AGREE WITH THE <a href="#" className="text-orange-500">TERMS AND CONDITIONS</a> AND <a href="#" className="text-orange-500">PRIVACY POLICY</a>.
                 </label>
               </div>
-
+              
+              {/* Botón de envío para el formulario de SIGN UP */}
               <div className="flex items-center justify-between">
                 <button
                   className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
@@ -201,6 +205,7 @@ export const FormularioInicio = () => {
                   placeholder="Password"
                 />
                 <div className="text-right mt-2">
+
                   <a href="#" className="text-sm text-orange-500">FORGOT PASSWORD</a>  
                 </div>
               </div>
@@ -217,6 +222,7 @@ export const FormularioInicio = () => {
           )}
         </div>
       </div>
+      {/* Renderiza el componente Footer */}
       <Footer />
     </>
   );

@@ -1,29 +1,36 @@
 <?php
+// Configuración de errores
 ini_set('display_errors', 0);  // Desactiva la visualización de errores en la salida
 ini_set('log_errors', 1);       // Activa la escritura de errores en un archivo de registro
 ini_set('error_log', 'errores.log');  // Establece el archivo de registro de errores
 
-
+// Configuración de conexión a la base de datos
 $servername = "localhost";
 $username = "papu";
 $password = "1234";
 $dbname = "papustore";
 
+// Crear conexión
 $conn = new mysqli($servername, $username, $password, $dbname);
 
+// Verificar conexión
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
+// Función para consultar usuarios
 function consultaUsuarios($conn, $id) {
+    $id = (int)$id; // Asegurarse de que $id sea un entero
 
-    $id = (int)$id;
-
-    // Consulta preparada con un marcador de posición (?)
+    // Consulta preparada
     $sql = "SELECT * FROM usuarios WHERE id = ?";
     
     // Preparar la consulta
     $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error al preparar la consulta: " . $conn->error);
+        return array();
+    }
 
     // Vincular el valor de la variable $id al marcador de posición
     $stmt->bind_param("i", $id); // "i" indica que se espera un valor entero
@@ -47,7 +54,7 @@ function consultaUsuarios($conn, $id) {
     }
 }
 
-
+// Manejo de solicitudes POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Leer los datos del cuerpo de la solicitud
     $data = file_get_contents('php://input');
@@ -65,14 +72,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Ejecutar la función correspondiente
             switch ($functionName) {
                 case 'consulta':
-                    $usuarios = consultaUsuarios($conn,$id);
+                    $usuarios = consultaUsuarios($conn, $id);
                     // Establecer el encabezado de respuesta como JSON
                     header('Content-Type: application/json');
                     // Imprimir los datos de los usuarios como JSON
                     echo json_encode($usuarios);
                     break;
                 default:
-                error_log("Función no válida");
+                    error_log("Función no válida");
             }
         } else {
             error_log("Error: No se recibió functionName o el JSON es inválido");
@@ -84,4 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     error_log("Esta página solo acepta solicitudes POST");
 }
 
+// Cerrar conexión
 $conn->close();
+
