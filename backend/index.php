@@ -32,6 +32,19 @@ function consultaUsuario($conn, $email) {
     }
 }
 
+function consultaAdministrador($conn, $adminuser) {
+    $sql = "SELECT * FROM user_administrator WHERE adminuser = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $adminuser);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        return $res->fetch_assoc();
+    } else {
+        return null;
+    }
+}
+
 function registrarUsuario($conn, $data) {
     $sql1 = "INSERT INTO user_data (email, first_name, last_name) VALUES (?, ?, ?)";
     $stmt1 = $conn->prepare($sql1);
@@ -86,6 +99,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         echo json_encode(["success" => $resultado]);
                     }
                     break;
+                    case 'consultaAdministradores':
+                        if (isset($jsonData->adminuser, $jsonData->password)) {
+                            $admin = consultaAdministrador($conn, $jsonData->adminuser);
+                            header('Content-Type: application/json');
+                            if ($admin && $jsonData->password === $admin['password']) {
+                                echo json_encode(['success' => true]);
+                            } else {
+                                echo json_encode(['success' => false]);
+                            }
+                        }
+                        break;
                 default:
                     error_log("Función no válida");
             }
