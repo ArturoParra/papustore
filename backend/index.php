@@ -1,82 +1,90 @@
 <?php
-// Configuración de errores
 ini_set('display_errors', 0);  // Desactiva la visualización de errores en la salida
 ini_set('log_errors', 1);       // Activa la escritura de errores en un archivo de registro
 ini_set('error_log', 'errores.log');  // Establece el archivo de registro de errores
 
-// Configuración de conexión a la base de datos
+// Permitir solicitudes desde cualquier origen
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
 $servername = "localhost";
 $username = "papu";
 $password = "1234";
 $dbname = "papustore";
 
-// Crear conexión
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Verificar conexión
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Función para consultar usuarios
-function consultaUsuarios($conn, $id) {
-    $id = (int)$id; // Asegurarse de que $id sea un entero
-
-    // Consulta preparada
-    $sql = "SELECT * FROM usuarios WHERE id = ?";
-    
-    // Preparar la consulta
+function consultaUsuario($conn, $email) {
+    $sql = "SELECT * FROM user_login WHERE email = ?";
     $stmt = $conn->prepare($sql);
-    if (!$stmt) {
-        error_log("Error al preparar la consulta: " . $conn->error);
-        return array();
-    }
-
-    // Vincular el valor de la variable $id al marcador de posición
-    $stmt->bind_param("i", $id); // "i" indica que se espera un valor entero
-
-    // Ejecutar la consulta
+    $stmt->bind_param("s", $email);
     $stmt->execute();
-
-    // Obtener el resultado de la consulta
     $res = $stmt->get_result();
-
-    // Verificar si se encontraron resultados
     if ($res->num_rows > 0) {
-        $usuarios = array();
-        // Iterar sobre los resultados y almacenarlos en un array
-        while ($row = $res->fetch_assoc()) {
-            $usuarios[] = $row;
-        }
-        return $usuarios;
+        return $res->fetch_assoc();
     } else {
-        return array();
+        return null;
     }
 }
 
-// Manejo de solicitudes POST
+function registrarUsuario($conn, $data) {
+    $sql1 = "INSERT INTO user_data (email, first_name, last_name) VALUES (?, ?, ?)";
+    $stmt1 = $conn->prepare($sql1);
+    $stmt1->bind_param("sss", $data->email, $data->first_name, $data->last_name);
+
+    $sql2 = "INSERT INTO user_login (email, password) VALUES (?, ?)";
+    $stmt2 = $conn->prepare($sql2);
+    $passwordHash = password_hash($data->password, PASSWORD_BCRYPT);
+    $stmt2->bind_param("ss", $data->email, $passwordHash);
+
+    $result1 = $stmt1->execute();
+    $result2 = $stmt2->execute();
+
+    if ($result1 && $result2) {
+        return true;
+    } else {
+        error_log("Error al registrar usuario: " . $conn->error);
+        return false;
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header("HTTP/1.1 200 OK");
+    exit();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Leer los datos del cuerpo de la solicitud
     $data = file_get_contents('php://input');
-
-    // Verificar si se recibieron datos
     if ($data !== false) {
-        // Convertir los datos JSON en un objeto PHP
         $jsonData = json_decode($data);
-
-        // Verificar si la decodificación fue exitosa y si functionName está definido
-        if ($jsonData !== null && isset($jsonData->functionName) && isset($jsonData->id)) {
+        if ($jsonData !== null && isset($jsonData->functionName)) {
             $functionName = $jsonData->functionName;
-            $id = (int)$jsonData->id;
-
-            // Ejecutar la función correspondiente
             switch ($functionName) {
-                case 'consulta':
-                    $usuarios = consultaUsuarios($conn, $id);
-                    // Establecer el encabezado de respuesta como JSON
-                    header('Content-Type: application/json');
-                    // Imprimir los datos de los usuarios como JSON
-                    echo json_encode($usuarios);
+                case 'consultaProductos':
+                    // Implementa la lógica para consultar productos si es necesario
+                    break;
+                case 'consultaUsuarios':
+                    if (isset($jsonData->email, $jsonData->password)) {
+                        $usuario = consultaUsuario($conn, $jsonData->email);
+                        header('Content-Type: application/json');
+                        if ($usuario && password_verify($jsonData->password, $usuario['password'])) {
+                            echo json_encode(['success' => true]);
+                        } else {
+                            echo json_encode(['success' => false]);
+                        }
+                    }
+                    break;
+                case 'registro':
+                    if (isset($jsonData->data)) {
+                        $resultado = registrarUsuario($conn, $jsonData->data);
+                        header('Content-Type: application/json');
+                        echo json_encode(["success" => $resultado]);
+                    }
                     break;
                 default:
                     error_log("Función no válida");
@@ -91,6 +99,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     error_log("Esta página solo acepta solicitudes POST");
 }
 
-// Cerrar conexión
 $conn->close();
 
+?>
