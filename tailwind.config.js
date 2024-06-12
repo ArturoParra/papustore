@@ -13,7 +13,13 @@ export default {
       'lg': '1000px',
       'xl': '1300px',
     },
-    extend: {},
+    extend: {
+    colors:{
+        'primary': '#EE7210',
+        'secondary': '#FFCC66',
+        'fondo': '#140D0D',
+      },
+    },
   },
   variants: {},
   plugins: [],

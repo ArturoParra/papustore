@@ -7,9 +7,9 @@ import logo from "../assets/logo-papustore.png";
 // Importacion para iconos
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
-
-// Importacion para manejo de media querys
 import { useMediaQuery } from "@react-hook/media-query";
+import { Link } from "react-router-dom";
+
 
 export function Header() {
     // Definicion del tamaño de pantalla lg
@@ -47,14 +47,14 @@ export function Header() {
     ]
 
   return (
-    <header className="flex flex-col xss:bg-black xs:bg-red-300 sm:bg-slate-400 md:bg-orange-400 lg:bg-violet-300 xl:bg-fuchsia-400">
+    <header className="flex top-0 left-0 fixed w-full z-50 mb-14 flex-col xss:bg-black xs:bg-red-300 sm:bg-slate-400 md:bg-orange-400 lg:bg-violet-500 xl:bg-fuchsia-400">
 
         {/* Dividir tres */}
         {lg ? 
         (
             <div className="flex justify-between items-center lg:px-12 lg:py-2">
                 <div>
-                    <img src={logo} alt="papustore" className="lg:w-20 lg:h-10"/>
+                    <Link to="/"><img src={logo} alt="papustore" className="lg:w-20 lg:h-10"/></Link>
                 </div>
 
                 <div className="relative">
@@ -64,7 +64,6 @@ export function Header() {
                         
                     </div>
                 </div>
-
 
                 {/* Se renderiza para pantallas mayores a 360 pixeles */}
                 <div className="flex items-center bg-white rounded-xl font-bold p-2 w-2/5 text-sm">
@@ -76,9 +75,9 @@ export function Header() {
 
                 {/* Icono de herramientas */}
                 <div className="flex justify-between my-auto gap-4 text-white lg:text-2xl">
-                    {IconoCarrito}
-                    {IconoCorazon}
-                    {IconoUsuario}
+                    <Link to="/carrito">{IconoCarrito}</Link>
+                    <Link to="/favoritos">{IconoCorazon}</Link>
+                    <Link to="/perfil">{IconoUsuario}</Link>
                 </div>
             </div>
         ) 
