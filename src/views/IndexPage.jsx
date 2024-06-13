@@ -12,7 +12,8 @@ export const IndexPage = () => {
   return (
     <>
       {/* <Header/> */}
-      <FormularioInicio />
+      <Header/>
+      <Ofertas/>
       {/* <Footer/> */}
     </>
   )

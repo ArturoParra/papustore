@@ -16,7 +16,7 @@ export function Productos()
         //Seccion de las mejores ventas
         <div className="w-9/12 mx-auto m-12">
             
-            <div className="flex flex-col justify-between gap-10">
+            <div className="flex flex-col justify-between gap-10 md:flex-row">
                 
                 <div className="w-full">
 
@@ -110,29 +110,3 @@ export function Productos()
         </div>
     );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
