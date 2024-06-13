@@ -19,6 +19,39 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
+
+// Función para consultar usuarios
+function consultaProductos($conn) {
+    
+    // Consulta preparada
+    $sql = "SELECT * FROM products";
+    
+    // Preparar la consulta
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error al preparar la consulta: " . $conn->error);
+        return array();
+    }
+
+    // Ejecutar la consulta
+    $stmt->execute();
+
+    // Obtener el resultado de la consulta
+    $res = $stmt->get_result();
+
+    // Verificar si se encontraron resultados
+    if ($res->num_rows > 0) {
+        $usuarios = array();
+        // Iterar sobre los resultados y almacenarlos en un array
+        while ($row = $res->fetch_assoc()) {
+            $productos[] = $row;
+        }
+        return $productos;
+    } else {
+        return array();
+    }
+}
+
 function consultaUsuario($conn, $email) {
     $sql = "SELECT * FROM user_login WHERE email = ?";
     $stmt = $conn->prepare($sql);
@@ -75,11 +108,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = file_get_contents('php://input');
     if ($data !== false) {
         $jsonData = json_decode($data);
+      
         if ($jsonData !== null && isset($jsonData->functionName)) {
             $functionName = $jsonData->functionName;
             switch ($functionName) {
+
                 case 'consultaProductos':
-                    // Implementa la lógica para consultar productos si es necesario
+                    $productos = consultaProductos($conn);
+                    // Establecer el encabezado de respuesta como JSON
+                    header('Content-Type: application/json');
+                    // Imprimir los datos de los usuarios como JSON
+                    echo json_encode($productos);
                     break;
                 case 'consultaUsuarios':
                     if (isset($jsonData->email, $jsonData->password)) {
