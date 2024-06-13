@@ -9,7 +9,9 @@ export const IndexPage = () => {
   return (
     <>
       {/* <Header/> */}
-      <FormularioInicio/>
+      {/*<FormularioInicio/>*/}
+      <Header/>
+      <Ofertas/>
       {/* <Footer/> */}
     </>
   )
