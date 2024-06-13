@@ -5,6 +5,7 @@ import { Footer } from '../components/Footer';
 import { useNavigate } from 'react-router-dom';  
 import { useAuth } from '../components/AuthProvider';  // Asegúrate de ajustar la ruta
 
+
 export const FormularioInicio = () => {
   const [isSignUp, setIsSignUp] = useState(false);  
   const signupValidator = useRef(null);
@@ -135,6 +136,41 @@ export const FormularioInicio = () => {
     document.querySelectorAll('.just-validate-error-label').forEach(label => label.remove());
     document.querySelectorAll('.is-invalid').forEach(input => input.classList.remove('is-invalid'));
   };
+
+  useEffect(() => {
+    const validator = new JustValidate('#login-form');
+
+    validator
+      .addField('#email', [
+        {
+          rule: 'required',
+          errorMessage: 'El correo electrónico es requerido',
+        },
+        {
+          rule: 'email',
+          errorMessage: 'Correo electrónico inválido',
+        },
+      ])
+      .addField('#password', [
+        {
+          rule: 'required',
+          errorMessage: 'La contraseña es requerida',
+        },
+        {
+          rule: 'minLength',
+          value: 8,
+          errorMessage: 'La contraseña debe tener al menos 8 caracteres',
+        },
+      ])
+      .onSuccess((event) => {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        console.log(data);
+        alert(JSON.stringify(data, null, 2));
+      });
+  }, []);
 
   return (
     <>

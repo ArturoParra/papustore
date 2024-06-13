@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { SidebarFiltros, SidebarItem } from "../components/SidebarFiltros";
 import { Producto } from "../components/Producto";
 //TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
-import { products } from "../data/db.json";
+//import { products } from "../data/db.json";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import "../styles/Radio.css";
+import ReactSlider from "react-slider";
 
 // Componente principal de la tienda
 export const Shop = () => {
@@ -14,28 +15,105 @@ export const Shop = () => {
   // Estado para los datos del producto (inicialmente del archivo JSON)
   //TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
   //TODO: borrar el JSON del proyecto
-  const [data, setData] = useState(products);
+  const [data, setData] = useState([]);
   const [dataFiltrado, setdataFiltrado] = useState([]);
-  const [dataOrdenado, setdataOrdenado] = useState(products);
+  const [dataOrdenado, setdataOrdenado] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [criterio, setCriterio] = useState("");
   const itemsPerPage = 18; // Número de productos por página
   let filtrado = [];
+  
+  const [maxPrice, setmaxPrice] = useState(13999.99);
+  const [minPrice, setminPrice] = useState(0);
+  const [maxPriceFilter, setmaxPriceFilter] = useState(0);
+  const [minPriceFilter, setminPriceFilter] = useState(0);
 
   // Cálculo de los índices para la paginación
-  const startIdx = (currentPage - 1) * itemsPerPage;
+  const startIdx = (currentPage - 1) * itemsPerPage
   //TODO: hacer pasar data por un filtro y luego por la paginación
   //TODO: condicionar que arreglo se va a mostra (el filtrado o el original) también debería probar esto dentro del useEffect de los filtros
-  const paginatedData = dataOrdenado.slice(startIdx, startIdx + itemsPerPage);
-  const totalPages = Math.ceil(dataOrdenado.length / itemsPerPage);
+  const paginatedData = dataOrdenado.slice(startIdx, startIdx + itemsPerPage)
+  const totalPages = Math.ceil(dataOrdenado.length / itemsPerPage)
 
-  // Cálculo del valor máximo y mínimo de los precios
-  const values = Object.values(data).map((obj) => obj.price);
-  const maxValue = Math.max(...values);
-  const minValue = Math.min(...values);
+  useEffect(() => {
+    console.log("Set prices")
+    const setprices = () => {
 
-  const [maxPrice, setmaxPrice] = useState(maxValue);
-  const [minPrice, setminPrice] = useState(minValue);
+      // Cálculo del valor máximo y mínimo de los precios
+      const values = Object.values(data).map((obj) => obj.price)
+      const maxValue = Math.max(...values)
+      const minValue = Math.min(...values)
+      console.log(minValue)
+      console.log(maxValue)
+  
+      if (!isNaN(maxValue) && maxValue !== Infinity && maxValue !== -Infinity) {
+        setmaxPrice(maxValue);
+      }
+      if (!isNaN(minValue) && minValue !== Infinity && minValue !== -Infinity) {
+        setminPrice(minValue);
+      }
+      setmaxPriceFilter(maxValue)
+      setminPriceFilter(minValue)
+      
+    }
+    setprices()
+  }, [data])    
+
+  useEffect(() => {
+    // Función asincrónica para obtener datos del servidor
+    const fetchData = async () => {
+        try {
+            // Realizar la solicitud al servidor
+            const res = await fetch('/api/index.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    functionName: 'consultaproductos',           
+                })
+            });
+
+            if (!res.ok) {
+              throw new Error('Error en la solicitud fetch');
+            }
+            // Manejar la respuesta aquí
+
+            const data = await res.json(); // Parsea la respuesta a JSON
+        // Calcula el nuevo valor de maxPrice desde los datos recibidos
+        const values = data.map(item => item.price);
+        const newMaxPrice = Math.max(...values);
+        setmaxPrice(newMaxPrice)
+
+            // Procesar los datos recibidos
+            // Por ejemplo, si recibes datos en formato JSON, puedes hacer lo siguiente:
+            return data // Convertir la cadena JSON a objeto
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    // Función para obtener los datos del servidor
+    const getData = async () => {
+      try {
+        const res = await fetchData(); // Obtener datos del servidor
+        
+        if (!Array.isArray(res)) {
+          throw new Error("La respuesta no es un array");
+        }
+
+        setdataOrdenado(res); // Establecer la respuesta del servidor en el estado
+        setData(res);
+      } catch (error) {
+        console.error("Error al obtener los datos:", error);
+        // Manejar el error adecuadamente, por ejemplo, mostrando un mensaje al usuario
+      }
+    };
+    
+    getData(); // Llamar a la función para obtener los datos del servidor
+
+  }, []); // Dependencia vacía para que el efecto se ejecute solo una vez
+  
 
   // Manejador para cambios en los filtros
   const handleFilterChange = (newFilter) => {
@@ -58,13 +136,15 @@ export const Shop = () => {
     let res = [];
     let res2 = [];
     let res3 = [];
+    console.log(data)
 
     // Filtrar productos por precio
     res3 = Object.values(data).filter((item) => {
       const realPrice =
         item.price - item.price * (item.discountPercentage / 100);
-      return realPrice >= minPrice && realPrice <= maxPrice;
+      return realPrice >= minPriceFilter && realPrice <= maxPriceFilter;
     });
+    console.log(res3)
 
     if (filters.length === 0) {
       return res3;
@@ -106,6 +186,7 @@ export const Shop = () => {
     }
 
     res = intersection(res, res3);
+    console.log(res)
     return res;
   };
 
@@ -127,9 +208,10 @@ export const Shop = () => {
 
   // Manejador para cambios en el slider de precios
   const onSliderChange = (value) => {
-    const [minval, maxval] = value;
-    setmaxPrice(maxval);
-    setminPrice(minval);
+    const [min, max] = value
+    setminPriceFilter(min)
+    setmaxPriceFilter(max)
+    console.log(`Padre onChange: ${JSON.stringify({ value })}`);
   };
 
   // Efecto para filtrar los datos cuando cambian los filtros o los precios
@@ -138,13 +220,13 @@ export const Shop = () => {
     console.log(filter);
     console.log(criterio);
     setdataFiltrado(filtrado);
-  }, [filter, maxPrice, minPrice]);
+  }, [filter, maxPriceFilter, minPriceFilter]);
 
   // Efecto para ordenar los datos filtrados cuando cambian
   useEffect(() => {
     console.log(dataFiltrado);
     const temp = ordenarProductos(criterio);
-    temp != undefined ? setdataOrdenado(temp) : console.log("no hay modificaciones");
+    temp != undefined ? setdataOrdenado(temp) : setdataOrdenado(dataFiltrado);
   }, [dataFiltrado, criterio]);
 
   // Manejador para el cambio de página
@@ -161,12 +243,12 @@ export const Shop = () => {
         <div className="grid gap-4 lg:grid-cols-12">
           <div className="min-h-24 rounded-lg hidden lg:inline lg:col-span-1"></div>
           <div className="min-h-24 rounded-lg lg:col-span-2 lg:inline">
-            {/* SIdebar de filtros */}
+            {/* Sidebar de filtros */}
             <SidebarFiltros
               onFilterChange={handleFilterChange}
               onSliderChange={onSliderChange}
-              maxValue={maxValue}
-              minValue={minValue}
+              maxValue={maxPrice}
+              minValue={minPrice}
             >
               {/* Radio buttons de ordenamiento */}
               <p className="text-base font-light text-primary">Order By</p>
@@ -257,10 +339,26 @@ export const Shop = () => {
               <SidebarItem texto="Rolex" value="Rolex" />
               <SidebarItem texto="Amazon" value="Amazon" />
               <SidebarItem texto="Otras marcas" value="" />
+
+              <ReactSlider
+                  className="horizontal-slider"
+                  thumbClassName="example-thumb"
+                  trackClassName="example-track"
+                  defaultValue={[minPrice, maxPrice]}
+                  min={minPrice}
+                  max={maxPrice}
+                  onChange={onSliderChange}
+                  ariaLabel={["Middle thumb", "Rightmost thumb"]}
+                  renderThumb={(props, state) => <div {...props}>||</div>}
+                  pearling
+                  minDistance={0}
+                  withTracks={true}
+                />
+
               {/* Campos para desplegar los precios a filtrar */}
               <div className="flex justify-between mb-3">
-                <p>Min: $ {minPrice}</p>
-                <p>Max: $ {maxPrice}</p>
+                <p>Min: $ {minPriceFilter}</p>
+                <p>Max: $ {maxPriceFilter}</p>
               </div>
             </SidebarFiltros>
           </div>
