@@ -19,7 +19,38 @@ if ($conn->connect_error) {
 }
 
 // Función para consultar usuarios
-function consultaUsuarios($conn, $id) {
+function consultaProductos($conn) {
+    
+    // Consulta preparada
+    $sql = "SELECT * FROM products";
+    
+    // Preparar la consulta
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error al preparar la consulta: " . $conn->error);
+        return array();
+    }
+
+    // Ejecutar la consulta
+    $stmt->execute();
+
+    // Obtener el resultado de la consulta
+    $res = $stmt->get_result();
+
+    // Verificar si se encontraron resultados
+    if ($res->num_rows > 0) {
+        $usuarios = array();
+        // Iterar sobre los resultados y almacenarlos en un array
+        while ($row = $res->fetch_assoc()) {
+            $productos[] = $row;
+        }
+        return $productos;
+    } else {
+        return array();
+    }
+}
+
+function consultaProductosporID($conn, $id) {
     $id = (int)$id; // Asegurarse de que $id sea un entero
 
     // Consulta preparada
@@ -65,18 +96,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $jsonData = json_decode($data);
 
         // Verificar si la decodificación fue exitosa y si functionName está definido
-        if ($jsonData !== null && isset($jsonData->functionName) && isset($jsonData->id)) {
+        if ($jsonData !== null && isset($jsonData->functionName)) {
             $functionName = $jsonData->functionName;
             $id = (int)$jsonData->id;
 
             // Ejecutar la función correspondiente
             switch ($functionName) {
-                case 'consulta':
-                    $usuarios = consultaUsuarios($conn, $id);
+                case 'consultaproductos':
+                    $productos = consultaProductos($conn);
                     // Establecer el encabezado de respuesta como JSON
                     header('Content-Type: application/json');
                     // Imprimir los datos de los usuarios como JSON
-                    echo json_encode($usuarios);
+                    echo json_encode($productos);
                     break;
                 default:
                     error_log("Función no válida");

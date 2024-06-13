@@ -1,10 +1,46 @@
-import React, { useState } from 'react';  // Importación de React y el hook useState
+import React, { useEffect, useState } from 'react';  // Importación de React y el hook useState
+import JustValidate from 'just-validate' //Importacion de JustValidate
 import { Header } from '../components/Header';  // Importación del componente Header
 import { Footer } from '../components/Footer';  // Importación del componente Footer
 
 // Componente principal FormularioInicio
 export const FormularioInicio = () => {
   const [isSignUp, setIsSignUp] = useState(false);  // Estado local para manejar si el formulario es de registro (sign up) o inicio de sesión (sign in)
+
+  useEffect(() => {
+    const validator = new JustValidate('#login-form');
+
+    validator
+      .addField('#email', [
+        {
+          rule: 'required',
+          errorMessage: 'El correo electrónico es requerido',
+        },
+        {
+          rule: 'email',
+          errorMessage: 'Correo electrónico inválido',
+        },
+      ])
+      .addField('#password', [
+        {
+          rule: 'required',
+          errorMessage: 'La contraseña es requerida',
+        },
+        {
+          rule: 'minLength',
+          value: 8,
+          errorMessage: 'La contraseña debe tener al menos 8 caracteres',
+        },
+      ])
+      .onSuccess((event) => {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        console.log(data);
+        alert(JSON.stringify(data, null, 2));
+      });
+  }, []);
 
   return (
     <>
@@ -33,6 +69,7 @@ export const FormularioInicio = () => {
 
           {/* Renderiza el formulario de SIGN UP si isSignUp es verdadero, de lo contrario renderiza el formulario de SIGN IN */}
           {isSignUp ? (
+            /* Formulario de registro */
             <form>
               {/* Campo de entrada para el nombre */}
               <div className="mb-4">
@@ -109,7 +146,8 @@ export const FormularioInicio = () => {
               </div>
             </form>
           ) : (
-            <form>
+            /* Formulario de inicio de sesión */
+            <form id='login-form'>
               {/* Campo de entrada para el correo electrónico */}
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
@@ -143,7 +181,7 @@ export const FormularioInicio = () => {
               <div className="flex items-center justify-between">
                 <button
                   className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  type="button"
+                  type="submit"
                 >
                   SIGN IN
                 </button>
