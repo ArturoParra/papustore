@@ -19,30 +19,18 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-
-// Función para consultar usuarios
+// Función para consultar productos
 function consultaProductos($conn) {
-    
-    // Consulta preparada
     $sql = "SELECT * FROM products";
-    
-    // Preparar la consulta
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
         error_log("Error al preparar la consulta: " . $conn->error);
         return array();
     }
-
-    // Ejecutar la consulta
     $stmt->execute();
-
-    // Obtener el resultado de la consulta
     $res = $stmt->get_result();
-
-    // Verificar si se encontraron resultados
     if ($res->num_rows > 0) {
-        $usuarios = array();
-        // Iterar sobre los resultados y almacenarlos en un array
+        $productos = array();
         while ($row = $res->fetch_assoc()) {
             $productos[] = $row;
         }
@@ -51,6 +39,27 @@ function consultaProductos($conn) {
         return array();
     }
 }
+
+function consultarCarrito($conn) {
+    $sql = "SELECT * FROM shopping_cart";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error al preparar la consulta: " . $conn->error);
+        return array();
+    }
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $productos = array();
+        while ($row = $res->fetch_assoc()) {
+            $productos[] = $row;
+        }
+        return $productos;
+    } else {
+        return array();
+    }
+}
+
 
 function consultaUsuario($conn, $email) {
     $sql = "SELECT * FROM user_login WHERE email = ?";
@@ -99,6 +108,66 @@ function registrarUsuario($conn, $data) {
     }
 }
 
+function addToCart($conn, $email, $product_id, $quantity) {
+    $stmt = $conn->prepare("INSERT INTO shopping_cart (email, product_id, quantity) VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)");
+    $stmt->bind_param("sii", $email, $product_id, $quantity);
+    if ($stmt->execute()) {
+        return ["success" => true];
+    } else {
+        return ["success" => false, "message" => "Error al añadir el producto al carrito"];
+    }
+}
+
+// Funcion para obtener los productos del carrito de un usuario y sus detalles
+function consultaCarrito($conn, $email) {
+    $sql = "SELECT products.id, products.title, products.price, products.thumbnail, shopping_cart.quantity
+            FROM shopping_cart
+            JOIN products ON shopping_cart.product_id = products.id
+            WHERE shopping_cart.email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $productos = array();
+        while ($row = $res->fetch_assoc()) {
+            $productos[] = $row;
+        }
+        return $productos;
+    } else {
+        return array();
+    }
+}
+
+// Funcion para eliminar un producto del carrito de un usuario
+function eliminarProductoCarrito($conn, $email, $product_id) {
+    $stmt = $conn->prepare("DELETE FROM shopping_cart WHERE email = ? AND product_id = ?");
+    $stmt->bind_param("si", $email, $product_id);
+    if ($stmt->execute()) {
+        return ["success" => true];
+    } else {
+        return ["success" => false, "message" => "Error al eliminar el producto del carrito"];
+    }
+}
+
+function getCartItems($conn, $email) {
+    $sql = "SELECT sc.product_id, sc.quantity, p.title, p.price, p.discountPercentage, p.thumbnail
+        FROM shopping_cart sc
+        INNER JOIN products p ON sc.product_id = p.id
+        WHERE sc.email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $cartItems = [];
+    while ($row = $result->fetch_assoc()) {
+        $cartItems[] = $row;
+    }
+    return $cartItems;
+}
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header("HTTP/1.1 200 OK");
     exit();
@@ -112,12 +181,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($jsonData !== null && isset($jsonData->functionName)) {
             $functionName = $jsonData->functionName;
             switch ($functionName) {
-
                 case 'consultaProductos':
                     $productos = consultaProductos($conn);
-                    // Establecer el encabezado de respuesta como JSON
                     header('Content-Type: application/json');
-                    // Imprimir los datos de los usuarios como JSON
                     echo json_encode($productos);
                     break;
                 case 'consultaUsuarios':
@@ -138,15 +204,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         echo json_encode(["success" => $resultado]);
                     }
                     break;
-                    case 'consultaAdministradores':
-                        if (isset($jsonData->adminuser, $jsonData->password)) {
-                            $admin = consultaAdministrador($conn, $jsonData->adminuser);
+                case 'consultaAdministradores':
+                    if (isset($jsonData->adminuser, $jsonData->password)) {
+                        $admin = consultaAdministrador($conn, $jsonData->adminuser);
+                        header('Content-Type: application/json');
+                        if ($admin && $jsonData->password === $admin['password']) {
+                            echo json_encode(['success' => true]);
+                        } else {
+                            echo json_encode(['success' => false]);
+                        }
+                    }
+                    break;
+                case 'insertarCarrito':
+                    if (isset($jsonData->email, $jsonData->product_id, $jsonData->quantity)) {
+                        $resultado = addToCart($conn, $jsonData->email, $jsonData->product_id, $jsonData->quantity);
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    }
+                    break;
+                    case 'consultaCarrito':
+                        if (isset($jsonData->email)) {
+                            $productos = consultaCarrito($conn, $jsonData->email);
                             header('Content-Type: application/json');
-                            if ($admin && $jsonData->password === $admin['password']) {
-                                echo json_encode(['success' => true]);
-                            } else {
-                                echo json_encode(['success' => false]);
-                            }
+                            echo json_encode($productos);
+                        }
+                        break;
+                    case 'eliminarProductoCarrito':
+                        if (isset($jsonData->email, $jsonData->product_id)) {
+                            $resultado = eliminarProductoCarrito($conn, $jsonData->email, $jsonData->product_id);
+                            header('Content-Type: application/json');
+                            echo json_encode($resultado);
                         }
                         break;
                 default:
@@ -163,5 +250,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $conn->close();
-
 ?>
