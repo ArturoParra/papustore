@@ -70,7 +70,7 @@ export const Shop = () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    functionName: 'consultaproductos',           
+                    functionName: 'consultaProductos',           
                 })
             });
 
