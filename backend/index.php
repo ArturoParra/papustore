@@ -60,6 +60,7 @@ function consultarCarrito($conn) {
     }
 }
 
+
 function consultaUsuario($conn, $email) {
     $sql = "SELECT * FROM user_login WHERE email = ?";
     $stmt = $conn->prepare($sql);
@@ -139,6 +140,16 @@ function consultaCarrito($conn, $email) {
     }
 }
 
+// Funcion para eliminar un producto del carrito de un usuario
+function eliminarProductoCarrito($conn, $email, $product_id) {
+    $stmt = $conn->prepare("DELETE FROM shopping_cart WHERE email = ? AND product_id = ?");
+    $stmt->bind_param("si", $email, $product_id);
+    if ($stmt->execute()) {
+        return ["success" => true];
+    } else {
+        return ["success" => false, "message" => "Error al eliminar el producto del carrito"];
+    }
+}
 
 function getCartItems($conn, $email) {
     $sql = "SELECT sc.product_id, sc.quantity, p.title, p.price, p.discountPercentage, p.thumbnail
@@ -216,6 +227,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $productos = consultaCarrito($conn, $jsonData->email);
                             header('Content-Type: application/json');
                             echo json_encode($productos);
+                        }
+                        break;
+                    case 'eliminarProductoCarrito':
+                        if (isset($jsonData->email, $jsonData->product_id)) {
+                            $resultado = eliminarProductoCarrito($conn, $jsonData->email, $jsonData->product_id);
+                            header('Content-Type: application/json');
+                            echo json_encode($resultado);
                         }
                         break;
                 default:

@@ -8,7 +8,6 @@ import { Link } from "react-router-dom";
 export const ShoppingCart = () => {
   const { userEmail } = useAuth();
   const [cart, setCart] = useState([]);
-  const [productos, setProductos] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,7 +19,7 @@ export const ShoppingCart = () => {
           },
           body: JSON.stringify({
             functionName: "consultaCarrito",
-            email: userEmail, // Aquí puedes establecer el email del usuario actual
+            email: userEmail,
           }),
         });
 
@@ -29,8 +28,8 @@ export const ShoppingCart = () => {
         }
 
         const data = await res.json();
-
         // Actualizar el estado de productos con los datos obtenidos
+
         setCart(data);
       } catch (error) {
         console.error("Error:", error);
@@ -38,7 +37,7 @@ export const ShoppingCart = () => {
     };
 
     fetchData();
-  }, []);
+  }, [userEmail]);
 
   const incrementQuantity = (id) => {
     setCart(
@@ -57,9 +56,30 @@ export const ShoppingCart = () => {
       )
     );
   };
+  const removeItem = async (id) => {
+    try {
+      const res = await fetch("/api/index.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          functionName: "eliminarProductoCarrito",
+          email: userEmail,
+          product_id: id,
+        }),
+      });
 
-  const removeItem = (id) => {
-    setCart(cart.filter((item) => item.id !== id));
+      if (!res.ok) {
+        throw new Error("Error en la solicitud fetch");
+      }
+
+      // Actualizar el estado del carrito eliminando el producto
+      setCart(cart.filter((item) => item.id !== id));
+      console.log("Producto eliminado del carrito:", id);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const cartTotal = () => {
