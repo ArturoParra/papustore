@@ -118,6 +118,27 @@ function addToCart($conn, $email, $product_id, $quantity) {
     }
 }
 
+// Funcion para obtener los productos del carrito de un usuario y sus detalles
+function consultaCarrito($conn, $email) {
+    $sql = "SELECT products.id, products.title, products.price, products.thumbnail, shopping_cart.quantity
+            FROM shopping_cart
+            JOIN products ON shopping_cart.product_id = products.id
+            WHERE shopping_cart.email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $productos = array();
+        while ($row = $res->fetch_assoc()) {
+            $productos[] = $row;
+        }
+        return $productos;
+    } else {
+        return array();
+    }
+}
+
 
 function getCartItems($conn, $email) {
     $sql = "SELECT sc.product_id, sc.quantity, p.title, p.price, p.discountPercentage, p.thumbnail
@@ -190,11 +211,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         echo json_encode($resultado);
                     }
                     break;
-                 case 'getCartItems':
-                        $resultado = consultarCarrito($conn, $jsonData->email);
-                        header('Content-Type: application/json');
-                        echo json_encode($resultado);
-                    break;
+                    case 'consultaCarrito':
+                        if (isset($jsonData->email)) {
+                            $productos = consultaCarrito($conn, $jsonData->email);
+                            header('Content-Type: application/json');
+                            echo json_encode($productos);
+                        }
+                        break;
                 default:
                     error_log("Función no válida");
             }
