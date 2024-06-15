@@ -13,7 +13,7 @@ export const IndexPage = () => {
     <>
       {/* <Header/> */}
       <Header/>
-      <FormularioInicio/>
+      <Shop/>
       {/* <Footer/> */}
     </>
   )

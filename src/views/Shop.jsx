@@ -356,9 +356,13 @@ export const Shop = () => {
                 />
 
               {/* Campos para desplegar los precios a filtrar */}
-              <div className="flex justify-between mb-3">
-                <p>Min: $ {minPriceFilter}</p>
-                <p>Max: $ {maxPriceFilter}</p>
+              <div className="flex justify-between">
+                <p>Min:</p>
+                <p>Max:</p>
+              </div>
+              <div className="flex justify-between mb-16">
+                <p>$ {minPriceFilter}</p>
+                <p>$ {maxPriceFilter}</p>
               </div>
             </SidebarFiltros>
           </div>
