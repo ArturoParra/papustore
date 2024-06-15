@@ -7,6 +7,8 @@ import { Accesorios } from "./Principal/Accesorios";
 import { Bfinal } from "./Principal/Bfinal";
 import { Productos } from "./Principal/Productos";
 
+import { useEffect } from "react";
+
 // Importacion para iconos
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
@@ -22,6 +24,160 @@ export function Ofertas() {
     <FontAwesomeIcon className="my-auto" icon={fas.faCircle} />
   );
 
+
+  // Estado para almacenar las mejores ofertas y el indice de la oferta actual
+  const [mejoresOfertas, setMejoresOfertas] = React.useState([]);
+  const [indiceOfertaActual, setIndiceOfertaActual] = React.useState(0);
+
+  // Estado para almacennar la mejor laptop y el mejor accesorio
+  const [mejorLaptop, setMejorLaptop] = React.useState({});
+  const [mejorAccesorio, setMejorAccesorio] = React.useState({});
+  
+  useEffect(() =>
+  {
+    // Función para obtener datos del servidor y convertirlos a JSON
+    const fetchData = async () =>
+    {
+        try // Intentar obtener los datos del servidor
+        {
+            // Realizar una solicitud fetch al servidor
+            const res = await fetch('/api/index.php', 
+            {
+                // Configurar la solicitud
+                method: 'POST',
+                headers: 
+                {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify
+                ({
+                    functionName: 'consultaProductos',
+                })
+            });
+            
+            // Verificar si la solicitud fue exitosa
+            if (!res.ok)
+            {
+              throw new Error('Error en la solicitud fetch');
+            }
+            
+            // Manejar la respuesta del servidor
+            const data = await res.json(); // Convertir la respuesta a JSON
+
+            // Devolver los datos obtenidos
+            return data
+        } 
+        catch (error) // Capturar errores
+        {
+            console.error('Error:', error);
+        }
+    };
+
+    // Funcion para llamar a la funcion fetchData y procesar los datos obtenidos
+    const getData = async () => 
+    {
+      try // Intentar obtener los datos de fetchData
+      {
+        // Llamar a la función fetchData
+        const res = await fetchData();
+        
+        // Verificar si res es un array
+        if (!Array.isArray(res))
+        {
+          throw new Error("La respuesta no es un array");
+        }
+
+        // Mostar los datos obtenidos
+        console.log("Datos obtenidos:", res);
+
+        filtrarProductos(res);
+        obtenerCategorias(res);
+        
+      }
+      catch (error) // Capturar errores
+      {
+        console.error("Error al obtener los datos:", error);
+      }
+    };
+
+    // Llamar a la función getData
+    getData();
+  }, []); // Dependencia vacía para que el efecto se ejecute solo una vez
+  
+  
+  // Funcion para filtrar los productos (3 mejores ofertas)
+  const filtrarProductos = (productos) =>
+  {
+    // Verificar si productos es un array
+    if (!Array.isArray(productos))
+    {
+      throw new Error("El argumento no es un array");
+    }
+
+    // Ordernar los productos por discountPercentage de forma descendente
+    productos.sort((a, b) => b.discountPercentage - a.discountPercentage);
+
+    // Filtrar los productos que tienen stock y obtener los 3 primeros
+    const mejoresofertas = productos.filter((producto) => producto.stock > 0).slice(0, 3);
+    setMejoresOfertas(mejoresofertas);
+
+
+    // Obtener la mejor laptop
+    const mejorlaptop = productos.filter((producto) => producto.category === "laptops" && producto.stock > 0)[0];
+    // Si no se encuentra la mejor laptop
+    if (!mejorlaptop)
+    {
+      // Buscar la cuarta mejor oferta
+      const cuartamejoroferta = productos.filter((producto) => producto.stock > 0)[3];
+      setMejorLaptop(cuartamejoroferta);
+    }
+    else
+    {
+      setMejorLaptop(mejorlaptop);
+    }
+
+    // Obtener el mejor accesorio
+    const mejoraccesorio = productos.filter((producto) => producto.category === "mobile-accessories" && producto.stock > 0)[0];
+    // Si no se encuentra el mejor accesorio ni la mejor laptop
+    if (!mejoraccesorio && !mejorlaptop)
+    {
+      // Buscar la quinta mejor oferta
+      const quintamejoroferta = productos.filter((producto) => producto.stock > 0)[4];
+      setMejorAccesorio(quintamejoroferta);
+    }
+    else if (!mejoraccesorio) // Si no se encuentra el mejor accesorio
+    {
+      // Buscar la cuarta mejor oferta
+      const cuartamejoroferta = productos.filter((producto) => producto.stock > 0)[3];
+      setMejorAccesorio(cuartamejoroferta);
+    }
+    else
+    {
+      setMejorAccesorio(mejoraccesorio);
+    }
+
+    console.log("Mejor laptop:", mejorlaptop);
+    console.log("Mejor accesorio:", mejoraccesorio);
+    console.log("Mejores ofertas:", mejoresofertas);
+
+    // Devolver las mejores ofertas
+    return mejoresofertas;
+  };
+
+  // Temporizador para cambiar automaticamente la oferta
+  useEffect(() =>
+  {
+    const timer = setTimeout(() => 
+    {
+      setIndiceOfertaActual((indice) => (indice + 1) % mejoresOfertas.length);
+    }, 3000); // cambiar cada 3 segundos
+
+    return () => clearTimeout(timer); // Limpiar el temporizador cuando el componente se desmonte
+  }, [indiceOfertaActual, mejoresOfertas]); // Dependencias del efecto
+
+
+  
+  
   return (
     // Contenedor de las ofertas
     <div>
@@ -30,25 +186,23 @@ export function Ofertas() {
         <div className="flex flex-col sm:flex-row">
           {/* Definicion del contenedor de la oferta uno */}
           <div className="flex flex-col bg-gray-100 rounded-xl w-full p-3 xs:p-5 sm:w-2/3">
-
-            {/* Subcontenedor de la oferta uno */}
+            {/* Renderizado de las tres mejores ofertas por tiempo */}
             <div className="flex w-full my-auto items-center ">
               {/* Columna izquierda subcontenedor de la oferta uno */}
               <div className="flex flex-col w-1/2 sm:w-1/2">
                 <div className="flex flex-col mt-1.5 items-center">
                   <div className="flex text-sky-600 justify-center font-semibold text-[10px] xs:text-xs sm:text-[10px] md:text-sm lg:text-base xl:text-xl xxl:text-2xl">
-                    <div className="mr-1">{IconoFlecha}</div>MEJOR OFERTA
+                    <div className="mr-1">{IconoFlecha}</div>BEST OFFER
                   </div>
-                  <div className="flex justify-center font-bold text-sm py-4 xs:text-base sm:text-sm md:text-lg lg:text-xl xl:text-2xl xxl:text-3xl">
-                    CONSOLA XBOX
+                  <div className="flex justify-center text-center font-bold text-sm py-4 xs:text-base sm:text-sm md:text-lg lg:text-xl xl:text-2xl xxl:text-3xl">
+                    {mejoresOfertas[indiceOfertaActual]?.title}
                   </div>
                   <div className="text-justify text-xs xs:text-sm sm:text-xs md:leading-normal md:text-[15.5px] lg:text-[20.2px] xl:text-[25px] xxl:text-[33px]">
-                    Ahorra hasta 50% en juegos de Xbox. Obtén 3 meses de PC Game
-                    Pass por $40 MXN.
+                    {mejoresOfertas[indiceOfertaActual]?.description}
                   </div>
                   <div>
                     <button className="flex bg-orange-400 text-white justify-center rounded-xl font-bold uppercase p-1.5 mt-4 text-[10px] xs:text-xs sm:text-[10px] md:text-sm lg:text-base xl:text-xl xxl:text-2xl">
-                      COMPRAR AHORA<div className="ml-0.5">{IconoFlecha}</div>
+                      BUY NOW<div className="ml-0.5">{IconoFlecha}</div>
                     </button>
                   </div>
                 </div>
@@ -57,10 +211,10 @@ export function Ofertas() {
               {/* Columna derecha subcontenedor de la oferta uno */}
               <div className="flex flex-col m-auto w-1/2 relative">
                 <div className="flex absolute w-1/4 aspect-1 justify-center items-center right-0 bg-blue-500 border-2 border-white  text-white rounded-full text-[8px] xs:text-[11px] xs:border-1 sm:text-[10px] sm:border-2 md:text-xs md:border-3 lg:text-base lg:border-4 xl:text-lg xl:border-5 xxl:text-xl xxl:border-6">
-                  $299
+                  ${mejoresOfertas[indiceOfertaActual]?.price}
                 </div>
                 <img
-                  srcSet="https://cdn.dummyjson.com/products/images/beauty/Essence%20Mascara%20Lash%20Princess/1.png"
+                  srcSet={mejoresOfertas[indiceOfertaActual]?.thumbnail}
                   className="grow aspect-square bg-transparent pl-2.5"
                 />
               </div>
@@ -68,9 +222,11 @@ export function Ofertas() {
 
             {/* Selector de la oferta mostrada */}
             <div className="flex mx-auto gap-3 mt-4 text-xs xs:gap-4 sm:gap-5 sm:text-sm md:gap-6 md:text-base lg:gap-7 lg:text-lg xl:gap-8 xl:text-xl xxl:text-2xl">
-              <div className="text-gray-400">{IconoCirculo}</div>
-              <div className="text-black">{IconoCirculo}</div>
-              <div className="text-black">{IconoCirculo}</div>
+            {
+              mejoresOfertas.map((_, index) => (
+                <div key={index} className={`text-${index === indiceOfertaActual ? 'black' : 'gray'}-400`}>{IconoCirculo}</div>
+              ))
+            }
             </div>
           </div>
 
@@ -84,15 +240,15 @@ export function Ofertas() {
                   <div className="flex flex-col my-auto items-center text-white">
                     {/* Titulo del la oferta */}
                     <div className="text-center text-yellow-400 font-medium uppercase text-xs xs:text-base sm:leading-normal sm:text-[10px] md:text-xs lg:text-base xl:text-lg xxl:text-xl">
-                      OFERTA VERANO
+                      SUMMER OFFER
                     </div>
                     {/* Producto ofertado */}
                     <div className="text-center font-semibold text-sm mt-1.5 xs:text-xl sm:text-[11px] sm:leading-normal md:text-xs lg:text-base xl:text-lg xxl:text-2xl">
-                      NUEVO GOOGLE PIXEL 6 PRO
+                      {mejorLaptop.title}
                     </div>
                     {/* Boton comprar ahora */}
                     <button className="flex bg-orange-400 justify-center rounded-xl font-bold uppercase p-1.5 my-2 text-[10px] xs:text-xs sm:p-1 sm:text-[6px] md:text-[8px] lg:text-[11px] xl:text-sm xxl:text-base">
-                      COMPRAR AHORA<div className="ml-0.5">{IconoFlecha}</div>
+                      BUY NOW<div className="ml-0.5">{IconoFlecha}</div>
                     </button>
                   </div>
                 </div>
@@ -104,11 +260,11 @@ export function Ofertas() {
                 <div className="flex flex-col font-bold h-full">
                     {/* Descuento en porcentaje */}
                     <div className="justify-center self-end bg-amber-300 px-2 py-1.5 mr-6 text-[8px] xs:text-[10px] sm:py-0.5 sm:mr-2 sm:text-[8px] md:text-[10px] lg:text-xs xl:text-sm xxl:text-base">
-                      29% OFF
+                      {mejorLaptop.discountPercentage}% OFF
                     </div>
                     {/* Imagen del producto */}
                     <img
-                      srcSet="https://cdn.builder.io/api/v1/image/assets/TEMP/0bab3fc3f6734a24f872e9f592d8065ef1911403e59145a39ed761bbf791deb5?apiKey=1a2f25590aec488b8dd6a75e7dd5b9e1&width=100 100w, https://cdn.builder.io/api/v1/image/assets/TEMP/0bab3fc3f6734a24f872e9f592d8065ef1911403e59145a39ed761bbf791deb5?apiKey=1a2f25590aec488b8dd6a75e7dd5b9e1&width=200 200w, https://cdn.builder.io/api/v1/image/assets/TEMP/0bab3fc3f6734a24f872e9f592d8065ef1911403e59145a39ed761bbf791deb5?apiKey=1a2f25590aec488b8dd6a75e7dd5b9e1&width=400 400w, https://cdn.builder.io/api/v1/image/assets/TEMP/0bab3fc3f6734a24f872e9f592d8065ef1911403e59145a39ed761bbf791deb5?apiKey=1a2f25590aec488b8dd6a75e7dd5b9e1&width=800 800w, https://cdn.builder.io/api/v1/image/assets/TEMP/0bab3fc3f6734a24f872e9f592d8065ef1911403e59145a39ed761bbf791deb5?apiKey=1a2f25590aec488b8dd6a75e7dd5b9e1&width=1200 1200w, https://cdn.builder.io/api/v1/image/assets/TEMP/0bab3fc3f6734a24f872e9f592d8065ef1911403e59145a39ed761bbf791deb5?apiKey=1a2f25590aec488b8dd6a75e7dd5b9e1&width=1600 1600w, https://cdn.builder.io/api/v1/image/assets/TEMP/0bab3fc3f6734a24f872e9f592d8065ef1911403e59145a39ed761bbf791deb5?apiKey=1a2f25590aec488b8dd6a75e7dd5b9e1&width=2000 2000w, https://cdn.builder.io/api/v1/image/assets/TEMP/0bab3fc3f6734a24f872e9f592d8065ef1911403e59145a39ed761bbf791deb5?apiKey=1a2f25590aec488b8dd6a75e7dd5b9e1&"
+                      srcSet={mejorLaptop.thumbnail}
                       className="rounded-ee-lg w-full h-full"
                     />
                   </div>
@@ -121,19 +277,19 @@ export function Ofertas() {
                   <div className="flex flex-col w-1/2">
                     <img
                       loading="lazy"
-                      srcSet="https://cdn.dummyjson.com/products/images/mobile-accessories/Apple%20Airpods/1.png"
+                      srcSet={mejorAccesorio.thumbnail}
                       className="my-auto aspect-square"
                     />
                   </div>
                   <div className="flex flex-col ml-1 w-1/2 items-center">
-                    <div className="text-center font-semibold text-sm xs:text-base sm:text-xs md:text-sm lg:text-base xl:text-xl xxl:text-2xl">
-                      Apple Airpods
+                    <div className="text-center font-semibold text-sm xs:text-base sm:text-xs md:text-base lg:text-lg xl:text-2xl xxl:text-3xl">
+                      {mejorAccesorio.title}
                     </div>
                     <div className="text-center text-sky-400 mt-3 text-base xs:text-lg sm:text-sm md:text-base lg:text-lg xl:text-2xl xxl:text-3xl">
-                      $129.99 USD
+                      ${mejorAccesorio.price}
                     </div>
                     <button className="flex bg-orange-400 text-white justify-center rounded-xl font-bold uppercase p-1.5 mt-2 text-[10px] xs:text-xs sm:text-[6px] md:text-[9px] lg:text-[11px] xl:text-sm xxl:text-base">
-                      COMPRAR AHORA<div className="ml-0.5">{IconoFlecha}</div>
+                      BUY NOW<div className="ml-0.5">{IconoFlecha}</div>
                     </button>
                   </div>
                 </div>
@@ -158,10 +314,10 @@ export function Ofertas() {
 
                 <div className="flex flex-col items-center mx-auto">
                   <div className="font-medium uppercase text-zinc-900 text-center">
-                    Entrega Rapida
+                    Fast Delivery
                   </div>
                   <div className="mt-1 text-gray-500 text-center capitalize">
-                    Entrega en 24/H
+                    Delivery in 24/H
                   </div>
                 </div>
               </div>
@@ -177,10 +333,10 @@ export function Ofertas() {
 
                 <div className="flex flex-col items-center mx-auto">
                   <div className="font-medium uppercase text-zinc-900 text-center">
-                    Devoluciones
+                    Returns
                   </div>
                   <div className="mt-1 text-gray-500 text-center capitalize">
-                    Devoluciones en 24/H
+                    Returns in 24/H
                   </div>
                 </div>
               </div>
@@ -198,10 +354,10 @@ export function Ofertas() {
 
                 <div className="flex flex-col items-center mx-auto">
                   <div className="font-medium uppercase text-zinc-900 text-center">
-                    Pago seguro
+                    Secure Payment
                   </div>
                   <div className="mt-1 text-gray-500 text-center capitalize">
-                    Tù dinero esta seguro
+                    Your money is safe
                   </div>
                 </div>
               </div>
@@ -217,10 +373,10 @@ export function Ofertas() {
 
                 <div className="flex flex-col mx-auto  ">
                   <div className="font-medium uppercase text-zinc-900">
-                    Soporte 24/7
+                    24/7 Support
                   </div>
                   <div className="mt-1 text-gray-500 text-center capitalize">
-                    Chat en vivo
+                    Live Chat
                   </div>
                 </div>
               </div>
@@ -229,6 +385,7 @@ export function Ofertas() {
         </div>
       </div>
       <Mventas/>
+      {/* Enviar los productos obtenidos a Cventas */}
       <Cventas/>
       <Dventas/>
       <Bmedio/>
