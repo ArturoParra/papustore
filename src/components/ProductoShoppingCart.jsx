@@ -3,13 +3,7 @@ import React from 'react';
 // Componente ProductoShoppingCart que recibe props: item, incrementQuantity, decrementQuantity, removeItem
 export const ProductoShoppingCart = ({ item, incrementQuantity, decrementQuantity, removeItem }) => {
   // Asignar valores predeterminados si las propiedades están indefinidas
-  const {
-    product_id = 'Unknown',
-    name = 'Producto desconocido',
-    price = 0,
-    quantity = 1,
-    thumbnail = 'default_image'
-  } = item;
+  const {id, title, thumbnail, quantity, price} = item
 
   return (
     // Contenedor principal con clases de Tailwind CSS para estilo y diseño responsivo
@@ -19,19 +13,19 @@ export const ProductoShoppingCart = ({ item, incrementQuantity, decrementQuantit
       <div className="w-full sm:w-2/5 flex flex-col items-center sm:items-start">
         {/* Imagen del producto */}
         <div className="w-20 mb-4">
-          <img className="h-24 object-cover" src={thumbnail ? `https://via.placeholder.com/50?text=${thumbnail}` : 'https://via.placeholder.com/50'} alt={name} />
+          <img className="h-24 object-cover" src={thumbnail}/>
         </div>
         
         {/* Información del producto */}
         <div className="flex flex-col justify-between flex-grow text-center sm:text-left">
           {/* Nombre del producto, limitado a 40 caracteres */}
           <span className="font-bold text-sm">
-            {name.length > 40 ? `${name.substring(0, 40)}...` : name}
+            {title}
           </span>
           {/* Botón para remover el producto del carrito */}
           <button
             className="font-semibold hover:text-red-500 text-gray-500 text-xs mt-2"
-            onClick={() => removeItem(product_id)}
+            onClick={() => removeItem(id)}
           >
             REMOVE
           </button>
@@ -42,7 +36,7 @@ export const ProductoShoppingCart = ({ item, incrementQuantity, decrementQuantit
       <div className="flex justify-center w-full sm:w-1/4 mt-4 sm:mt-0">
         <button
           className="text-gray-600"
-          onClick={() => decrementQuantity(product_id)}
+          onClick={() => decrementQuantity(id)}
         >
           -
         </button>
@@ -54,7 +48,7 @@ export const ProductoShoppingCart = ({ item, incrementQuantity, decrementQuantit
         />
         <button
           className="text-gray-600"
-          onClick={() => incrementQuantity(product_id)}
+          onClick={() => incrementQuantity(id)}
         >
           +
         </button>
