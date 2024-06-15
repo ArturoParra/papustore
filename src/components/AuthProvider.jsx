@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Crear el contexto de autenticación
@@ -9,13 +8,17 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem('isAuthenticated') === 'true';
   });
+  const [userEmail, setUserEmail] = useState(() => {
+    return localStorage.getItem('userEmail') || '';
+  });
 
   useEffect(() => {
     localStorage.setItem('isAuthenticated', isAuthenticated);
-  }, [isAuthenticated]);
+    localStorage.setItem('userEmail', userEmail);
+  }, [isAuthenticated, userEmail]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, userEmail, setUserEmail }}>
       {children}
     </AuthContext.Provider>
   );

@@ -3,14 +3,14 @@ import JustValidate from 'just-validate';
 import { Header } from '../components/Header';  
 import { Footer } from '../components/Footer';  
 import { useNavigate } from 'react-router-dom';  
-import { useAuth } from '../components/AuthProvider';
+import { useAuth } from '../components/AuthProvider'; 
 
 export const FormularioInicio = () => {
   const [isSignUp, setIsSignUp] = useState(false);  
   const signupValidator = useRef(null);
   const loginValidator = useRef(null);
   const navigate = useNavigate();  
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated, setUserEmail } = useAuth();
 
   useEffect(() => {
     if (isSignUp && !signupValidator.current) {
@@ -150,6 +150,7 @@ export const FormularioInicio = () => {
 
   const verificarUsuario = async (email, password) => {
     try {
+      console.log('Enviando datos:', { email, password }); 
       const response = await fetch('/api/index.php', {
         method: 'POST',
         headers: {
@@ -158,8 +159,10 @@ export const FormularioInicio = () => {
         body: JSON.stringify({ functionName: 'consultaUsuarios', email, password }),
       });
       const result = await response.json();
+      console.log('Respuesta del servidor:', result); 
       if (result.success) {
         setIsAuthenticated(true);
+        setUserEmail(email); // Guardar el correo electrónico
         navigate('/tienda');
       } else {
         alert('Credenciales incorrectas');
