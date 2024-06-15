@@ -8,6 +8,7 @@ import { VistaProducto } from './views/VistaProducto';
 import { Shop } from './views/Shop';
 import { AdministratorMode } from './views/AdministratorMode';
 import { FormularioAdministrator } from './views/FormularioAdministrator';
+import { FormularioInicio } from './views/FormularioInicio';
 import { AuthProvider } from './components/AuthProvider'; // Ajusta la ruta según sea necesario
 
 export const AppRouter = () => {
@@ -22,6 +23,7 @@ export const AppRouter = () => {
           <Route path='/favoritos' element={<Wishlist />} />
           <Route path='/producto' element={<VistaProducto />} />
           <Route path='/administrador' element={<AdministratorMode />} />
+          <Route path='/form' element={<FormularioInicio />} />
           <Route path='/adminForm' element={<FormularioAdministrator />} />
         </Routes>
       </AuthProvider>
