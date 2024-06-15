@@ -1,28 +1,44 @@
-import React from "react";  // Importa la librería React
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";  // Importa el componente FontAwesomeIcon para usar íconos
-import { fas } from "@fortawesome/free-solid-svg-icons";  // Importa los íconos sólidos de FontAwesome
-import { Link } from "react-router-dom";  // Importa el componente Link de React Router para la navegación
+import React from "react";  
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";  
+import { fas } from "@fortawesome/free-solid-svg-icons";  
+import { Link } from "react-router-dom";  
+import { useAuth } from '../components/AuthProvider';  // Asegúrate de ajustar la ruta
 
-// Componente Producto que recibe el prop 'producto'
 export const Producto = ({producto}) => {
-  // Define íconos usando FontAwesome
+  const { userEmail } = useAuth();  // Obtener el email del usuario desde el contexto de autenticación
+
   const IconoAddCart = <FontAwesomeIcon icon={fas.faCartPlus} />
   const IconoCorazon = <FontAwesomeIcon icon={fas.faHeart}/>
 
-  // Desestructura propiedades del objeto 'producto'
   const {id, title, price, discountPercentage, rating, thumbnail} = producto
 
-  // Función para calcular el precio con descuento
   const CalcularPrecio = (price, discountPercentage) => {
     const newPrice = price - (price * (discountPercentage / 100))
-    return parseFloat(newPrice.toFixed(2))  // Redondea a 2 decimales
+    return parseFloat(newPrice.toFixed(2))  
   };
 
-  // TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
   const realPrice = CalcularPrecio(price, discountPercentage)
-
-  // Crear un nuevo objeto de producto con el precio real calculado
   const productoActualizado = {...producto, realPrice}
+
+  const addToCart = async () => {
+    try {
+      const response = await fetch('/api/index.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ functionName: 'insertarCarrito', email: userEmail, product_id: id, quantity: 1 }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        alert('Producto añadido al carrito');
+      } else {
+        alert('Error al añadir el producto al carrito');
+      }
+    } catch (error) {
+      console.error('Error al añadir el producto al carrito:', error);
+    }
+  };
 
   return (
     <>
@@ -39,14 +55,13 @@ export const Producto = ({producto}) => {
           <p className="font-black text-slate-500 text-base line-through">$ {price} USD</p>
           <p className="font-black text-primary text-xl">$ {CalcularPrecio(price, discountPercentage)} USD</p>
           <div className="my-2">
-          {/*Botón para agregar al carrito con ícono*/}
-             <button
+            <button
               type="button"
               className="bg-primary hover:bg-orange-700 transition duration-300 ease-in-out rounded-md p-2 mx-2 text-white "
+              onClick={addToCart}
             >
               {IconoAddCart}
             </button>
-            {/*Botón para marcar como favorito con ícono*/}
             <button
               type="button"
               className="bg-primary hover:bg-orange-700 transition duration-300 ease-in-out rounded-md p-2 mx-2 text-white "

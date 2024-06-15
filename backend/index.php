@@ -19,30 +19,38 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-
-// Función para consultar usuarios
+// Función para consultar productos
 function consultaProductos($conn) {
-    
-    // Consulta preparada
     $sql = "SELECT * FROM products";
-    
-    // Preparar la consulta
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
         error_log("Error al preparar la consulta: " . $conn->error);
         return array();
     }
-
-    // Ejecutar la consulta
     $stmt->execute();
-
-    // Obtener el resultado de la consulta
     $res = $stmt->get_result();
-
-    // Verificar si se encontraron resultados
     if ($res->num_rows > 0) {
-        $usuarios = array();
-        // Iterar sobre los resultados y almacenarlos en un array
+        $productos = array();
+        while ($row = $res->fetch_assoc()) {
+            $productos[] = $row;
+        }
+        return $productos;
+    } else {
+        return array();
+    }
+}
+
+function consultarCarrito($conn) {
+    $sql = "SELECT * FROM shopping_cart";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error al preparar la consulta: " . $conn->error);
+        return array();
+    }
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $productos = array();
         while ($row = $res->fetch_assoc()) {
             $productos[] = $row;
         }
@@ -99,6 +107,35 @@ function registrarUsuario($conn, $data) {
     }
 }
 
+function addToCart($conn, $email, $product_id, $quantity) {
+    $stmt = $conn->prepare("INSERT INTO shopping_cart (email, product_id, quantity) VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)");
+    $stmt->bind_param("sii", $email, $product_id, $quantity);
+    if ($stmt->execute()) {
+        return ["success" => true];
+    } else {
+        return ["success" => false, "message" => "Error al añadir el producto al carrito"];
+    }
+}
+
+
+function getCartItems($conn, $email) {
+    $sql = "SELECT sc.product_id, sc.quantity, p.title, p.price, p.discountPercentage, p.thumbnail
+        FROM shopping_cart sc
+        INNER JOIN products p ON sc.product_id = p.id
+        WHERE sc.email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $cartItems = [];
+    while ($row = $result->fetch_assoc()) {
+        $cartItems[] = $row;
+    }
+    return $cartItems;
+}
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header("HTTP/1.1 200 OK");
     exit();
@@ -112,12 +149,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($jsonData !== null && isset($jsonData->functionName)) {
             $functionName = $jsonData->functionName;
             switch ($functionName) {
-
                 case 'consultaProductos':
                     $productos = consultaProductos($conn);
-                    // Establecer el encabezado de respuesta como JSON
                     header('Content-Type: application/json');
-                    // Imprimir los datos de los usuarios como JSON
                     echo json_encode($productos);
                     break;
                 case 'consultaUsuarios':
@@ -138,17 +172,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         echo json_encode(["success" => $resultado]);
                     }
                     break;
-                    case 'consultaAdministradores':
-                        if (isset($jsonData->adminuser, $jsonData->password)) {
-                            $admin = consultaAdministrador($conn, $jsonData->adminuser);
-                            header('Content-Type: application/json');
-                            if ($admin && $jsonData->password === $admin['password']) {
-                                echo json_encode(['success' => true]);
-                            } else {
-                                echo json_encode(['success' => false]);
-                            }
+                case 'consultaAdministradores':
+                    if (isset($jsonData->adminuser, $jsonData->password)) {
+                        $admin = consultaAdministrador($conn, $jsonData->adminuser);
+                        header('Content-Type: application/json');
+                        if ($admin && $jsonData->password === $admin['password']) {
+                            echo json_encode(['success' => true]);
+                        } else {
+                            echo json_encode(['success' => false]);
                         }
-                        break;
+                    }
+                    break;
+                case 'insertarCarrito':
+                    if (isset($jsonData->email, $jsonData->product_id, $jsonData->quantity)) {
+                        $resultado = addToCart($conn, $jsonData->email, $jsonData->product_id, $jsonData->quantity);
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    }
+                    break;
+                 case 'getCartItems':
+                        $resultado = consultarCarrito($conn, $jsonData->email);
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    break;
                 default:
                     error_log("Función no válida");
             }
@@ -163,5 +209,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $conn->close();
-
 ?>
