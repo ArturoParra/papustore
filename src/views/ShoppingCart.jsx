@@ -28,6 +28,8 @@ export const ShoppingCart = () => {
         }
 
         const data = await res.json();
+        // Actualizar el estado de productos con los datos obtenidos
+
         setCart(data);
       } catch (error) {
         console.error("Error:", error);
@@ -54,7 +56,6 @@ export const ShoppingCart = () => {
       )
     );
   };
-
   const removeItem = async (id) => {
     try {
       const res = await fetch("/api/index.php", {

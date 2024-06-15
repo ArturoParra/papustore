@@ -3,33 +3,35 @@ import JustValidate from 'just-validate';
 import { Header } from '../components/Header';  
 import { Footer } from '../components/Footer';  
 import { useNavigate } from 'react-router-dom';  
-import { useAuth } from '../components/AuthProvider';  // Asegúrate de ajustar la ruta
-
+import { useAuth } from '../components/AuthProvider'; 
 
 export const FormularioInicio = () => {
   const [isSignUp, setIsSignUp] = useState(false);  
   const signupValidator = useRef(null);
+  const loginValidator = useRef(null);
   const navigate = useNavigate();  
-  const { setIsAuthenticated } = useAuth();  // Usar el contexto de autenticación
+  const { setIsAuthenticated, setUserEmail } = useAuth();
 
   useEffect(() => {
     if (isSignUp && !signupValidator.current) {
-      signupValidator.current = new JustValidate('#signup-form');
+      signupValidator.current = new JustValidate('#signup-form', {
+        validateBeforeSubmitting: true,
+      });
 
       signupValidator.current
-        .addField('#name', [
+        .addField('#signup-name', [
           {
             rule: 'required',
             errorMessage: 'El nombre es requerido',
           },
         ])
-        .addField('#lastname', [
+        .addField('#signup-lastname', [
           {
             rule: 'required',
             errorMessage: 'El apellido es requerido',
           },
         ])
-        .addField('#email', [
+        .addField('#signup-email', [
           {
             rule: 'required',
             errorMessage: 'El correo electrónico es requerido',
@@ -39,7 +41,7 @@ export const FormularioInicio = () => {
             errorMessage: 'Correo electrónico inválido',
           },
         ])
-        .addField('#password', [
+        .addField('#signup-password', [
           {
             rule: 'required',
             errorMessage: 'La contraseña es requerida',
@@ -50,19 +52,19 @@ export const FormularioInicio = () => {
             errorMessage: 'La contraseña debe tener al menos 8 caracteres',
           },
         ])
-        .addField('#confirm-password', [
+        .addField('#signup-confirm-password', [
           {
             rule: 'required',
             errorMessage: 'La confirmación de la contraseña es requerida',
           },
           {
             validator: (value, fields) => {
-              return value === fields['#password'].elem.value;
+              return value === fields['#signup-password'].elem.value;
             },
             errorMessage: 'Las contraseñas no coinciden',
           },
         ])
-        .addField('#terms', [
+        .addField('#signup-terms', [
           {
             rule: 'required',
             errorMessage: 'Debes aceptar los términos y condiciones',
@@ -78,10 +80,50 @@ export const FormularioInicio = () => {
         });
     }
 
+    if (!isSignUp && !loginValidator.current) {
+      loginValidator.current = new JustValidate('#login-form', {
+        validateBeforeSubmitting: true,
+      });
+
+      loginValidator.current
+        .addField('#login-email', [
+          {
+            rule: 'required',
+            errorMessage: 'El correo electrónico es requerido',
+          },
+          {
+            rule: 'email',
+            errorMessage: 'Correo electrónico inválido',
+          },
+        ])
+        .addField('#login-password', [
+          {
+            rule: 'required',
+            errorMessage: 'La contraseña es requerida',
+          },
+          {
+            rule: 'minLength',
+            value: 8,
+            errorMessage: 'La contraseña debe tener al menos 8 caracteres',
+          },
+        ])
+        .onSuccess((event) => {
+          event.preventDefault();
+          const form = event.target;
+          const email = form.login_email.value;
+          const password = form.login_password.value;
+          verificarUsuario(email, password);
+        });
+    }
+
     return () => {
       if (signupValidator.current) {
         signupValidator.current.destroy();
         signupValidator.current = null;
+      }
+      if (loginValidator.current) {
+        loginValidator.current.destroy();
+        loginValidator.current = null;
       }
     };
   }, [isSignUp]);
@@ -119,7 +161,8 @@ export const FormularioInicio = () => {
       const result = await response.json();
       console.log('Respuesta del servidor:', result); 
       if (result.success) {
-        setIsAuthenticated(true);  // Actualizar el estado de autenticación
+        setIsAuthenticated(true);
+        setUserEmail(email); // Guardar el correo electrónico
         navigate('/tienda');
       } else {
         alert('Credenciales incorrectas');
@@ -137,58 +180,22 @@ export const FormularioInicio = () => {
     document.querySelectorAll('.is-invalid').forEach(input => input.classList.remove('is-invalid'));
   };
 
-  useEffect(() => {
-    const validator = new JustValidate('#login-form');
-
-    validator
-      .addField('#email', [
-        {
-          rule: 'required',
-          errorMessage: 'El correo electrónico es requerido',
-        },
-        {
-          rule: 'email',
-          errorMessage: 'Correo electrónico inválido',
-        },
-      ])
-      .addField('#password', [
-        {
-          rule: 'required',
-          errorMessage: 'La contraseña es requerida',
-        },
-        {
-          rule: 'minLength',
-          value: 8,
-          errorMessage: 'La contraseña debe tener al menos 8 caracteres',
-        },
-      ])
-      .onSuccess((event) => {
-        event.preventDefault();
-        const form = event.target;
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        console.log(data);
-        alert(JSON.stringify(data, null, 2));
-      });
-  }, []);
-
   return (
     <>
       <Header />
 
       <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
         <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-          
           <div className="flex justify-center mb-4">
             <div
               className={`cursor-pointer ${!isSignUp ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-600'}`}
-              onClick={() => handleTabChange(false)}  
+              onClick={() => handleTabChange(false)}
             >
               SIGN IN
             </div>
             <div
               className={`ml-8 cursor-pointer ${isSignUp ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-600'}`}
-              onClick={() => handleTabChange(true)}  
+              onClick={() => handleTabChange(true)}
             >
               SIGN UP
             </div>
@@ -197,12 +204,12 @@ export const FormularioInicio = () => {
           {isSignUp ? (
             <form id="signup-form" className="space-y-4">
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="signup-name">
                   NAME
                 </label>
                 <input
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="name"
+                  id="signup-name"
                   type="text"
                   name="first_name"
                   placeholder="Name"
@@ -210,12 +217,12 @@ export const FormularioInicio = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="lastname">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="signup-lastname">
                   LASTNAME
                 </label>
                 <input
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="lastname"
+                  id="signup-lastname"
                   type="text"
                   name="last_name"
                   placeholder="Lastname"
@@ -223,12 +230,12 @@ export const FormularioInicio = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="signup-email">
                   EMAIL ADDRESS
                 </label>
                 <input
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="email"
+                  id="signup-email"
                   type="email"
                   name="email"
                   placeholder="Email Address"
@@ -236,12 +243,12 @@ export const FormularioInicio = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="signup-password">
                   PASSWORD
                 </label>
                 <input
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="password"
+                  id="signup-password"
                   type="password"
                   name="password"
                   placeholder="8+ Characters"
@@ -249,12 +256,12 @@ export const FormularioInicio = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirm-password">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="signup-confirm-password">
                   CONFIRM PASSWORD
                 </label>
                 <input
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="confirm-password"
+                  id="signup-confirm-password"
                   type="password"
                   placeholder="Confirm Password"
                 />
@@ -264,9 +271,9 @@ export const FormularioInicio = () => {
                 <input
                   className="mr-2 leading-tight"
                   type="checkbox"
-                  id="terms"
+                  id="signup-terms"
                 />
-                <label className="text-sm text-gray-600" htmlFor="terms">
+                <label className="text-sm text-gray-600" htmlFor="signup-terms">
                   YOU AGREE WITH THE <a href="#" className="text-orange-500">TERMS AND CONDITIONS</a> AND <a href="#" className="text-orange-500">PRIVACY POLICY</a>.
                 </label>
               </div>
@@ -281,38 +288,33 @@ export const FormularioInicio = () => {
               </div>
             </form>
           ) : (
-            <form id="login-form" className="space-y-4" onSubmit={(e) => {
-              e.preventDefault();
-              const email = e.target.email.value;
-              const password = e.target.password.value;
-              verificarUsuario(email, password);  // Pasar el email y password
-            }}>
+            <form id="login-form" className="space-y-4">
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="login-email">
                   EMAIL ADDRESS
                 </label>
                 <input
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="email"
+                  id="login-email"
                   type="email"
-                  name="email"
+                  name="login_email"
                   placeholder="Email Address"
                 />
               </div>
 
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="login-password">
                   PASSWORD
                 </label>
                 <input
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="password"
+                  id="login-password"
                   type="password"
-                  name="password"
+                  name="login_password"
                   placeholder="Password"
                 />
                 <div className="text-right mt-2">
-                  <a href="#" className="text-sm text-orange-500">FORGOT PASSWORD</a>  
+                  <a href="#" className="text-sm text-orange-500">FORGOT PASSWORD</a>
                 </div>
               </div>
 

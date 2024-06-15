@@ -5,6 +5,7 @@ import { Shop } from "./Shop"
 import { AdministratorMode } from "./AdministratorMode"
 import { FormularioAdministrator } from "./FormularioAdministrator"
 //   import { Ofertas } from "../components/SeccionPrincipal/Ofertas"
+import { FormularioInicio } from "../views/FormularioInicio"
 
 
 export const IndexPage = () => {
@@ -12,7 +13,7 @@ export const IndexPage = () => {
     <>
       {/* <Header/> */}
       <Header/>
-      <Ofertas/>
+      <Shop/>
       {/* <Footer/> */}
     </>
   )
