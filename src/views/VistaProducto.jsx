@@ -4,14 +4,14 @@ import { Footer } from '../components/Footer' // Importa el componente Footer de
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Importa el componente FontAwesomeIcon desde '@fortawesome/react-fontawesome'
 import { fas } from "@fortawesome/free-solid-svg-icons"; // Importa el conjunto de iconos sólidos de FontAwesome desde "@fortawesome/free-solid-svg-icons"
 import { Link, useParams } from "react-router-dom"; // Importa el componente Link desde 'react-router-dom'
-import { data } from 'autoprefixer'; // Importa 'data' desde 'autoprefixer'
 
 export const VistaProducto = () => {
   const [quantity, setQuantity] = useState(1) // Estado para la cantidad del producto
   const [currentImageIndex, setCurrentImageIndex] = useState(0) // Estado para el índice de la imagen actual
   const [BackRes, setBackRes] = useState({}) // Estado para almacenar la respuesta de la solicitud al servidor
   const [BackImages, setBackImages] = useState([]) // Estado para almacenar la respuesta de la solicitud al servidor
-  const {id} = useParams();
+  const [comments, setComments] = useState([]); // Estado para almacenar los comentarios del servidor
+  const { id } = useParams();
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -29,121 +29,158 @@ export const VistaProducto = () => {
   const [depth, setDepth] = useState(0)
   const [imagenes, setImagenes] = useState([])
 
-  //! Esto probablemente habrá que cambiarlo
-  //TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
-  //const {width, height, depth} = dimensions // Desestructuración de las propiedades de dimensions
-
-  const IconoFlecha = <FontAwesomeIcon icon = {fas.faArrowLeft}/> // Icono de flecha izquierda
-  const IconoEstrella = <FontAwesomeIcon icon = {fas.faStar}/> // Icono de estrella
+  const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft} /> // Icono de flecha izquierda
+  const IconoEstrella = <FontAwesomeIcon icon={fas.faStar} /> // Icono de estrella
 
   useEffect(() => {
-    window.scrollTo(0,0)
+    window.scrollTo(0, 0)
   }, [])
-  
 
   useEffect(() => {
     // Función asincrónica para obtener datos del servidor
     const fetchData = async () => {
-        try {
-            // Realizar la solicitud al servidor
-            const res = await fetch('/api/index.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    functionName: 'consultaProductoIndividual',
-                    id:id            
-                })
-            });
+      try {
+        // Realizar la solicitud al servidor
+        const res = await fetch('/api/index.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            functionName: 'consultaProductoIndividual',
+            id: id
+          })
+        });
 
-            if (!res.ok) {
-              throw new Error('Error en la solicitud fetch');
-            }
-
-            // Manejar la respuesta aquí
-            const data = await res.text(); // Leer la respuesta como texto
-            // Procesar los datos recibidos
-            // Por ejemplo, si recibes datos en formato JSON, puedes hacer lo siguiente:
-            return JSON.parse(data); // Convertir la cadena JSON a objeto
-        } catch (error) {
-            console.error('Error:', error);
+        if (!res.ok) {
+          throw new Error('Error en la solicitud fetch');
         }
+
+        // Manejar la respuesta aquí
+        const data = await res.text(); // Leer la respuesta como texto
+        // Procesar los datos recibidos
+        return JSON.parse(data); // Convertir la cadena JSON a objeto
+      } catch (error) {
+        console.error('Error:', error);
+      }
     };
 
     // Función para obtener los datos del servidor
     const getData = async () => {
       try {
         const res = await fetchData(); // Obtener datos del servidor
-        
+
         setBackRes(res); // Establecer la respuesta del servidor en el estado
       } catch (error) {
         console.error("Error al obtener los datos:", error);
         // Manejar el error adecuadamente, por ejemplo, mostrando un mensaje al usuario
       }
     };
-    
+
     getData(); // Llamar a la función para obtener los datos del servidor
 
-  }, []); // Dependencia vacía para que el efecto se ejecute solo una vez
+  }, [id]); // Dependencia incluye 'id' para que se ejecute cuando 'id' cambie
 
   useEffect(() => {
-    // Función asincrónica para obtener imagenes del servidor
+    // Función asincrónica para obtener imágenes del servidor
     const fetchImages = async () => {
-        try {
-            // Realizar la solicitud al servidor
-            const res = await fetch('/api/index.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    functionName: 'consultaImagenes',
-                    id:id            
-                })
-            });
+      try {
+        // Realizar la solicitud al servidor
+        const res = await fetch('/api/index.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            functionName: 'consultaImagenes',
+            id: id
+          })
+        });
 
-            if (!res.ok) {
-              throw new Error('Error en la solicitud fetch');
-            }
-
-            // Manejar la respuesta aquí
-            const images = await res.json();
-            
-            // Verificar si las imágenes son un arreglo
-            if (Array.isArray(images)) {
-              // Convertir el arreglo de objetos a un arreglo de valores
-              const imageUrls = images.map(image => image.url);
-              return imageUrls; // Devolver el arreglo de URLs
-          } else {
-              throw new Error('La respuesta no es un arreglo');
-          }
-
-            return images; // Convertir la cadena JSON a objeto
-        } catch (error) {
-            console.error('Error:', error);
+        if (!res.ok) {
+          throw new Error('Error en la solicitud fetch');
         }
+
+        // Manejar la respuesta aquí
+        const images = await res.json();
+
+        // Verificar si las imágenes son un arreglo
+        if (Array.isArray(images)) {
+          // Convertir el arreglo de objetos a un arreglo de valores
+          const imageUrls = images.map(image => image.url);
+          return imageUrls; // Devolver el arreglo de URLs
+        } else {
+          throw new Error('La respuesta no es un arreglo');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+      }
     };
 
     // Función para obtener los datos del servidor
     const getImages = async () => {
       try {
         const res = await fetchImages(); // Obtener datos del servidor
-        
+
         setBackImages(res); // Establecer la respuesta del servidor en el estado
       } catch (error) {
         console.error("Error al obtener los datos:", error);
         // Manejar el error adecuadamente, por ejemplo, mostrando un mensaje al usuario
       }
     };
-    
+
     getImages(); // Llamar a la función para obtener los datos del servidor
 
-  }, []); // Dependencia vacía para que el efecto se ejecute solo una vez
+  }, [id]); // Dependencia incluye 'id' para que se ejecute cuando 'id' cambie
+
+  useEffect(() => {
+    // Función asincrónica para obtener comentarios del servidor
+    const fetchComments = async () => {
+      try {
+        // Realizar la solicitud al servidor
+        const res = await fetch('/api/index.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            functionName: 'consultaComentarios',
+            id: id
+          })
+        });
+
+        if (!res.ok) {
+          throw new Error('Error en la solicitud fetch');
+        }
+
+        // Manejar la respuesta aquí
+        const comments = await res.json();
+        return comments; // Convertir la cadena JSON a objeto
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    // Función para obtener los datos del servidor
+    const getComments = async () => {
+      try {
+        const res = await fetchComments(); // Obtener datos del servidor
+
+        setComments(res); // Establecer la respuesta del servidor en el estado
+      } catch (error) {
+        console.error("Error al obtener los datos:", error);
+        // Manejar el error adecuadamente, por ejemplo, mostrando un mensaje al usuario
+      }
+    };
+
+    getComments(); // Llamar a la función para obtener los datos del servidor
+
+  }, [id]); // Dependencia incluye 'id' para que se ejecute cuando 'id' cambie
 
   useEffect(() => {
     console.log(BackRes); // Imprimir la respuesta del servidor en la consola
-    const {title, description, discountPercentage, priceWithDiscount, price, brand, rating, returnPolicy, shippingInformation, warrantyInformation, weight, width, height, depth} = BackRes
+    const { title, description, discountPercentage, priceWithDiscount, price, brand, rating, returnPolicy, shippingInformation, warrantyInformation, weight, width, height, depth } = BackRes
     setTitle(title)
     setDescription(description)
     setPrice(price)
@@ -162,16 +199,17 @@ export const VistaProducto = () => {
 
   useEffect(() => {
     console.log(BackImages)
-    setImagenes(BackImages)    
+    setImagenes(BackImages)
   }, [BackImages])
 
   useEffect(() => {
     console.log(imagenes)
   }, [imagenes])
-  
-  
 
-  
+  useEffect(() => {
+    console.log(comments)
+  }, [comments])
+
   // Función para cambiar la cantidad del producto
   const handleQuantityChange = (amount) => {
     setQuantity((prevQuantity) => Math.max(1, prevQuantity + amount));
@@ -190,9 +228,9 @@ export const VistaProducto = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 mt-14">
-        <div className="bg-white p-4 md:p-8 rounded-lg shadow-md w-full max-w-4xl">
-        <Link to="/tienda"><p className="font-semibold">{IconoFlecha} BACK TO SHOP</p></Link>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4 mt-14">
+        <div className="bg-white p-4 md:p-8 rounded-lg shadow-md w-full max-w-4xl mb-8">
+          <Link to="/tienda"><p className="font-semibold">{IconoFlecha} BACK TO SHOP</p></Link>
           <div className="flex flex-wrap md:flex-nowrap">
             <div className="w-full md:w-1/2">
               <div className="relative mb-4 flex items-center justify-center">
@@ -218,7 +256,7 @@ export const VistaProducto = () => {
               </div>
               {/* Caroussel de imagenes */}
               <div className="flex justify-center space-x-2 overflow-x-auto">
-              
+
                 {BackImages.map((image, index) => (
                   <img
                     key={index}
@@ -316,6 +354,24 @@ export const VistaProducto = () => {
               </div>
             </div>
           </div>
+        </div>
+        {/* Sección de comentarios */}
+        <div className="bg-white p-4 md:p-8 rounded-lg shadow-md w-full max-w-4xl">
+          <h3 className="text-lg font-bold mb-2">Comments</h3>
+          {comments.length > 0 ? (
+            comments.map((comment, index) => (
+              <div key={index} className="mb-4 border p-4 rounded">
+                <div className="flex flex-col mb-2">
+                  <span className="font-semibold">{comment.name} ({comment.email})</span>
+                  <div className="text-orange-500">{Array(comment.rating).fill().map((_, i) => <FontAwesomeIcon key={i} icon={fas.faStar} />)}</div>
+                </div>
+                <p className="text-gray-600">{comment.comment}</p>
+                <small className="text-gray-500">{new Date(comment.date).toLocaleDateString()}</small>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-600">No comments yet.</p>
+          )}
         </div>
       </div>
       <Footer />
