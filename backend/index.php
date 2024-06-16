@@ -20,7 +20,8 @@ if ($conn->connect_error) {
 }
 
 // Función para consultar productos
-function consultaProductos($conn) {
+function consultaProductos($conn)
+{
     $sql = "SELECT * FROM products";
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
@@ -40,7 +41,40 @@ function consultaProductos($conn) {
     }
 }
 
-function consultarCarrito($conn) {
+function consultaProductoIndividual($conn, $id)
+{
+    $sql = "SELECT * FROM products WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        return $res->fetch_assoc();
+    } else {
+        return null;
+    }
+}
+
+function consultaImagenes($conn, $id)
+{
+    $sql = "SELECT url FROM images WHERE product_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $imagenes = array();
+        while ($row = $res->fetch_assoc()) {
+            $imagenes[] = $row;
+        }
+        return $imagenes;
+    } else {
+        return array();
+    }
+}
+
+function consultarCarrito($conn)
+{
     $sql = "SELECT * FROM shopping_cart";
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
@@ -60,7 +94,8 @@ function consultarCarrito($conn) {
     }
 }
 
-function consultaUsuario($conn, $email) {
+function consultaUsuario($conn, $email)
+{
     $sql = "SELECT * FROM user_login WHERE email = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $email);
@@ -73,7 +108,8 @@ function consultaUsuario($conn, $email) {
     }
 }
 
-function consultaAdministrador($conn, $adminuser) {
+function consultaAdministrador($conn, $adminuser)
+{
     $sql = "SELECT * FROM user_administrator WHERE adminuser = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $adminuser);
@@ -86,7 +122,8 @@ function consultaAdministrador($conn, $adminuser) {
     }
 }
 
-function registrarUsuario($conn, $data) {
+function registrarUsuario($conn, $data)
+{
     $sql1 = "INSERT INTO user_data (email, first_name, last_name) VALUES (?, ?, ?)";
     $stmt1 = $conn->prepare($sql1);
     $stmt1->bind_param("sss", $data->email, $data->first_name, $data->last_name);
@@ -107,7 +144,8 @@ function registrarUsuario($conn, $data) {
     }
 }
 
-function addToCart($conn, $email, $product_id, $quantity) {
+function addToCart($conn, $email, $product_id, $quantity)
+{
     $stmt = $conn->prepare("INSERT INTO shopping_cart (email, product_id, quantity) VALUES (?, ?, ?)
         ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)");
     $stmt->bind_param("sii", $email, $product_id, $quantity);
@@ -119,7 +157,8 @@ function addToCart($conn, $email, $product_id, $quantity) {
 }
 
 // Funcion para obtener los productos del carrito de un usuario y sus detalles
-function consultaCarrito($conn, $email) {
+function consultaCarrito($conn, $email)
+{
     $sql = "SELECT products.id, products.title, products.price, products.thumbnail, shopping_cart.quantity
             FROM shopping_cart
             JOIN products ON shopping_cart.product_id = products.id
@@ -140,7 +179,8 @@ function consultaCarrito($conn, $email) {
 }
 
 
-function getCartItems($conn, $email) {
+function getCartItems($conn, $email)
+{
     $sql = "SELECT sc.product_id, sc.quantity, p.title, p.price, p.discountPercentage, p.thumbnail
         FROM shopping_cart sc
         INNER JOIN products p ON sc.product_id = p.id
@@ -166,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = file_get_contents('php://input');
     if ($data !== false) {
         $jsonData = json_decode($data);
-      
+
         if ($jsonData !== null && isset($jsonData->functionName)) {
             $functionName = $jsonData->functionName;
             switch ($functionName) {
@@ -211,13 +251,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         echo json_encode($resultado);
                     }
                     break;
-                    case 'consultaCarrito':
-                        if (isset($jsonData->email)) {
-                            $productos = consultaCarrito($conn, $jsonData->email);
-                            header('Content-Type: application/json');
-                            echo json_encode($productos);
-                        }
-                        break;
+                case 'consultaCarrito':
+                    if (isset($jsonData->email)) {
+                        $productos = consultaCarrito($conn, $jsonData->email);
+                        header('Content-Type: application/json');
+                        echo json_encode($productos);
+                    }
+                    break;
+                case 'consultaProductoIndividual':
+                    if (isset($jsonData->id)) {
+                        $productos = consultaProductoIndividual($conn, $jsonData->id);
+                        header('Content-Type: application/json');
+                        echo json_encode($productos);
+                    }
+                    break;
+                case 'consultaImagenes':
+                    if (isset($jsonData->id)) {
+                        $productos = consultaImagenes($conn, $jsonData->id);
+                        header('Content-Type: application/json');
+                        echo json_encode($productos);
+                    }
+                    break;
                 default:
                     error_log("Función no válida");
             }

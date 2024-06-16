@@ -10,15 +10,7 @@ export const Producto = ({producto}) => {
   const IconoAddCart = <FontAwesomeIcon icon={fas.faCartPlus} />
   const IconoCorazon = <FontAwesomeIcon icon={fas.faHeart}/>
 
-  const {id, title, price, discountPercentage, rating, thumbnail} = producto
-
-  const CalcularPrecio = (price, discountPercentage) => {
-    const newPrice = price - (price * (discountPercentage / 100))
-    return parseFloat(newPrice.toFixed(2))  
-  };
-
-  const realPrice = CalcularPrecio(price, discountPercentage)
-  const productoActualizado = {...producto, realPrice}
+  const {id, title, price, priceWithDiscount, discountPercentage, rating, thumbnail} = producto
 
   const addToCart = async () => {
     try {
@@ -43,17 +35,17 @@ export const Producto = ({producto}) => {
   return (
     <>
       <div className="border border-slate-200 rounded-md p-3 shadow-md max-h-fit content-end justify-items-stretch">
-        <Link to="/producto" state={productoActualizado}>
+        <Link to={{ pathname: `/producto/${id}` }}>
           <img className="object-cover mx-auto my-auto" src={thumbnail} alt="imagen producto" />
         </Link>
 
         <div className="pt-2">
-          <Link to="/producto" state={producto}>
-            <h3 className="text-black text-lg font-semibold uppercase">{title}</h3>
-          </Link>
+        <Link to={{ pathname: `/producto/${id}` }}>
+          <h3 className="text-black text-lg font-semibold uppercase">{title}</h3>
+        </Link>
           <p className="text-green-600 text-l font-bold">%{discountPercentage} OFF</p>
           <p className="font-black text-slate-500 text-base line-through">$ {price} USD</p>
-          <p className="font-black text-primary text-xl">$ {CalcularPrecio(price, discountPercentage)} USD</p>
+          <p className="font-black text-primary text-xl">$ {priceWithDiscount} USD</p>
           <div className="my-2">
             <button
               type="button"
