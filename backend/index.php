@@ -217,6 +217,27 @@ function getCartItems($conn, $email)
     return $cartItems;
 }
 
+// Función para consultar comentarios de un producto
+function consultaComentarios($conn, $id)
+{
+    $sql = "SELECT u.first_name as name, u.email, c.rating, c.comment, c.date
+            FROM comments c
+            JOIN user_data u ON c.email = u.email
+            WHERE c.product_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $comentarios = array();
+        while ($row = $res->fetch_assoc()) {
+            $comentarios[] = $row;
+        }
+        return $comentarios;
+    } else {
+        return array();
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header("HTTP/1.1 200 OK");
@@ -287,12 +308,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     break;
                 case 'eliminarProductoCarrito':
-                        if (isset($jsonData->email, $jsonData->product_id)) {
-                            $resultado = eliminarProductoCarrito($conn, $jsonData->email, $jsonData->product_id);
-                            header('Content-Type: application/json');
-                            echo json_encode($resultado);
-                        }
-                        break;
+                    if (isset($jsonData->email, $jsonData->product_id)) {
+                        $resultado = eliminarProductoCarrito($conn, $jsonData->email, $jsonData->product_id);
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    }
+                    break;
                 case 'consultaProductoIndividual':
                     if (isset($jsonData->id)) {
                         $productos = consultaProductoIndividual($conn, $jsonData->id);
@@ -305,6 +326,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $productos = consultaImagenes($conn, $jsonData->id);
                         header('Content-Type: application/json');
                         echo json_encode($productos);
+                    }
+                    break;
+                case 'consultaComentarios':
+                    if (isset($jsonData->id)) {
+                        $comentarios = consultaComentarios($conn, $jsonData->id);
+                        header('Content-Type: application/json');
+                        echo json_encode($comentarios);
                     }
                     break;
                 default:
