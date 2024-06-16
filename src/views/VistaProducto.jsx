@@ -1,28 +1,45 @@
 import React, { useEffect, useState } from 'react'; // Importa React, useEffect y useState desde la biblioteca 'react'
 import { Header } from '../components/Header' // Importa el componente Header desde '../components/Header'
 import { Footer } from '../components/Footer' // Importa el componente Footer desde '../components/Footer'
-import { useLocation } from 'react-router-dom'; // Importa el hook useLocation desde 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Importa el componente FontAwesomeIcon desde '@fortawesome/react-fontawesome'
 import { fas } from "@fortawesome/free-solid-svg-icons"; // Importa el conjunto de iconos sólidos de FontAwesome desde "@fortawesome/free-solid-svg-icons"
-import { Link } from "react-router-dom"; // Importa el componente Link desde 'react-router-dom'
+import { Link, useParams } from "react-router-dom"; // Importa el componente Link desde 'react-router-dom'
 import { data } from 'autoprefixer'; // Importa 'data' desde 'autoprefixer'
 
 export const VistaProducto = () => {
   const [quantity, setQuantity] = useState(1) // Estado para la cantidad del producto
   const [currentImageIndex, setCurrentImageIndex] = useState(0) // Estado para el índice de la imagen actual
-  const location = useLocation(); // Hook useLocation para obtener la ubicación actual
-  const [BackRes, setBackRes] = useState([]) // Estado para almacenar la respuesta de la solicitud al servidor
+  const [BackRes, setBackRes] = useState({}) // Estado para almacenar la respuesta de la solicitud al servidor
+  const [BackImages, setBackImages] = useState([]) // Estado para almacenar la respuesta de la solicitud al servidor
+  const {id} = useParams();
 
-  // Datos de la BD
-  const [nombre, setNombre] = useState('') // Estado para el nombre del producto
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [price, setPrice] = useState(0)
+  const [priceWithDiscount, setpriceWithDiscount] = useState(0)
+  const [discountPercentage, setdiscountPercentage] = useState(0)
+  const [brand, setBrand] = useState('')
+  const [rating, setRating] = useState(0)
+  const [returnPolicy, setreturnPolicy] = useState('')
+  const [shippingInformation, setshippingInformation] = useState('')
+  const [warrantyInformation, setwarrantyInformation] = useState('')
+  const [weight, setWeight] = useState(0)
+  const [width, setWidth] = useState(0)
+  const [height, setHeight] = useState(0)
+  const [depth, setDepth] = useState(0)
+  const [imagenes, setImagenes] = useState([])
 
   //! Esto probablemente habrá que cambiarlo
   //TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
-  const {id, title, description, price, discountPercentage, realPrice, rating, images, dimensions, brand, weight, warrantyInformation, shippingInformation, availabilityStatus, returnPolicy} = location.state || {}; // Desestructuración de las propiedades del objeto location.state
-  const {width, height, depth} = dimensions // Desestructuración de las propiedades de dimensions
+  //const {width, height, depth} = dimensions // Desestructuración de las propiedades de dimensions
 
   const IconoFlecha = <FontAwesomeIcon icon = {fas.faArrowLeft}/> // Icono de flecha izquierda
   const IconoEstrella = <FontAwesomeIcon icon = {fas.faStar}/> // Icono de estrella
+
+  useEffect(() => {
+    window.scrollTo(0,0)
+  }, [])
+  
 
   useEffect(() => {
     // Función asincrónica para obtener datos del servidor
@@ -35,7 +52,7 @@ export const VistaProducto = () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    functionName: 'consulta',
+                    functionName: 'consultaProductoIndividual',
                     id:id            
                 })
             });
@@ -46,8 +63,6 @@ export const VistaProducto = () => {
 
             // Manejar la respuesta aquí
             const data = await res.text(); // Leer la respuesta como texto
-            console.log(data)
-
             // Procesar los datos recibidos
             // Por ejemplo, si recibes datos en formato JSON, puedes hacer lo siguiente:
             return JSON.parse(data); // Convertir la cadena JSON a objeto
@@ -61,23 +76,6 @@ export const VistaProducto = () => {
       try {
         const res = await fetchData(); // Obtener datos del servidor
         
-        if (!Array.isArray(res)) {
-          throw new Error("La respuesta no es un array");
-        }
-    
-        const [producto] = res; // Obtener el primer elemento del array de respuesta
-        
-        if (!producto || typeof producto !== 'object') {
-          throw new Error("El objeto producto no es válido");
-        }
-        
-        const { nombre } = producto; // Obtener el nombre del producto del objeto
-        
-        if (!nombre) {
-          throw new Error("La propiedad nombre no existe en el objeto producto");
-        }
-        
-        setNombre(nombre); // Establecer el nombre del producto en el estado
         setBackRes(res); // Establecer la respuesta del servidor en el estado
       } catch (error) {
         console.error("Error al obtener los datos:", error);
@@ -90,10 +88,89 @@ export const VistaProducto = () => {
   }, []); // Dependencia vacía para que el efecto se ejecute solo una vez
 
   useEffect(() => {
+    // Función asincrónica para obtener imagenes del servidor
+    const fetchImages = async () => {
+        try {
+            // Realizar la solicitud al servidor
+            const res = await fetch('/api/index.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    functionName: 'consultaImagenes',
+                    id:id            
+                })
+            });
+
+            if (!res.ok) {
+              throw new Error('Error en la solicitud fetch');
+            }
+
+            // Manejar la respuesta aquí
+            const images = await res.json();
+            
+            // Verificar si las imágenes son un arreglo
+            if (Array.isArray(images)) {
+              // Convertir el arreglo de objetos a un arreglo de valores
+              const imageUrls = images.map(image => image.url);
+              return imageUrls; // Devolver el arreglo de URLs
+          } else {
+              throw new Error('La respuesta no es un arreglo');
+          }
+
+            return images; // Convertir la cadena JSON a objeto
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    // Función para obtener los datos del servidor
+    const getImages = async () => {
+      try {
+        const res = await fetchImages(); // Obtener datos del servidor
+        
+        setBackImages(res); // Establecer la respuesta del servidor en el estado
+      } catch (error) {
+        console.error("Error al obtener los datos:", error);
+        // Manejar el error adecuadamente, por ejemplo, mostrando un mensaje al usuario
+      }
+    };
+    
+    getImages(); // Llamar a la función para obtener los datos del servidor
+
+  }, []); // Dependencia vacía para que el efecto se ejecute solo una vez
+
+  useEffect(() => {
     console.log(BackRes); // Imprimir la respuesta del servidor en la consola
+    const {title, description, discountPercentage, priceWithDiscount, price, brand, rating, returnPolicy, shippingInformation, warrantyInformation, weight, width, height, depth} = BackRes
+    setTitle(title)
+    setDescription(description)
+    setPrice(price)
+    setpriceWithDiscount(priceWithDiscount)
+    setdiscountPercentage(discountPercentage)
+    setBrand(brand)
+    setRating(rating)
+    setreturnPolicy(returnPolicy)
+    setshippingInformation(shippingInformation)
+    setwarrantyInformation(warrantyInformation)
+    setWeight(weight)
+    setHeight(height)
+    setWidth(width)
+    setDepth(depth)
   }, [BackRes]); // Ejecutar el efecto cuando cambie BackRes
 
-  const imagenes = images // Asignar las imágenes a la variable 'imagenes'
+  useEffect(() => {
+    console.log(BackImages)
+    setImagenes(BackImages)    
+  }, [BackImages])
+
+  useEffect(() => {
+    console.log(imagenes)
+  }, [imagenes])
+  
+  
+
   
   // Función para cambiar la cantidad del producto
   const handleQuantityChange = (amount) => {
@@ -102,12 +179,12 @@ export const VistaProducto = () => {
 
   // Función para mostrar la siguiente imagen
   const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % BackImages.length);
   };
 
   // Función para mostrar la imagen anterior
   const handlePreviousImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + BackImages.length) % BackImages.length);
   };
 
   return (
@@ -127,7 +204,7 @@ export const VistaProducto = () => {
                   &lt;
                 </button>
                 <img
-                  src={images[currentImageIndex]}
+                  src={BackImages[currentImageIndex]}
                   alt="Product"
                   className="w-full h-auto"
                 />
@@ -142,7 +219,7 @@ export const VistaProducto = () => {
               {/* Caroussel de imagenes */}
               <div className="flex justify-center space-x-2 overflow-x-auto">
               
-                {imagenes.map((image, index) => (
+                {BackImages.map((image, index) => (
                   <img
                     key={index}
                     src={image}
@@ -156,7 +233,7 @@ export const VistaProducto = () => {
             <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pl-8">
 
               {/* Informacioin general del producto */}
-              <h1 className="text-2xl font-bold">{title}{nombre}</h1>
+              <h1 className="text-2xl font-bold">{title}</h1>
 
               <div className="flex items-center my-4">
                 <div className="flex items-center text-orange-500">
@@ -164,10 +241,10 @@ export const VistaProducto = () => {
                 </div>
               </div>
               <div className="text-xl text-gray-500 line-through">$ {price} USD</div>
-              <div className="text-3xl font-bold mb-2">$ {realPrice} USD</div>
+              <div className="text-3xl font-bold mb-2">$ {priceWithDiscount} USD</div>
               <div className="text-green-500 font-bold mb-2">{discountPercentage}% OFF</div>
               <div className="mb-4">
-                <span className="text-gray-600">AVAILABILITY:</span> <span className="text-green-500">{availabilityStatus}</span>
+                <span className="text-gray-600">AVAILABILITY:</span> <span className="text-green-500">{/* {availabilityStatus} */}</span>
               </div>
               <div className="flex items-center mb-4">
                 <button

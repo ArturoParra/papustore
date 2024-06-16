@@ -21,7 +21,7 @@ export const AppRouter = () => {
           <Route path='/tienda' element={<Shop />} />
           <Route path='/perfil' element={<UserProfile />} />
           <Route path='/favoritos' element={<Wishlist />} />
-          <Route path='/producto' element={<VistaProducto />} />
+          <Route path='/producto/:id' element={<VistaProducto />} />
           <Route path='/administrador' element={<AdministratorMode />} />
           <Route path='/form' element={<FormularioInicio />} />
           <Route path='/adminForm' element={<FormularioAdministrator />} />
