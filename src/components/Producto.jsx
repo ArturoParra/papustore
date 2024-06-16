@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from '../components/AuthProvider';  // Asegúrate de ajustar la ruta
 
 export const Producto = ({producto}) => {
-  const { userEmail } = useAuth();  // Obtener el email del usuario desde el contexto de autenticación
+  const { userEmail, isAuthenticated } = useAuth();  // Obtener el email del usuario desde el contexto de autenticación
 
   const IconoAddCart = <FontAwesomeIcon icon={fas.faCartPlus} />
   const IconoCorazon = <FontAwesomeIcon icon={fas.faHeart}/>
@@ -13,22 +13,26 @@ export const Producto = ({producto}) => {
   const {id, title, price, priceWithDiscount, discountPercentage, rating, thumbnail} = producto
 
   const addToCart = async () => {
-    try {
-      const response = await fetch('/api/index.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ functionName: 'insertarCarrito', email: userEmail, product_id: id, quantity: 1 }),
-      });
-      const result = await response.json();
-      if (result.success) {
-        alert('Producto añadido al carrito');
-      } else {
-        alert('Error al añadir el producto al carrito');
+    if(isAuthenticated){
+      try {
+        const response = await fetch('/api/index.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ functionName: 'insertarCarrito', email: userEmail, product_id: id, quantity: 1 }),
+        });
+        const result = await response.json();
+        if (result.success) {
+          alert('Producto añadido al carrito');
+        } else {
+          alert('Error al añadir el producto al carrito');
+        }
+      } catch (error) {
+        console.error('Error al añadir el producto al carrito:', error);
       }
-    } catch (error) {
-      console.error('Error al añadir el producto al carrito:', error);
+    }else{
+      alert("Log in to add to cart")
     }
   };
 

@@ -1,9 +1,40 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useAuth } from './AuthProvider';
 
 // Componente ProductoShoppingCart que recibe props: item, incrementQuantity, decrementQuantity, removeItem
 export const ProductoShoppingCart = ({ item, incrementQuantity, decrementQuantity, removeItem }) => {
   // Asignar valores predeterminados si las propiedades están indefinidas
   const {id, title, thumbnail, quantity, price} = item
+  const { userEmail } = useAuth()
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/index.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            functionName: "updateCarrito",
+            email: userEmail,
+            quantity: quantity,
+            id: id
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Error en la solicitud fetch");
+        }
+
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchData();
+  }, [quantity])
+  
 
   return (
     // Contenedor principal con clases de Tailwind CSS para estilo y diseño responsivo

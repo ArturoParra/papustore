@@ -8,8 +8,7 @@ import { Link } from "react-router-dom";
 export const ShoppingCart = () => {
   const { userEmail } = useAuth();
   const [cart, setCart] = useState([]);
-  const [productos, setProductos] = useState([]);
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
