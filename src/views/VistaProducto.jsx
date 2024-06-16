@@ -4,8 +4,12 @@ import { Footer } from '../components/Footer' // Importa el componente Footer de
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Importa el componente FontAwesomeIcon desde '@fortawesome/react-fontawesome'
 import { fas } from "@fortawesome/free-solid-svg-icons"; // Importa el conjunto de iconos sólidos de FontAwesome desde "@fortawesome/free-solid-svg-icons"
 import { Link, useParams } from "react-router-dom"; // Importa el componente Link desde 'react-router-dom'
+import { useAuth } from '../components/AuthProvider';
 
 export const VistaProducto = () => {
+
+  const { userEmail, isAuthenticated } = useAuth()
+
   const [quantity, setQuantity] = useState(1) // Estado para la cantidad del producto
   const [currentImageIndex, setCurrentImageIndex] = useState(0) // Estado para el índice de la imagen actual
   const [BackRes, setBackRes] = useState({}) // Estado para almacenar la respuesta de la solicitud al servidor
@@ -27,7 +31,6 @@ export const VistaProducto = () => {
   const [width, setWidth] = useState(0)
   const [height, setHeight] = useState(0)
   const [depth, setDepth] = useState(0)
-  const [imagenes, setImagenes] = useState([])
 
   const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft} /> // Icono de flecha izquierda
   const IconoEstrella = <FontAwesomeIcon icon={fas.faStar} /> // Icono de estrella
@@ -197,14 +200,30 @@ export const VistaProducto = () => {
     setDepth(depth)
   }, [BackRes]); // Ejecutar el efecto cuando cambie BackRes
 
-  useEffect(() => {
-    console.log(BackImages)
-    setImagenes(BackImages)
-  }, [BackImages])
+  const addToCart = async () => {
+    if(isAuthenticated){
+      try {
+        const response = await fetch('/api/index.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ functionName: 'insertarCarrito', email: userEmail, product_id: id, quantity: quantity }),
+        });
+        const result = await response.json();
+        if (result.success) {
+          alert('Producto añadido al carrito');
+        } else {
+          alert('Error al añadir el producto al carrito');
+        }
+      } catch (error) {
+        console.error('Error al añadir el producto al carrito:', error);
+      }
+    }else{
+      alert("Log in to add to cart")
+    }
+  };
 
-  useEffect(() => {
-    console.log(imagenes)
-  }, [imagenes])
 
   useEffect(() => {
     console.log(comments)
@@ -244,7 +263,7 @@ export const VistaProducto = () => {
                 <img
                   src={BackImages[currentImageIndex]}
                   alt="Product"
-                  className="w-full h-auto"
+                  className="w-fit h-96"
                 />
                 <button
                   className="absolute right-0 p-2 rounded-full bg-gray-200 hover:bg-gray-300"
@@ -262,7 +281,7 @@ export const VistaProducto = () => {
                     key={index}
                     src={image}
                     alt={`Thumbnail ${index + 1}`}
-                    className={`w-20 h-20 border ${currentImageIndex === index ? 'border-orange-500' : ''}`}
+                    className={`w-auto h-20 border ${currentImageIndex === index ? 'border-orange-500' : ''}`}
                     onClick={() => setCurrentImageIndex(index)}
                   />
                 ))}
@@ -301,7 +320,7 @@ export const VistaProducto = () => {
               </div>
               {/* Botones para agregar al carrito, agregar a la wishlist y comprar ahora */}
               <div className="flex items-center space-x-4 mb-4">
-                <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                <button onClick={addToCart} className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                   ADD TO CART
                 </button>
                 <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">

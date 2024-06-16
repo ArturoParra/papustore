@@ -156,6 +156,17 @@ function addToCart($conn, $email, $product_id, $quantity)
     }
 }
 
+function updateCarrito($conn, $email, $quantity, $id)
+{
+    $stmt = $conn->prepare("UPDATE shopping_cart SET quantity = ? WHERE product_id = ? AND email = ?");
+    $stmt->bind_param("iis", $quantity, $id, $email);
+    if ($stmt->execute()) {
+        return ["success" => true];
+    } else {
+        return ["success" => false, "message" => "Error al actualizar el carrito"];
+    }
+}
+
 // Funcion para obtener los productos del carrito de un usuario y sus detalles
 function consultaCarrito($conn, $email)
 {
@@ -278,6 +289,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 case 'insertarCarrito':
                     if (isset($jsonData->email, $jsonData->product_id, $jsonData->quantity)) {
                         $resultado = addToCart($conn, $jsonData->email, $jsonData->product_id, $jsonData->quantity);
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    }
+                    break;
+                case 'updateCarrito':
+                    if (isset($jsonData->email, $jsonData->id, $jsonData->quantity)) {
+                        $resultado = updateCarrito($conn, $jsonData->email, $jsonData->quantity, $jsonData->id);
                         header('Content-Type: application/json');
                         echo json_encode($resultado);
                     }
