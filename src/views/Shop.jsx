@@ -235,6 +235,11 @@ export const Shop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [dataOrdenado])
+  
+
   return (
     <>
       {/* Renderización del header */}
