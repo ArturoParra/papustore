@@ -13,7 +13,7 @@ export const IndexPage = () => {
   return (
     <>
       <Header/>
-      <Shop/>
+      <ConfirmarCompra/>
       <Footer/>
     </>
   )
