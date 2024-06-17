@@ -4,10 +4,14 @@ import { Footer } from "../components/Footer";
 import { ProductoShoppingCart } from "../components/ProductoShoppingCart";
 import { useAuth } from "../components/AuthProvider";
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { fas } from "@fortawesome/free-solid-svg-icons";
 
 export const ShoppingCart = () => {
   const { userEmail } = useAuth();
   const [cart, setCart] = useState([]);
+
+  const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,9 +94,8 @@ export const ShoppingCart = () => {
   };
 
   const subTotal = cartTotal();
-  const discount = 24;
   const tax = 61.99;
-  const total = subTotal - discount + tax;
+  const total = subTotal + tax;
 
   return (
     <>
@@ -100,6 +103,13 @@ export const ShoppingCart = () => {
       <div className="container mx-auto mt-10 p-4 sm:p-8">
         <div className="flex flex-col lg:flex-row shadow-md my-10">
           <div className="w-full lg:w-3/4 bg-white px-4 sm:px-10 py-10">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-5 space-y-4 sm:space-y-0 sm:space-x-4">
+              <Link to="/tienda">
+                <button className="flex font-semibold text-sm text-black items-center sm:justify-start w-full sm:w-auto">
+                  <span>{IconoFlecha} BACK TO SHOP</span>
+                </button>
+              </Link>
+            </div>
             <div className="flex justify-between border-b pb-8">
               <h1 className="font-semibold text-2xl">SHOPPING CART</h1>
             </div>
@@ -126,22 +136,6 @@ export const ShoppingCart = () => {
                 removeItem={removeItem}
               />
             ))}
-            <div className="flex flex-col sm:flex-row justify-between items-center mt-10 space-y-4 sm:space-y-0 sm:space-x-4">
-              <Link to="/tienda">
-                <button className="flex font-semibold text-sm text-blue-600 items-center sm:justify-start w-full sm:w-auto">
-                  <svg
-                    className="fill-current mr-2 text-blue-600 w-4"
-                    viewBox="0 0 448 512"
-                  >
-                    <path d="M134.059 296H432c8.837 0 16 7.163 16 16v16c0 8.837-7.163 16-16 16H134.059l49.636 49.373c6.286 6.25 6.317 16.378.059 22.667L160 452.687c-6.308 6.279-16.454 6.255-22.667-.059L5.373 320c-6.249-6.284-6.249-16.444 0-22.627l132-132.373c6.313-6.316 16.455-6.349 22.667-.059l23.655 23.314c6.259 6.288 6.228 16.416-.059 22.666L134.059 296z" />
-                  </svg>
-                  BACK TO SHOP
-                </button>
-              </Link>
-              <button className="bg-blue-500 font-semibold hover:bg-blue-600 py-3 text-sm text-white uppercase w-full sm:w-auto px-4">
-                UPDATE CART
-              </button>
-            </div>
           </div>
 
           <div
@@ -158,10 +152,6 @@ export const ShoppingCart = () => {
               </span>
             </div>
             <div className="flex justify-between mt-10 mb-5">
-              <span className="font-semibold text-sm uppercase">DISCOUNT</span>
-              <span className="font-semibold text-sm">${discount}</span>
-            </div>
-            <div className="flex justify-between mt-10 mb-5">
               <span className="font-semibold text-sm uppercase">TAX</span>
               <span className="font-semibold text-sm">${tax}</span>
             </div>
@@ -170,9 +160,11 @@ export const ShoppingCart = () => {
                 <span>TOTAL</span>
                 <span>${total.toFixed(2)}</span>
               </div>
+              <Link to="/pedido">
               <button className="bg-orange-500 font-semibold hover:bg-orange-600 py-3 text-sm text-white uppercase w-full">
                 CHECKOUT
               </button>
+              </Link>
             </div>
           </div>
         </div>

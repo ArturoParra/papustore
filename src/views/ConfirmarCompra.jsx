@@ -1,13 +1,99 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'
+import { Header } from '../components/Header'
+import { Footer } from '../components/Footer'
+import { useAuth } from '../components/AuthProvider'
+import { ProductoPedido } from '../components/ProductoPedido'
+import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 
-
 export const ConfirmarCompra = () => {
-    const [papuCreditos, setPapuCreditos] = useState(20000); // Variable de estado para los PapuCreditos
+
+  const { userEmail } = useAuth()
+  const [pedido, setPedido] = useState([])
+  const [subTotal, setsubTotal] = useState(0)
+  const [papuCreditos, setPapuCreditos] = useState(20000); // Variable de estado para los PapuCreditos
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/index.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            functionName: "consultaCarrito",
+            email: userEmail,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Error en la solicitud fetch");
+        }
+
+        const data = await res.json();
+        // Actualizar el estado de productos con los datos obtenidos
+
+        setPedido(data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchData();
+  }, [userEmail]);
+
+  const pedidoTotal = () => {
+    return pedido.reduce(
+      (total, item) => total + (item.price || 0) * item.quantity,
+      0
+    );
+  };
+
+  useEffect(() => {
+    setsubTotal(pedidoTotal)
+  }, [pedido])
+  
+
+  const placeOrder = async () => {
+    try {
+      const res = await fetch("/api/index.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          functionName: "agregarCompra",
+          email: userEmail,
+          total: subTotal
+        }),
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        alert('Compra registrada con éxito');
+      } else {
+        alert('Error al registrar compra');
+      }
+
+    } catch (error) {
+      console.error("Error:", error);
+    }
+
+    const timer = setTimeout(() => {
+      navigate('/tienda'); // Cambia '/nueva-ruta' por la ruta a la que deseas navegar
+    }, 3000);
+
+  }
+
   return (
     <>
-    <div className="bg-gray-100 p-8 flex flex-col lg:flex-row">
+    <Header/>
+     <div className="bg-gray-100 p-8 flex flex-col lg:flex-row">
       {/* Billing Information */}
       <div className="bg-white p-8 rounded-lg shadow-md w-full lg:w-2/3 mb-8 lg:mb-0 lg:mr-8">
         <h2 className="text-2xl font-bold mb-6">Billing Information</h2>
@@ -50,21 +136,17 @@ export const ConfirmarCompra = () => {
       <div className="bg-white p-8 rounded-lg shadow-md w-full lg:w-1/3">
         <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
         <div className="mb-4">
-          <div className="flex justify-between items-center mb-4">
-            <img src="/path-to-image-1.jpg" alt="Product 1" className="w-16 h-16 object-cover" />
-            <div className="flex-1 ml-4">Canon EOS 1500D DSLR Camera Body+ 18-...</div>
-            <div>1 x <span className="text-blue-600">$70</span></div>
-          </div>
-          <div className="flex justify-between items-center">
-            <img src="/path-to-image-2.jpg" alt="Product 2" className="w-16 h-16 object-cover" />
-            <div className="flex-1 ml-4">Wired Over-Ear Gaming Headphones with U...</div>
-            <div>3 x <span className="text-blue-600">$250</span></div>
-          </div>
+        {pedido.map((item) => (
+              <ProductoPedido
+                key={item.id}
+                item={item}
+              />
+            ))}
         </div>
         <div className="border-t pt-4">
           <div className="flex justify-between mb-2">
             <div>Sub-total</div>
-            <div>$320</div>
+            <div>$ {subTotal} USD</div>
           </div>
           <div className="flex justify-between mb-2">
             <div>Shipping</div>
@@ -80,14 +162,15 @@ export const ConfirmarCompra = () => {
           </div>
           <div className="flex justify-between font-bold text-lg">
             <div>Total</div>
-            <div>$357.99 USD</div>
+            <div>$ {subTotal} USD</div>
           </div>
         </div>
-        <button className="mt-6 w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        <button onClick={placeOrder} className="mt-6 w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
           PLACE ORDER
         </button>
       </div>
     </div>
+    <Footer/>
     </>
   )
 }
