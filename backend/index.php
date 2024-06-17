@@ -207,6 +207,27 @@ function getCartItems($conn, $email)
     return $cartItems;
 }
 
+function consultaComentarios($conn, $id)
+{
+    $sql = "SELECT u.first_name as name, u.email, c.rating, c.comment, c.date
+            FROM comments c
+            JOIN user_data u ON c.email = u.email
+            WHERE c.product_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $comentarios = array();
+        while ($row = $res->fetch_assoc()) {
+            $comentarios[] = $row;
+        }
+        return $comentarios;
+    } else {
+        return array();
+    }
+}
+
 // Nuevas funciones para el perfil del usuario y pedidos recientes
 
 function consultaUsuarioData($conn, $email)
