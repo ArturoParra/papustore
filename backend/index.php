@@ -283,6 +283,20 @@ function agregarCompra($conn, $email, $total)
     }
 }
 
+function updateUserData($conn, $userData)
+{
+    $sql = "UPDATE user_data SET first_name=?, last_name=?, phone=?, email_secondary=?, purchases=?, country=?, state=?, zip=?, company=?, address=?, region=?, city=? WHERE email=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssisssssssss", $userData->first_name, $userData->last_name, $userData->phone, $userData->email_secondary, $userData->purchases, $userData->country, $userData->state, $userData->zip, $userData->company, $userData->address, $userData->region, $userData->city, $userData->email);
+
+    if ($stmt->execute()) {
+        return ["success" => true];
+    } else {
+        error_log("Error al actualizar la información del usuario: " . $conn->error);
+        return ["success" => false];
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header("HTTP/1.1 200 OK");
     exit();
@@ -393,7 +407,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         echo json_encode($resultado);
                     }
                     break;
-                default:
+                case 'updateUserData':
+                    if (isset($jsonData->userData)) {
+                        $resultado = updateUserData($conn, $jsonData->userData);
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    }
+                    break;
                     error_log("Función no válida");
             }
         } else {
