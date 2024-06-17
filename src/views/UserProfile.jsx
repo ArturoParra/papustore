@@ -3,11 +3,13 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import Order from '../components/Order';
 import { useAuth } from '../components/AuthProvider';
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 
 export const UserProfile = () => {
   const { userEmail } = useAuth();
   const [userInfo, setUserInfo] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
+  const navigate = useNavigate(); // Inicializar useNavigate
 
   useEffect(() => {
     // Fetch user information
@@ -19,7 +21,7 @@ export const UserProfile = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            functionName: 'consultaUsuarioData',  // Cambiado a consultaUsuarioData
+            functionName: 'consultaUsuarioData',
             email: userEmail,
           }),
         });
@@ -39,7 +41,7 @@ export const UserProfile = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            functionName: 'consultaPedidosRecientes',  // Cambiado a consultaPedidosRecientes
+            functionName: 'consultaPedidosRecientes',
             email: userEmail,
           }),
         });
@@ -101,7 +103,7 @@ export const UserProfile = () => {
                   <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.country}</div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">REGION/STATE</label>
+                  <label className="block text-sm font-medium text-gray-700">STATE</label>
                   <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.state}</div>
                 </div>
                 <div>
@@ -120,11 +122,18 @@ export const UserProfile = () => {
                   <label className="block text-sm font-medium text-gray-700">ADDRESS</label>
                   <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.address}</div>
                 </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">REGION</label>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.region}</div>
+                </div>
               </div>
             </div>
           </div>
           <div className="mt-4">
-            <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            <button
+              onClick={() => navigate('/edit-profile')} // Usar navigate para redirigir
+              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
               EDIT INFORMATION
             </button>
           </div>
