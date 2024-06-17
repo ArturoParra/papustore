@@ -10,6 +10,7 @@ import { AdministratorMode } from './views/AdministratorMode';
 import { FormularioAdministrator } from './views/FormularioAdministrator';
 import { FormularioInicio } from './views/FormularioInicio';
 import { AuthProvider } from './components/AuthProvider'; // Ajusta la ruta según sea necesario
+import { ConfirmarCompra } from './views/ConfirmarCompra';
 
 export const AppRouter = () => {
   return (
@@ -25,6 +26,7 @@ export const AppRouter = () => {
           <Route path='/administrador' element={<AdministratorMode />} />
           <Route path='/form' element={<FormularioInicio />} />
           <Route path='/adminForm' element={<FormularioAdministrator />} />
+          <Route path='/pedido' element={<ConfirmarCompra />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

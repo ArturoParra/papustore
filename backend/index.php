@@ -190,7 +190,8 @@ function consultaCarrito($conn, $email)
 }
 
 // Funcion para eliminar un producto del carrito de un usuario
-function eliminarProductoCarrito($conn, $email, $product_id) {
+function eliminarProductoCarrito($conn, $email, $product_id)
+{
     $stmt = $conn->prepare("DELETE FROM shopping_cart WHERE email = ? AND product_id = ?");
     $stmt->bind_param("si", $email, $product_id);
     if ($stmt->execute()) {
@@ -236,6 +237,17 @@ function consultaComentarios($conn, $id)
         return $comentarios;
     } else {
         return array();
+    }
+}
+
+function agregarCompra($conn, $email, $total)
+{
+    $stmt = $conn->prepare("INSERT INTO purchase_history (email, total) VALUES (?, ?)");
+    $stmt->bind_param("si", $email, $total);
+    if ($stmt->execute()) {
+        return ["success" => true];
+    } else {
+        return ["success" => false, "message" => "Error al añadir compra"];
     }
 }
 
@@ -333,6 +345,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $comentarios = consultaComentarios($conn, $jsonData->id);
                         header('Content-Type: application/json');
                         echo json_encode($comentarios);
+                    }
+                    break;
+                case 'agregarCompra':
+                    if (isset($jsonData->email, $jsonData->total)) {
+                        $resultado = agregarCompra($conn, $jsonData->email, $jsonData->total);
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
                     }
                     break;
                 default:
