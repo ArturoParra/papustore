@@ -4,12 +4,15 @@ import { Footer } from '../components/Footer'
 import { useAuth } from '../components/AuthProvider'
 import { ProductoPedido } from '../components/ProductoPedido'
 import { useNavigate } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 
 export const ConfirmarCompra = () => {
 
   const { userEmail } = useAuth()
   const [pedido, setPedido] = useState([])
   const [subTotal, setsubTotal] = useState(0)
+  const [papuCreditos, setPapuCreditos] = useState(20000); // Variable de estado para los PapuCreditos
 
   const navigate = useNavigate();
 
@@ -118,6 +121,14 @@ export const ConfirmarCompra = () => {
           <div>
             <label className="block text-gray-700">Zip Code</label>
             <input type="text" className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Zip Code" />
+          </div>
+        </div>
+        <div className="mt-6">
+          <h2 className="text-xl font-bold mb-2">PapuCreditos</h2>
+          <div className="flex items-center text-lg text-gray-700">
+            <FontAwesomeIcon icon={faDollarSign} className="mr-2 text-green-500" />
+            <span className="font-bold">{papuCreditos.toLocaleString()}</span>
+            <span className="ml-2 text-sm">USD</span>
           </div>
         </div>
       </div>
