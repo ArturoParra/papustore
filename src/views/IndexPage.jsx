@@ -8,12 +8,13 @@ import { FormularioAdministrator } from "./FormularioAdministrator"
 import { FormularioInicio } from "../views/FormularioInicio"
 import { VistaProducto } from "../views/VistaProducto"
 import { ConfirmarCompra } from "../views/ConfirmarCompra"
+import { UserProfile } from "../views/UserProfile"
 
 export const IndexPage = () => {
   return (
     <>
       <Header/>
-      <ConfirmarCompra/>
+      <Shop/>
       <Footer/>
     </>
   )

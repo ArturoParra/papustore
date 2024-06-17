@@ -1,133 +1,156 @@
-import React, { useState } from 'react'; // Importa React y el hook useState
-import { Header } from '../components/Header'; // Importa el componente Header
-import { Footer } from '../components/Footer'; // Importa el componente Footer
+import React, { useEffect, useState } from 'react';
+import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
+import Order from '../components/Order';
+import { useAuth } from '../components/AuthProvider';
 
-// Componente UserProfile
 export const UserProfile = () => {
+  const { userEmail } = useAuth();
+  const [userInfo, setUserInfo] = useState({});
+  const [recentOrders, setRecentOrders] = useState([]);
+
+  useEffect(() => {
+    // Fetch user information
+    const fetchUserInfo = async () => {
+      try {
+        const response = await fetch('/api/index.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            functionName: 'consultaUsuarioData',  // Cambiado a consultaUsuarioData
+            email: userEmail,
+          }),
+        });
+        const data = await response.json();
+        setUserInfo(data);
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    };
+
+    // Fetch recent orders
+    const fetchRecentOrders = async () => {
+      try {
+        const response = await fetch('/api/index.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            functionName: 'consultaPedidosRecientes',  // Cambiado a consultaPedidosRecientes
+            email: userEmail,
+          }),
+        });
+        const data = await response.json();
+        setRecentOrders(data);
+      } catch (error) {
+        console.error('Error fetching recent orders:', error);
+      }
+    };
+
+    fetchUserInfo();
+    fetchRecentOrders();
+  }, [userEmail]);
+
   return (
     <>
-      <Header /> {/* Renderiza el componente Header */}
-      {/* Contenedor principal */}
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-4xl">
+      <Header />
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-12 px-4">
+        <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-4xl mb-8">
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Sección de Configuración de la Cuenta */}
             <div className="w-full md:w-1/2">
-              <h2 className="text-xl font-bold mb-4">ACCOUNT SETTINGS</h2> {/* Título de la sección */}
-              {/* Formulario para configurar la cuenta */}
-              <div className="flex items-center mb-4">
-                <img
-                  src="https://via.placeholder.com/100"
-                  alt="Profile"
-                  className="w-24 h-24 rounded-full mr-4"
-                />
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">DISPLAY NAME</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Display Name"/>
-                </div>
-              </div>
-              {/* Campos para ingresar datos de la cuenta */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Cada campo de entrada */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">FULL NAME</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Full Name"/>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">USERNAME</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Username" />
-                </div>
+              <h2 className="text-xl font-bold mb-4">ACCOUNT INFORMATION</h2>
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">EMAIL</label>
-                  <input type="email" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Email"/>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.email}</div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">PHONE NUMBER</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Phone Number"/>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">SECONDARY EMAIL</label>
-                  <input type="email" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Secondary Email"/>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">COUNTRY/REGION</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Country/Region"/>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">STATE</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="State"/>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">ZIP CODE</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Zip Code"/>
-                </div>
-                
-              </div>
-              {/* Botón para guardar cambios */}
-              <div className="mt-4">
-                <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                  SAVE CHANGES
-                </button>
-              </div>
-            </div>
-            {/* Sección de Dirección de Envío */}
-            <div className="w-full md:w-1/2">
-              <h2 className="text-xl font-bold mb-4">SHIPPING ADDRESS</h2> {/* Título de la sección */}
-              {/* Formulario para ingresar la dirección de envío */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Cada campo de entrada */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">FIRST NAME</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="First Name"/>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.first_name}</div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">LAST NAME</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Last Name"/>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">COMPANY NAME (OPTIONAL)</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Company Name"/>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">ADDRESS</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Address"/>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.last_name}</div>
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-700">PHONE</label>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.phone}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">SECONDARY EMAIL</label>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.email_secondary}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">PURCHASES</label>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.purchases}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">PAPU CREDITS</label>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">${userInfo.papu_credits} USD</div>
+                </div>
+              </div>
+            </div>
+            <div className="w-full md:w-1/2">
+              <h2 className="text-xl font-bold mb-4">SHIPPING ADDRESS</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
                   <label className="block text-sm font-medium text-gray-700">COUNTRY</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Country"/>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.country}</div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">REGION/STATE</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Region/State" />
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.state}</div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">CITY</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="City"/>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.city}</div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">ZIP CODE</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Zip Code"/>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.zip}</div>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">EMAIL</label>
-                  <input type="email" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Email"/>
+                  <label className="block text-sm font-medium text-gray-700">COMPANY NAME (OPTIONAL)</label>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.company}</div>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">PHONE NUMBER</label>
-                  <input type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Phone Number"/>
+                  <label className="block text-sm font-medium text-gray-700">ADDRESS</label>
+                  <div className="mt-1 block w-full p-2 bg-gray-100">{userInfo.address}</div>
                 </div>
-              </div>
-              {/* Botón para guardar cambios */}
-              <div className="mt-4">
-                <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                  SAVE CHANGES
-                </button>
               </div>
             </div>
           </div>
+          <div className="mt-4">
+            <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+              EDIT INFORMATION
+            </button>
+          </div>
+        </div>
+        <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-4xl">
+          <h2 className="text-xl font-bold mb-4">RECENT ORDER</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200">
+              <thead>
+                <tr>
+                  <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ORDER ID</th>
+                  <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">DATE</th>
+                  <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">TOTAL</th>
+                  <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ACTION</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentOrders.map((order) => (
+                  <Order key={order.id} id={order.id} date={order.date} total={order.total} action={order.action} />
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-      <Footer /> {/* Renderiza el componente Footer */}
+      <Footer />
     </>
   );
 };

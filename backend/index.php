@@ -156,17 +156,6 @@ function addToCart($conn, $email, $product_id, $quantity)
     }
 }
 
-function updateCarrito($conn, $email, $quantity, $id)
-{
-    $stmt = $conn->prepare("UPDATE shopping_cart SET quantity = ? WHERE product_id = ? AND email = ?");
-    $stmt->bind_param("iis", $quantity, $id, $email);
-    if ($stmt->execute()) {
-        return ["success" => true];
-    } else {
-        return ["success" => false, "message" => "Error al actualizar el carrito"];
-    }
-}
-
 // Funcion para obtener los productos del carrito de un usuario y sus detalles
 function consultaCarrito($conn, $email)
 {
@@ -217,23 +206,45 @@ function getCartItems($conn, $email)
     return $cartItems;
 }
 
-// Función para consultar comentarios de un producto
-function consultaComentarios($conn, $id)
+// Nuevas funciones para el perfil del usuario y pedidos recientes
+
+function consultaUsuarioData($conn, $email)
 {
-    $sql = "SELECT u.first_name as name, u.email, c.rating, c.comment, c.date
-            FROM comments c
-            JOIN user_data u ON c.email = u.email
-            WHERE c.product_id = ?";
+    $sql = "SELECT email, first_name, last_name, phone, email_secondary, purchases, papu_credits, country, state, zip, company, address, region, city FROM user_data WHERE email = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id);
+    $stmt->bind_param("s", $email);
     $stmt->execute();
     $res = $stmt->get_result();
     if ($res->num_rows > 0) {
-        $comentarios = array();
+        return $res->fetch_assoc();
+    } else {
+        return null;
+    }
+}
+
+function consultaPedidosRecientes($conn, $email)
+{
+    $sql = "SELECT p.purchase_id AS id, p.date, p.total, COUNT(pd.product_id) AS products
+            FROM purchase_history p
+            JOIN purchase_details pd ON p.purchase_id = pd.purchase_id
+            WHERE p.email = ?
+            GROUP BY p.purchase_id, p.date, p.total
+            ORDER BY p.date DESC
+            LIMIT 10";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $pedidos = array();
         while ($row = $res->fetch_assoc()) {
-            $comentarios[] = $row;
+            $pedidos[] = [
+                'id' => '#' . $row['id'],
+                'date' => date('M d, Y H:i', strtotime($row['date'])),
+                'total' => '$' . number_format($row['total'], 2) . ' (' . $row['products'] . ' Products)'
+            ];
         }
-        return $comentarios;
+        return $pedidos;
     } else {
         return array();
     }
@@ -268,6 +279,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
                     break;
+                case 'consultaUsuarioData':  // Caso para consultaUsuarioData
+                    if (isset($jsonData->email)) {
+                        $usuario = consultaUsuarioData($conn, $jsonData->email);
+                        header('Content-Type: application/json');
+                        echo json_encode($usuario);
+                    }
+                    break;
+                case 'consultaPedidosRecientes':  // Caso para consultaPedidosRecientes
+                    if (isset($jsonData->email)) {
+                        $pedidos = consultaPedidosRecientes($conn, $jsonData->email);
+                        header('Content-Type: application/json');
+                        echo json_encode($pedidos);
+                    }
+                    break;
                 case 'registro':
                     if (isset($jsonData->data)) {
                         $resultado = registrarUsuario($conn, $jsonData->data);
@@ -289,13 +314,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 case 'insertarCarrito':
                     if (isset($jsonData->email, $jsonData->product_id, $jsonData->quantity)) {
                         $resultado = addToCart($conn, $jsonData->email, $jsonData->product_id, $jsonData->quantity);
-                        header('Content-Type: application/json');
-                        echo json_encode($resultado);
-                    }
-                    break;
-                case 'updateCarrito':
-                    if (isset($jsonData->email, $jsonData->id, $jsonData->quantity)) {
-                        $resultado = updateCarrito($conn, $jsonData->email, $jsonData->quantity, $jsonData->id);
                         header('Content-Type: application/json');
                         echo json_encode($resultado);
                     }
@@ -326,13 +344,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $productos = consultaImagenes($conn, $jsonData->id);
                         header('Content-Type: application/json');
                         echo json_encode($productos);
-                    }
-                    break;
-                case 'consultaComentarios':
-                    if (isset($jsonData->id)) {
-                        $comentarios = consultaComentarios($conn, $jsonData->id);
-                        header('Content-Type: application/json');
-                        echo json_encode($comentarios);
                     }
                     break;
                 default:
