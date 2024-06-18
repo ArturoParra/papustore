@@ -16,7 +16,7 @@ export const Producto = ({producto}) => {
   const {id, title, price, priceWithDiscount, discountPercentage, rating, thumbnail} = producto
 
   const addToCart = async () => {
-    if(isAuthenticated){
+    if(isAuthenticated){ 
       try {
         const response = await fetch('/api/index.php', {
           method: 'POST',

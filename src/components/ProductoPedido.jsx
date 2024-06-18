@@ -3,6 +3,7 @@ import React, { useState } from "react";
 export const ProductoPedido = ({item}) => {
 
     const { thumbnail, quantity, title, priceWithDiscount } = item
+    console.log(item)
     
   return (
     <>
