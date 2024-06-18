@@ -521,6 +521,15 @@ function agregarCompra($conn, $email, $total, $pedido)
                 $quantity = $item->quantity;
                 $unit_price = $item->priceWithDiscount;
 
+                $stmt7 = $conn->prepare("UPDATE products SET stock = stock - ?, total_sales = total_sales + ? WHERE id = ?");
+                if (!$stmt7) {
+                    return ["success" => false, "message" => "Error en prepare: " . $conn->error];
+                }
+                $stmt7->bind_param("iii", $quantity, $quantity, $product_id);
+                if (!$stmt7->execute()) {
+                    return ["success" => false, "message" => "Error al actualizar stock: " . $stmt4->error];
+                }
+
                 $stmt4->bind_param("iiid", $purchase_id, $product_id, $quantity, $unit_price);
                 if (!$stmt4->execute()) {
                     return ["success" => false, "message" => "Error al insertar en purchase_details: " . $stmt4->error];
@@ -572,6 +581,17 @@ function updateUserData($conn, $userData)
     } else {
         error_log("Error al actualizar la información del usuario: " . $conn->error);
         return ["success" => false];
+    }
+}
+
+function updateCarrito($conn, $email, $quantity, $id)
+{
+    $stmt = $conn->prepare("UPDATE shopping_cart SET quantity = ? WHERE product_id = ? AND email = ?");
+    $stmt->bind_param("iis", $quantity, $id, $email);
+    if ($stmt->execute()) {
+        return ["success" => true];
+    } else {
+        return ["success" => false, "message" => "Error al actualizar el carrito"];
     }
 }
 
@@ -731,22 +751,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         echo json_encode($comentarios);
                     }
                     break;
-                    case 'agregarCompra':
-                        if (isset($jsonData->email, $jsonData->total, $jsonData->pedido)) {
-                            // Decodificar el pedido
-                            $pedido = $jsonData->pedido;
-                    
-                            // Llamar a la función agregarCompra con el pedido
-                            $resultado = agregarCompra($conn, $jsonData->email, $jsonData->total, $pedido);
-                    
-                            // Enviar la respuesta
-                            header('Content-Type: application/json');
-                            echo json_encode($resultado);
-                        }
-                        break;
+                case 'agregarCompra':
+                    if (isset($jsonData->email, $jsonData->total, $jsonData->pedido)) {
+                        // Decodificar el pedido
+                        $pedido = $jsonData->pedido;
+
+                        // Llamar a la función agregarCompra con el pedido
+                        $resultado = agregarCompra($conn, $jsonData->email, $jsonData->total, $pedido);
+
+                        // Enviar la respuesta
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    }
+                    break;
                 case 'updateUserData':
                     if (isset($jsonData->userData)) {
                         $resultado = updateUserData($conn, $jsonData->userData);
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    }
+                    break;
+                case 'updateCarrito':
+                    if (isset($jsonData->email, $jsonData->id, $jsonData->quantity)) {
+                        $resultado = updateCarrito($conn, $jsonData->email, $jsonData->quantity, $jsonData->id);
                         header('Content-Type: application/json');
                         echo json_encode($resultado);
                     }
