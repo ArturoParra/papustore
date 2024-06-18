@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";  
 import { fas } from "@fortawesome/free-solid-svg-icons";  
 import { Link } from "react-router-dom";  
-import { useAuth } from '../components/AuthProvider';  // Asegúrate de ajustar la ruta
+import { useAuth } from '../components/AuthProvider';
 import { useState } from 'react';
 
 export const Producto = ({producto}) => {
