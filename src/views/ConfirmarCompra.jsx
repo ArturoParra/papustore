@@ -48,7 +48,7 @@ export const ConfirmarCompra = () => {
 
   const pedidoTotal = () => {
     return pedido.reduce(
-      (total, item) => total + (item.price || 0) * item.quantity,
+      (total, item) => total + (item.priceWithDiscount || 0) * item.quantity,
       0
     );
   };
@@ -68,7 +68,8 @@ export const ConfirmarCompra = () => {
         body: JSON.stringify({
           functionName: "agregarCompra",
           email: userEmail,
-          total: subTotal
+          total: subTotal,
+          pedido: pedido
         }),
       });
 
