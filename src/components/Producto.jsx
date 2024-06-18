@@ -2,10 +2,13 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";  
 import { fas } from "@fortawesome/free-solid-svg-icons";  
 import { Link } from "react-router-dom";  
-import { useAuth } from '../components/AuthProvider';  // Asegúrate de ajustar la ruta
+import { useAuth } from '../components/AuthProvider';
+import { useState } from 'react';
 
 export const Producto = ({producto}) => {
   const { userEmail, isAuthenticated } = useAuth();  // Obtener el email del usuario desde el contexto de autenticación
+  const [isInWishlist, setIsInWishlist] = useState(false); // Estado para verificar si el producto ya está en la wishlist
+
 
   const IconoAddCart = <FontAwesomeIcon icon={fas.faCartPlus} />
   const IconoCorazon = <FontAwesomeIcon icon={fas.faHeart}/>
@@ -36,6 +39,49 @@ export const Producto = ({producto}) => {
     }
   };
 
+// Función para añadir un producto a la lista de deseos
+const addToWishlist = async () => {
+  if (isAuthenticated) {
+    try {
+      // Verificar si el producto ya está en la wishlist
+      const responseCheck = await fetch('/api/index.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ functionName: 'verificarProductoWishlist', email: userEmail, product_id: id }),
+      });
+      const resultCheck = await responseCheck.json();
+
+      if (resultCheck) {
+        alert('Este producto ya está en tu lista de deseos.');
+      } else {
+        // Si no existe, procede a insertarlo
+        const responseInsert = await fetch('/api/index.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ functionName: 'insertarWishlist', email: userEmail, product_id: id }),
+        });
+        const resultInsert = await responseInsert.json();
+
+        if (resultInsert.success) {
+          alert('Producto añadido a la lista de deseos');
+          setIsInWishlist(true); // Actualiza el estado para reflejar que el producto está ahora en la wishlist
+        } else {
+          alert('Error al añadir el producto a la lista de deseos');
+        }
+      }
+    } catch (error) {
+      console.error('Error al añadir el producto a la lista de deseos:', error);
+    }
+  } else {
+    alert("Log in to add to wishlist");
+  }
+};
+
+
   return (
     <>
       <div className="border border-slate-200 rounded-md p-3 shadow-md max-h-fit content-end justify-items-stretch">
@@ -61,6 +107,7 @@ export const Producto = ({producto}) => {
             <button
               type="button"
               className="bg-primary hover:bg-orange-700 transition duration-300 ease-in-out rounded-md p-2 mx-2 text-white "
+              onClick={addToWishlist}
             >
               {IconoCorazon}  
             </button>

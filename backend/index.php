@@ -1,25 +1,74 @@
 <?php
-ini_set('display_errors', 0);  // Desactiva la visualización de errores en la salida
-ini_set('log_errors', 1);       // Activa la escritura de errores en un archivo de registro
-ini_set('error_log', 'errores.log');  // Establece el archivo de registro de errores
 
-// Permitir solicitudes desde cualquier origen
+/**
+ * Sets the configuration options for error handling.
+ * 
+ * This code snippet sets the following configuration options:
+ * - display_errors: Sets the value to 0, which disables the display of errors on the screen.
+ * - log_errors: Sets the value to 1, which enables the logging of errors.
+ * - error_log: Sets the path to the error log file, 'errores.log'.
+ * 
+ * @see https://www.php.net/manual/en/errorfunc.configuration.php
+ */
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', 'errores.log');
+
+/**
+ * Set the necessary headers for Cross-Origin Resource Sharing (CORS).
+ *
+ * This code sets the Access-Control-Allow-Origin, Access-Control-Allow-Methods, and Access-Control-Allow-Headers headers
+ * to allow cross-origin requests from any origin, with the specified methods (POST, GET, OPTIONS), and with the specified
+ * headers (Content-Type, Authorization).
+ *
+ * @param string $origin The origin from which the request is being made. Use "*" to allow requests from any origin.
+ * @param array $methods The allowed HTTP methods for the request. Defaults to ["POST", "GET", "OPTIONS"].
+ * @param array $headers The allowed headers for the request. Defaults to ["Content-Type", "Authorization"].
+ * @return void
+ */
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-$servername = "localhost";
-$username = "papu";
-$password = "1234";
-$dbname = "papustore";
+/**
+ * This file contains the configuration settings for connecting to the database.
+ */
 
+$servername = "localhost";  // The name of the server where the database is hosted.
+$username = "papu";         // The username used to connect to the database.
+$password = "1234";         // The password used to connect to the database.
+$dbname = "papustore";      // The name of the database to connect to.
+
+/**
+ * Creates a new MySQLi connection object.
+ *
+ * @param string $servername The name of the server to connect to.
+ * @param string $username The username to use for the connection.
+ * @param string $password The password to use for the connection.
+ * @param string $dbname The name of the database to connect to.
+ *
+ * @return mysqli|false Returns a new MySQLi connection object on success, or false on failure.
+ */
 $conn = new mysqli($servername, $username, $password, $dbname);
 
+/**
+ * Checks if there is a connection error with the database.
+ * If there is a connection error, it terminates the script and displays an error message.
+ *
+ * @param object $conn The database connection object.
+ * @return void
+ */
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-// Función para consultar productos
+
+/**
+ * Retrieves all products from the database.
+ *
+ * @param mysqli $conn The database connection object.
+ * @return array An array of products retrieved from the database.
+ */
 function consultaProductos($conn)
 {
     $sql = "SELECT * FROM products";
@@ -41,6 +90,13 @@ function consultaProductos($conn)
     }
 }
 
+/**
+ * Retrieves an individual product from the database based on its ID.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $id The ID of the product to retrieve.
+ * @return array|null The associative array representing the product, or null if not found.
+ */
 function consultaProductoIndividual($conn, $id)
 {
     $sql = "SELECT * FROM products WHERE id = ?";
@@ -55,6 +111,13 @@ function consultaProductoIndividual($conn, $id)
     }
 }
 
+/**
+ * Retrieves the URLs of images associated with a product.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $id The product ID.
+ * @return array An array of image URLs.
+ */
 function consultaImagenes($conn, $id)
 {
     $sql = "SELECT url FROM images WHERE product_id = ?";
@@ -73,6 +136,12 @@ function consultaImagenes($conn, $id)
     }
 }
 
+/**
+ * Retrieves the products in the shopping cart.
+ *
+ * @param mysqli $conn The database connection object.
+ * @return array An array of products in the shopping cart.
+ */
 function consultarCarrito($conn)
 {
     $sql = "SELECT * FROM shopping_cart";
@@ -94,6 +163,13 @@ function consultarCarrito($conn)
     }
 }
 
+/**
+ * Retrieves user information based on email.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $email The user's email.
+ * @return array|null User information if found, null otherwise.
+ */
 function consultaUsuario($conn, $email)
 {
     $sql = "SELECT * FROM user_login WHERE email = ?";
@@ -108,6 +184,13 @@ function consultaUsuario($conn, $email)
     }
 }
 
+/**
+ * Retrieves administrator information based on admin username.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $adminuser The administrator's username.
+ * @return array|null Administrator information if found, null otherwise.
+ */
 function consultaAdministrador($conn, $adminuser)
 {
     $sql = "SELECT * FROM user_administrator WHERE adminuser = ?";
@@ -122,6 +205,13 @@ function consultaAdministrador($conn, $adminuser)
     }
 }
 
+/**
+ * Registers a new user.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param object $data The user data object containing email, first name, last name, and password.
+ * @return bool True if registration is successful, false otherwise.
+ */
 function registrarUsuario($conn, $data)
 {
     $sql1 = "INSERT INTO user_data (email, first_name, last_name) VALUES (?, ?, ?)";
@@ -144,6 +234,15 @@ function registrarUsuario($conn, $data)
     }
 }
 
+/**
+ * Adds a product to the shopping cart.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $email The user's email.
+ * @param int $product_id The product ID.
+ * @param int $quantity The quantity of the product.
+ * @return array An array with success status and optional error message.
+ */
 function addToCart($conn, $email, $product_id, $quantity)
 {
     $stmt = $conn->prepare("INSERT INTO shopping_cart (email, product_id, quantity) VALUES (?, ?, ?)
@@ -156,7 +255,13 @@ function addToCart($conn, $email, $product_id, $quantity)
     }
 }
 
-// Funcion para obtener los productos del carrito de un usuario y sus detalles
+/**
+ * Retrieves the products in the shopping cart for a user and their details.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $email The user's email.
+ * @return array An array of products in the shopping cart with their details.
+ */
 function consultaCarrito($conn, $email)
 {
     $sql = "SELECT products.id, products.title, products.priceWithDiscount, products.thumbnail, shopping_cart.quantity
@@ -178,7 +283,14 @@ function consultaCarrito($conn, $email)
     }
 }
 
-// Funcion para eliminar un producto del carrito de un usuario
+/**
+ * Removes a product from the shopping cart for a given user.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $email The email of the user.
+ * @param int $product_id The ID of the product to be removed.
+ * @return array An associative array with the result of the operation. If the product is successfully removed, the array will contain ["success" => true]. If there is an error, the array will contain ["success" => false, "message" => "Error al eliminar el producto del carrito"].
+ */
 function eliminarProductoCarrito($conn, $email, $product_id)
 {
     $stmt = $conn->prepare("DELETE FROM shopping_cart WHERE email = ? AND product_id = ?");
@@ -190,23 +302,98 @@ function eliminarProductoCarrito($conn, $email, $product_id)
     }
 }
 
-function getCartItems($conn, $email)
+/**
+ * Verifies if a product exists in the user's wishlist.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $email The user's email.
+ * @param int $product_id The ID of the product to check.
+ * @return bool Returns true if the product exists in the wishlist, false otherwise.
+ */
+function verificarProductoWishlist($conn, $email, $product_id)
 {
-    $sql = "SELECT sc.product_id, sc.quantity, p.title, p.price, p.discountPercentage, p.thumbnail
-        FROM shopping_cart sc
-        INNER JOIN products p ON sc.product_id = p.id
-        WHERE sc.email = ?";
+    $stmt = $conn->prepare("SELECT * FROM wishlist WHERE email = ? AND product_id = ?");
+    $stmt->bind_param("si", $email, $product_id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    return $res->num_rows > 0;
+}
+
+/**
+ * Adds a product to the wishlist for a given email.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $email The email of the user.
+ * @param int $product_id The ID of the product to add to the wishlist.
+ * @return array An associative array with the following keys:
+ *               - success: A boolean indicating if the product was successfully added to the wishlist.
+ *               - message: A string containing an error message if the product was not added successfully.
+ */
+function addToWishlist($conn, $email, $product_id)
+{
+    $stmt = $conn->prepare("INSERT INTO wishlist (email, product_id) VALUES (?, ?)");
+    $stmt->bind_param("si", $email, $product_id);
+    if ($stmt->execute()) {
+        return ["success" => true];
+    } else {
+        return ["success" => false, "message" => "Error al añadir el producto a la lista de deseos"];
+    }
+}
+
+/**
+ * Retrieves the wishlist items for a given email from the database.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $email The email of the user.
+ * @return array The wishlist items as an array of associative arrays.
+ */
+function consultaWishlist($conn, $email)
+{
+    $sql = "SELECT products.id, products.title, products.price, products.priceWithDiscount, products.stock, products.thumbnail
+            FROM wishlist
+            JOIN products ON wishlist.product_id = products.id
+            WHERE wishlist.email = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $email);
     $stmt->execute();
-    $result = $stmt->get_result();
-    $cartItems = [];
-    while ($row = $result->fetch_assoc()) {
-        $cartItems[] = $row;
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $productos = array();
+        while ($row = $res->fetch_assoc()) {
+            $productos[] = $row;
+        }
+        return $productos;
+    } else {
+        return array();
     }
-    return $cartItems;
 }
 
+/**
+ * Deletes a product from the wishlist.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $email The email of the user.
+ * @param int $product_id The ID of the product to be deleted.
+ * @return array An array with the result of the operation. If the product is successfully deleted, the array will contain ["success" => true]. If there is an error, the array will contain ["success" => false, "message" => "Error al eliminar el producto de la lista de deseos"].
+ */
+function eliminarProductoWishlist($conn, $email, $product_id)
+{
+    $stmt = $conn->prepare("DELETE FROM wishlist WHERE email = ? AND product_id = ?");
+    $stmt->bind_param("si", $email, $product_id);
+    if ($stmt->execute()) {
+        return ["success" => true];
+    } else {
+        return ["success" => false, "message" => "Error al eliminar el producto de la lista de deseos"];
+    }
+}
+
+/**
+ * Retrieves comments for a specific product from the database.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param int $id The ID of the product.
+ * @return array An array of comments for the product.
+ */
 function consultaComentarios($conn, $id)
 {
     $sql = "SELECT u.first_name as name, u.email, c.rating, c.comment, c.date
@@ -228,8 +415,13 @@ function consultaComentarios($conn, $id)
     }
 }
 
-// Nuevas funciones para el perfil del usuario y pedidos recientes
-
+/**
+ * Retrieves user data from the database based on the provided email.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $email The email of the user to retrieve data for.
+ * @return array|null Returns an associative array containing the user data if found, or null if not found.
+ */
 function consultaUsuarioData($conn, $email)
 {
     $sql = "SELECT email, first_name, last_name, phone, email_secondary, purchases, papu_credits, country, state, zip, company, address, region, city FROM user_data WHERE email = ?";
@@ -244,6 +436,13 @@ function consultaUsuarioData($conn, $email)
     }
 }
 
+/**
+ * Retrieves the most recent orders for a given email address.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $email The email address to retrieve orders for.
+ * @return array An array of recent orders, each containing the order ID, date, total amount, and number of products.
+ */
 function consultaPedidosRecientes($conn, $email)
 {
     $sql = "SELECT p.purchase_id AS id, p.date, p.total, COUNT(pd.product_id) AS products
@@ -272,6 +471,14 @@ function consultaPedidosRecientes($conn, $email)
     }
 }
 
+/**
+ * Adds a purchase to the purchase history table.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param string $email The email of the customer making the purchase.
+ * @param float $total The total amount of the purchase.
+ * @return array An associative array with the success status and an optional error message.
+ */
 function agregarCompra($conn, $email, $total, $pedido)
 {
     // Preparar la declaración para insertar en purchase_history
@@ -347,6 +554,13 @@ function agregarCompra($conn, $email, $total, $pedido)
     }
 }
 
+/**
+ * Updates the user data in the database.
+ *
+ * @param mysqli $conn The database connection object.
+ * @param object $userData The user data to be updated.
+ * @return array An array indicating the success of the update operation.
+ */
 function updateUserData($conn, $userData)
 {
     $sql = "UPDATE user_data SET first_name=?, last_name=?, phone=?, email_secondary=?, purchases=?, country=?, state=?, zip=?, company=?, address=?, region=?, city=? WHERE email=?";
@@ -361,10 +575,35 @@ function updateUserData($conn, $userData)
     }
 }
 
+/**
+ * This code block checks if the current request method is OPTIONS.
+ * If the request method is OPTIONS, it sends a 200 OK response header and exits the script.
+ * This is commonly used to handle preflight requests in CORS (Cross-Origin Resource Sharing) implementations.
+ */
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header("HTTP/1.1 200 OK");
     exit();
 }
+
+/**
+ * This PHP script serves as the backend API for handling various requests.
+ * It checks the request method and processes the incoming JSON data based on the specified function name.
+ * The script performs different actions such as querying products, users, cart, wishlist, etc.
+ * The response is sent back in JSON format.
+ *
+ * @param string $_SERVER['REQUEST_METHOD'] The request method (POST)
+ * @param string $data The JSON data received in the request body
+ * @param object $jsonData The decoded JSON data
+ * @param string $functionName The name of the function to be executed
+ * @param mixed $productos The result of querying products
+ * @param mixed $usuario The result of querying a user
+ * @param mixed $pedidos The result of querying recent orders
+ * @param mixed $resultado The result of an operation (e.g., registration, adding to cart, etc.)
+ * @param mixed $admin The result of querying an administrator
+ * @param mixed $comentarios The result of querying comments
+ *
+ * @return void
+ */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = file_get_contents('php://input');
@@ -443,6 +682,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         echo json_encode($resultado);
                     }
                     break;
+                case 'verificarProductoWishlist':
+                    if (isset($jsonData->email, $jsonData->product_id)) {
+                        $resultado = verificarProductoWishlist($conn, $jsonData->email, $jsonData->product_id);
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    }
+                    break;
+                case 'insertarWishlist':
+                    if (isset($jsonData->email, $jsonData->product_id)) {
+                        $resultado = addToWishlist($conn, $jsonData->email, $jsonData->product_id);
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    }
+                    break;
+                case 'consultaWishlist':
+                    if (isset($jsonData->email)) {
+                        $productos = consultaWishlist($conn, $jsonData->email);
+                        header('Content-Type: application/json');
+                        echo json_encode($productos);
+                    }
+                    break;
+                case 'eliminarProductoWishlist':
+                    if (isset($jsonData->email, $jsonData->product_id)) {
+                        $resultado = eliminarProductoWishlist($conn, $jsonData->email, $jsonData->product_id);
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    }
+                    break;
                 case 'consultaProductoIndividual':
                     if (isset($jsonData->id)) {
                         $productos = consultaProductoIndividual($conn, $jsonData->id);
@@ -497,5 +764,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     error_log("Esta página solo acepta solicitudes POST");
 }
 
-$conn->close();
+$conn->close(); // Close the database connection
 ?>
