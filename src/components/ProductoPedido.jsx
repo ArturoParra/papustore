@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 export const ProductoPedido = ({item}) => {
 
-    const {thumbnail, quantity, title, price} = item
+    const { thumbnail, quantity, title, priceWithDiscount } = item
     
   return (
     <>
@@ -16,7 +16,7 @@ export const ProductoPedido = ({item}) => {
           {title}
         </div>
         <div>
-          {quantity} x <span className="text-primary">$ {price} USD</span>
+          {quantity} x <span className="text-primary">$ {priceWithDiscount} USD</span>
         </div>
       </div>
     </>
