@@ -4,9 +4,79 @@ import { Footer } from '../components/Footer'; // Importa el componente Footer d
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Importa el componente FontAwesomeIcon desde '@fortawesome/react-fontawesome'
 import { faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons'; // Importa los iconos faSearch y faShoppingCart desde '@fortawesome/free-solid-svg-icons'
 import { ProductoWishlist } from '../components/ProductoWishlist'; // Importa el componente ProductoWishlist desde '../components/ProductoWishlist'
+import { useAuth } from '../components/AuthProvider'; // Importa el componente useAuth desde '../components/AuthProvider'
+import { useEffect, useState } from 'react'; // Importa useEffect y useState desde la biblioteca 'react'
 
 export const Wishlist = () => {
-  
+  // Extraer el email del usuario autenticado
+  const { userEmail } = useAuth();
+
+  // Estado de la lista de deseos
+  const [wishlist, setWishlist] = useState([]);
+
+  // Efecto para obtener los productos de la lista de deseos
+  useEffect(() => {
+    const fetchData = async () => {
+      try 
+      {
+        const res = await fetch("/api/index.php", 
+          {
+          method: "POST",
+          headers: 
+          {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify
+          ({
+            functionName: "consultaWishlist",
+            email: userEmail,
+          }),
+        });
+
+        if (!res.ok)
+        {
+          throw new Error("Error en la solicitud fetch");
+        }
+
+        const data = await res.json();
+        // Actualizar el estado de productos con los datos obtenidos
+        console.log(data);
+
+        setWishlist(data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchData();
+  }, [userEmail]);
+
+
+  const removeItem = async (id) => {
+    try {
+      const res = await fetch("/api/index.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          functionName: "eliminarProductoWishlist",
+          email: userEmail,
+          product_id: id,
+        }),
+      });
+      
+      if (!res.ok) {
+        throw new Error("Error en la solicitud fetch");
+      }
+      // Actualizar el estado del carrito eliminando el producto
+      setWishlist(wishlist.filter((item) => item.id !== id));
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+
   // Define un producto de ejemplo
   const product = {
     name: 'Bose Sport Earbuds - Wireless Earphones - Bluetooth In Ear Headphones for Workouts and Running, Triple Black',
@@ -25,7 +95,14 @@ export const Wishlist = () => {
         <div className="bg-white p-4 md:p-8 rounded-lg shadow-md w-full max-w-5xl">
           <h1 className="text-2xl font-bold mb-4">Wishlist</h1> {/* Título de la lista de deseos */}
           <div className="overflow-x-auto">
-            <ProductoWishlist product={product} /> {/* Renderiza el componente ProductoWishlist con el producto dado */}
+            {/* Mapeo de los productos de la lista de deseos */}
+            {wishlist.map((item) => (
+              <ProductoWishlist 
+                key={item.id} 
+                item={item} 
+                removeItem={removeItem} 
+              />
+            ))}
           </div>
         </div>
       </div>
