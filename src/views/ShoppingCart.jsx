@@ -88,7 +88,7 @@ export const ShoppingCart = () => {
 
   const cartTotal = () => {
     return cart.reduce(
-      (total, item) => total + (item.price || 0) * item.quantity,
+      (total, item) => total + (item.priceWithDiscount || 0) * item.quantity,
       0
     );
   };

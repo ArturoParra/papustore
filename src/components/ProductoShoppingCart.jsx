@@ -4,7 +4,7 @@ import { useAuth } from './AuthProvider';
 // Componente ProductoShoppingCart que recibe props: item, incrementQuantity, decrementQuantity, removeItem
 export const ProductoShoppingCart = ({ item, incrementQuantity, decrementQuantity, removeItem }) => {
   // Asignar valores predeterminados si las propiedades están indefinidas
-  const {id, title, thumbnail, quantity, price} = item;
+  const {id, title, thumbnail, quantity, priceWithDiscount} = item;
   const { userEmail } = useAuth();
 
   useEffect(() => {
@@ -86,12 +86,12 @@ export const ProductoShoppingCart = ({ item, incrementQuantity, decrementQuantit
 
       {/* Precio unitario del producto */}
       <span className="text-center w-full sm:w-1/4 font-semibold text-lg mt-4 sm:mt-0">
-        ${price}
+        ${priceWithDiscount}
       </span>
 
       {/* Precio total del producto (precio unitario * cantidad) */}
       <span className="text-center w-full sm:w-1/4 font-semibold text-lg mt-4 sm:mt-0">
-        ${(price * quantity).toFixed(2)}
+        ${(priceWithDiscount * quantity).toFixed(2)}
       </span>
     </div>
   );
