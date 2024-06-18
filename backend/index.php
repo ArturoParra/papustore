@@ -574,7 +574,7 @@ function updateUserData($conn, $userData)
 {
     $sql = "UPDATE user_data SET first_name=?, last_name=?, phone=?, email_secondary=?, purchases=?, country=?, state=?, zip=?, company=?, address=?, region=?, city=? WHERE email=?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssisssssssss", $userData->first_name, $userData->last_name, $userData->phone, $userData->email_secondary, $userData->purchases, $userData->country, $userData->state, $userData->zip, $userData->company, $userData->address, $userData->region, $userData->city, $userData->email);
+    $stmt->bind_param("sssssssssssss", $userData->first_name, $userData->last_name, $userData->phone, $userData->email_secondary, $userData->purchases, $userData->country, $userData->state, $userData->zip, $userData->company, $userData->address, $userData->region, $userData->city, $userData->email);
 
     if ($stmt->execute()) {
         return ["success" => true];
@@ -594,6 +594,24 @@ function updateCarrito($conn, $email, $quantity, $id)
         return ["success" => false, "message" => "Error al actualizar el carrito"];
     }
 }
+
+function agregarComentario($conn, $email, $name, $product_id, $comment, $rating)
+{
+    $sql = "INSERT INTO comments (email, name, product_id, comment, rating, date) VALUES (?, ?, ?, ?, ?, NOW())";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error preparing statement: " . $conn->error);
+        return ["success" => false, "message" => "Error preparing statement"];
+    }
+    $stmt->bind_param("ssisi", $email, $name, $product_id, $comment, $rating);
+    if ($stmt->execute()) {
+        return ["success" => true];
+    } else {
+        error_log("Error executing statement: " . $stmt->error);
+        return ["success" => false, "message" => "Error executing statement"];
+    }
+}
+
 
 /**
  * This code block checks if the current request method is OPTIONS.
@@ -633,6 +651,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($jsonData !== null && isset($jsonData->functionName)) {
             $functionName = $jsonData->functionName;
             switch ($functionName) {
+                case 'agregarComentario':
+                    if (isset($jsonData->email, $jsonData->name, $jsonData->product_id, $jsonData->comment, $jsonData->rating)) {
+                        $resultado = agregarComentario($conn, $jsonData->email, $jsonData->name, $jsonData->product_id, $jsonData->comment, $jsonData->rating);
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    }
+                    break;
                 case 'consultaProductos':
                     $productos = consultaProductos($conn);
                     header('Content-Type: application/json');

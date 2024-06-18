@@ -2,6 +2,8 @@ DROP DATABASE IF EXISTS papustore;
 CREATE DATABASE IF NOT EXISTS papustore;
 USE papustore;
 
+select * from products;
+
 -- Table where user data is registered
 CREATE TABLE IF NOT EXISTS user_data (
     email           VARCHAR(100)    NOT NULL PRIMARY KEY,
@@ -82,10 +84,11 @@ CREATE TABLE IF NOT EXISTS comments (
     product_id  INT NOT NULL,
     rating      INT NOT NULL,
     comment     TEXT NOT NULL,
-    date        DATE NOT NULL,
+    date        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (email) REFERENCES user_data(email),
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
+
 
 -- Table for user shopping carts
 CREATE TABLE IF NOT EXISTS shopping_cart (
