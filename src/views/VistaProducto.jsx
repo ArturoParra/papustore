@@ -7,7 +7,6 @@ import { Link, useParams } from "react-router-dom"; // Importa el componente Lin
 import { useAuth } from '../components/AuthProvider';
 
 export const VistaProducto = () => {
-
   const { userEmail, isAuthenticated } = useAuth()
 
   const [quantity, setQuantity] = useState(1) // Estado para la cantidad del producto
@@ -31,6 +30,8 @@ export const VistaProducto = () => {
   const [width, setWidth] = useState(0)
   const [height, setHeight] = useState(0)
   const [depth, setDepth] = useState(0)
+  const [newComment, setNewComment] = useState('');
+  const [newRating, setNewRating] = useState(0);
 
   const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft} /> // Icono de flecha izquierda
   const IconoEstrella = <FontAwesomeIcon icon={fas.faStar} /> // Icono de estrella
@@ -201,7 +202,7 @@ export const VistaProducto = () => {
   }, [BackRes]); // Ejecutar el efecto cuando cambie BackRes
 
   const addToCart = async () => {
-    if(isAuthenticated){
+    if (isAuthenticated) {
       try {
         const response = await fetch('/api/index.php', {
           method: 'POST',
@@ -219,11 +220,44 @@ export const VistaProducto = () => {
       } catch (error) {
         console.error('Error al añadir el producto al carrito:', error);
       }
-    }else{
+    } else {
       alert("Log in to add to cart")
     }
   };
 
+  const submitComment = async () => {
+    if (isAuthenticated) {
+      try {
+        const response = await fetch('/api/index.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            functionName: 'agregarComentario',
+            email: userEmail,
+            name: "Nombre del usuario", // Aquí deberías pasar el nombre del usuario autenticado
+            product_id: id,
+            comment: newComment,
+            rating: newRating
+          }),
+        });
+        const result = await response.json();
+        if (result.success) {
+          alert('Comentario agregado');
+          setNewComment('');
+          setNewRating(0);
+          getComments();  // Obtener los comentarios nuevamente
+        } else {
+          alert('Error al agregar el comentario');
+        }
+      } catch (error) {
+        console.error('Error al agregar el comentario:', error);
+      }
+    } else {
+      alert("Log in to add a comment")
+    }
+  };
 
   useEffect(() => {
     console.log(comments)
@@ -392,6 +426,34 @@ export const VistaProducto = () => {
             <p className="text-gray-600">No comments yet.</p>
           )}
         </div>
+        {isAuthenticated && (
+          <div className="bg-white p-4 md:p-8 rounded-lg shadow-md w-full max-w-4xl mt-4">
+            <h3 className="text-lg font-bold mb-2">Add a Comment</h3>
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              className="w-full p-2 border rounded mb-2"
+              placeholder="Write your comment here"
+            />
+            <div className="mb-2">
+              <span className="font-semibold">Rating: </span>
+              {[1, 2, 3, 4, 5].map(star => (
+                <FontAwesomeIcon
+                  key={star}
+                  icon={fas.faStar}
+                  className={`cursor-pointer ${star <= newRating ? 'text-orange-500' : 'text-gray-300'}`}
+                  onClick={() => setNewRating(star)}
+                />
+              ))}
+            </div>
+            <button
+              onClick={submitComment}
+              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Submit Comment
+            </button>
+          </div>
+        )}
       </div>
       <Footer />
     </>
