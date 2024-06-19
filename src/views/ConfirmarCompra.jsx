@@ -173,7 +173,7 @@ export const ConfirmarCompra = () => {
             </div>
           </div>
           <div className="mt-6">
-            <h2 className="text-xl font-bold mb-2">PapuCreditos</h2>
+            <h2 className="text-xl font-bold mb-2">PapuCredits</h2>
             <div className="flex items-center text-lg text-gray-700">
               <FontAwesomeIcon icon={faDollarSign} className="mr-2 text-green-500" />
               <span className="font-bold">{papuCreditos.toLocaleString()}</span>
