@@ -41,7 +41,8 @@ export const FormularioAdministrator = () => {
     window.scrollTo(0, 0)
   }, [])
 
-    const validator = new JustValidate('#login-form');
+    useEffect(() => {
+      const validator = new JustValidate('#login-form');
 
     validator
       .addField('#adminuser', [
@@ -76,7 +77,8 @@ export const FormularioAdministrator = () => {
     return () => {
       validator.destroy();
     };
-  }, []);
+    }, [])
+    
 
   return (
     <>
