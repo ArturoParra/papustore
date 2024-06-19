@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthProvider';  
 
 export const FormularioAdministrator = () => {
- 
   const navigate = useNavigate();  
   const { setIsAuthenticated } = useAuth();  
 
@@ -42,25 +41,55 @@ export const FormularioAdministrator = () => {
     window.scrollTo(0, 0)
   }, [])
 
+    const validator = new JustValidate('#login-form');
+
+    validator
+      .addField('#adminuser', [
+        {
+          rule: 'required',
+          errorMessage: 'El usuario administrador es requerido',
+        },
+        {
+          rule: 'minLength',
+          value: 3,
+          errorMessage: 'El usuario administrador debe tener al menos 3 caracteres',
+        },
+      ])
+      .addField('#password', [
+        {
+          rule: 'required',
+          errorMessage: 'La contraseña es requerida',
+        },
+        {
+          rule: 'minLength',
+          value: 8,
+          errorMessage: 'La contraseña debe tener al menos 8 caracteres',
+        },
+      ])
+      .onSuccess((event) => {
+        event.preventDefault();
+        const adminuser = event.target.adminuser.value;
+        const password = event.target.password.value;
+        verificarAdministrador(adminuser, password);
+      });
+
+    return () => {
+      validator.destroy();
+    };
+  }, []);
+
   return (
     <>
-     <Header />
+      <Header />
       <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
         <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
           <div className="flex justify-center mb-4">
-            <div
-              className={`cursor-pointer text-orange-500 border-b-2 border-orange-500`}
-            >
+            <div className="cursor-pointer text-orange-500 border-b-2 border-orange-500">
               SIGN IN
             </div>
           </div>
 
-          <form id="login-form" className="space-y-4" onSubmit={(e) => {
-            e.preventDefault();
-            const adminuser = e.target.adminuser.value;
-            const password = e.target.password.value;
-            verificarAdministrador(adminuser, password);  
-          }}>
+          <form id="login-form" className="space-y-4">
             <div>
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="adminuser">
                 ADMIN USER
@@ -100,5 +129,5 @@ export const FormularioAdministrator = () => {
       </div>
       <Footer />
     </>
-  )
-}
+  );
+};
