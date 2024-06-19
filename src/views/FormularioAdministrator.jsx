@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import JustValidate from 'just-validate'; 
+import React, { useEffect } from 'react';
+import JustValidate from 'just-validate';
+import Swal from "sweetalert2"; 
 import { Header } from '../components/Header';  
 import { Footer } from '../components/Footer';  
 import { useNavigate } from 'react-router-dom';  
 import { useAuth } from '../components/AuthProvider';  
 
 export const FormularioAdministrator = () => {
-
-  const [isSignUp, setIsSignUp] = useState(false);  
+ 
   const navigate = useNavigate();  
   const { setIsAuthenticated } = useAuth();  
 
@@ -25,12 +25,22 @@ export const FormularioAdministrator = () => {
         setIsAuthenticated(true);  
         navigate('/administrador');
       } else {
-        alert('Credenciales incorrectas');
+        Swal.fire({
+          icon: "error",
+          title: "Incorrect email or password",
+          text: "Try again",
+          showConfirmButton: false,
+          timer: 2500
+        });
       }
     } catch (error) {
       console.error('Error al verificar el administrador:', error);
     }
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   return (
     <>
