@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import JustValidate from 'just-validate'; 
+import JustValidate from 'just-validate';
+import Swal from "sweetalert2";
 import { Header } from '../components/Header';  
 import { Footer } from '../components/Footer';  
 import { useNavigate } from 'react-router-dom';  
@@ -139,9 +140,21 @@ export const FormularioInicio = () => {
       });
       const result = await response.json();
       if (result.success) {
-        alert('Usuario registrado con éxito');
+        Swal.fire({
+          icon: "success",
+          title: "User successfully registered",
+          showConfirmButton: false,
+          timer: 2500
+        });
+        setIsSignUp(false)
       } else {
-        alert('Error al registrar el usuario');
+        Swal.fire({
+          icon: "error",
+          title: "Error trying to register",
+          text: "Try again",
+          showConfirmButton: false,
+          timer: 2500
+        });
       }
     } catch (error) {
       console.error('Error al registrar el usuario:', error);
@@ -165,7 +178,13 @@ export const FormularioInicio = () => {
         setUserEmail(email); // Guardar el correo electrónico
         navigate('/tienda');
       } else {
-        alert('Credenciales incorrectas');
+        Swal.fire({
+          icon: "error",
+          title: "Incorrect email or password",
+          text: "Try again",
+          showConfirmButton: false,
+          timer: 2500
+        });
       }
     } catch (error) {
       console.error('Error al verificar el usuario:', error);

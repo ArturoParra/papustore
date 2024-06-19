@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'; // Importa React, useEffect y useState desde la biblioteca 'react'
+import Swal from "sweetalert2";
 import { Header } from '../components/Header' // Importa el componente Header desde '../components/Header'
 import { Footer } from '../components/Footer' // Importa el componente Footer desde '../components/Footer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Importa el componente FontAwesomeIcon desde '@fortawesome/react-fontawesome'
@@ -213,15 +214,35 @@ export const VistaProducto = () => {
         });
         const result = await response.json();
         if (result.success) {
-          alert('Producto añadido al carrito');
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            toast: "true",
+            title: "Product added to wishlist",
+            showConfirmButton: false,
+            timer: 1500,
+          });
         } else {
-          alert('Error al añadir el producto al carrito');
+          Swal.fire({
+            position: "top-end",
+            icon: "error",
+            toast: "true",
+            title: "Product couldn't be added to wishlist",
+            showConfirmButton: false,
+            timer: 1500,
+          });
         }
       } catch (error) {
         console.error('Error al añadir el producto al carrito:', error);
       }
-    } else {
-      alert("Log in to add to cart")
+    }else{
+      Swal.fire({
+        icon: "warning",
+        title: "Cannot add to wishlist",
+        text: "Please log in into your account to add products to your wishlist",
+        showConfirmButton: false,
+        timer: 2500,
+      });
     }
   };
 
