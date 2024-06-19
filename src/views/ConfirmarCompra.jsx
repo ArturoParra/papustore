@@ -166,10 +166,6 @@ export const ConfirmarCompra = () => {
             <label className="block text-gray-700">Company Name (Optional)</label>
             <input type="text" value={company} className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Company Name" />
           </div>
-          <div className="md:col-span-2">
-            <label className="block text-gray-700">Address</label>
-            <input type="text" value={address} className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Address" />
-          </div>
           <div>
             <label className="block text-gray-700">Country</label>
             <input type="text" value={country} className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Country" />
