@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react'
 import Swal from "sweetalert2";
 import { Header } from '../components/Header'
@@ -9,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 
 export const ConfirmarCompra = () => {
+
 
   const { userEmail } = useAuth()
   const [pedido, setPedido] = useState([])
@@ -23,7 +25,10 @@ export const ConfirmarCompra = () => {
   const [address, setAddress] = useState('')
   const [city, setCity] = useState('')
 
+
   const navigate = useNavigate();
+  const formRef = useRef(null);
+  const validatorRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,8 +49,6 @@ export const ConfirmarCompra = () => {
         }
 
         const data = await res.json();
-        // Actualizar el estado de productos con los datos obtenidos
-
         setPedido(data);
       } catch (error) {
         console.error("Error:", error);
@@ -105,11 +108,63 @@ export const ConfirmarCompra = () => {
   };
 
   useEffect(() => {
-    setsubTotal(pedidoTotal)
-  }, [pedido])
-  
+    setsubTotal(pedidoTotal);
+  }, [pedido]);
 
-  const placeOrder = async () => {
+  useEffect(() => {
+    if (!validatorRef.current) {
+      validatorRef.current = new JustValidate(formRef.current, {
+        validateBeforeSubmitting: true,
+      });
+
+      validatorRef.current
+        .addField('#company-name', [
+          {
+            rule: 'required',
+            errorMessage: 'El nombre de la empresa es obligatorio',
+          },
+        ])
+        .addField('#address', [
+          {
+            rule: 'required',
+            errorMessage: 'La dirección es obligatoria',
+          },
+        ])
+        .addField('#country', [
+          {
+            rule: 'required',
+            errorMessage: 'El país es obligatorio',
+          },
+        ])
+        .addField('#region-state', [
+          {
+            rule: 'required',
+            errorMessage: 'La región/estado es obligatorio',
+          },
+        ])
+        .addField('#city', [
+          {
+            rule: 'required',
+            errorMessage: 'La ciudad es obligatoria',
+          },
+        ])
+        .addField('#zip-code', [
+          {
+            rule: 'required',
+            errorMessage: 'El código postal es obligatorio',
+          },
+        ]);
+    }
+  }, []);
+
+  const placeOrder = async (event) => {
+    event.preventDefault();
+    const isValid = await validatorRef.current.revalidate();
+
+    if (!isValid) {
+      return;
+    }
+
     try {
       const res = await fetch("/api/index.php", {
         method: "POST",
@@ -143,19 +198,18 @@ export const ConfirmarCompra = () => {
           timer: 2500
         });
       }
-
     } catch (error) {
       console.error("Error:", error);
     }
 
-    const timer = setTimeout(() => {
+    setTimeout(() => {
       navigate('/tienda'); // Cambia '/nueva-ruta' por la ruta a la que deseas navegar
     }, 3000);
-
-  }
+  };
 
   return (
     <>
+
     <Header/>
      <div className="bg-gray-100 p-8 flex flex-col lg:flex-row">
       {/* Billing Information */}
@@ -206,35 +260,32 @@ export const ConfirmarCompra = () => {
                 item={item}
               />
             ))}
+          </div>
+          <div className="border-t pt-4">
+            <div className="flex justify-between mb-2">
+              <div>Sub-total</div>
+              <div>$ {subTotal} USD</div>
+            </div>
+            <div className="flex justify-between mb-2">
+              <div>Shipping</div>
+              <div>Free</div>
+            </div>
+            <div className="flex justify-between mb-2">
+              <div>Discount</div>
+              <div>$24</div>
+            </div>
+            <div className="flex justify-between mb-2">
+              <div>Tax</div>
+              <div>$61.99</div>
+            </div>
+            <div className="flex justify-between font-bold text-lg">
+              <div>Total</div>
+              <div>$ {subTotal} USD</div>
+            </div>
+          </div>
         </div>
-        <div className="border-t pt-4">
-          <div className="flex justify-between mb-2">
-            <div>Sub-total</div>
-            <div>$ {subTotal} USD</div>
-          </div>
-          <div className="flex justify-between mb-2">
-            <div>Shipping</div>
-            <div>Free</div>
-          </div>
-          <div className="flex justify-between mb-2">
-            <div>Discount</div>
-            <div>$24</div>
-          </div>
-          <div className="flex justify-between mb-2">
-            <div>Tax</div>
-            <div>$61.99</div>
-          </div>
-          <div className="flex justify-between font-bold text-lg">
-            <div>Total</div>
-            <div>$ {subTotal} USD</div>
-          </div>
-        </div>
-        <button onClick={placeOrder} className="mt-6 w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-          PLACE ORDER
-        </button>
       </div>
-    </div>
-    <Footer/>
+      <Footer />
     </>
-  )
-}
+  );
+};
