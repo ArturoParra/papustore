@@ -14,6 +14,10 @@ export const ShoppingCart = () => {
   const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
 
   useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await fetch("/api/index.php", {
