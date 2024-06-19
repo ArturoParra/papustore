@@ -166,14 +166,6 @@ export const ConfirmarCompra = () => {
             <label className="block text-gray-700">Company Name (Optional)</label>
             <input type="text" value={company} className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Company Name" />
           </div>
-          <div className="mt-6">
-            <h2 className="text-xl font-bold mb-2">PapuCredits</h2>
-            <div className="flex items-center text-lg text-gray-700">
-              <FontAwesomeIcon icon={faDollarSign} className="mr-2 text-green-500" />
-              <span className="font-bold">{papuCreditos.toLocaleString()}</span>
-              <span className="ml-2 text-sm">USD</span>
-            </div>
-          </div>
           <div>
             <label className="block text-gray-700">Country</label>
             <input type="text" value={country} className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Country" />
