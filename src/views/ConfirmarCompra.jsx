@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import Swal from "sweetalert2";
 import { Header } from '../components/Header'
 import { Footer } from '../components/Footer'
 import { useAuth } from '../components/AuthProvider'
@@ -12,7 +13,15 @@ export const ConfirmarCompra = () => {
   const { userEmail } = useAuth()
   const [pedido, setPedido] = useState([])
   const [subTotal, setsubTotal] = useState(0)
-  const [papuCreditos, setPapuCreditos] = useState(20000); // Variable de estado para los PapuCreditos
+  const [userdata, setuserdata] = useState([])
+
+  const [papuCreditos, setPapuCreditos] = useState(0); // Variable de estado para los PapuCreditos
+  const [country, setCountry] = useState('')
+  const [state, setState] = useState('')
+  const [zip, setZip] = useState('')
+  const [company, setCompany] = useState('')
+  const [address, setAddress] = useState('')
+  const [city, setCity] = useState('')
 
   const navigate = useNavigate();
 
@@ -46,6 +55,48 @@ export const ConfirmarCompra = () => {
     fetchData();
   }, [userEmail]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/index.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            functionName: "consultaUsuarioData",
+            email: userEmail,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Error en la solicitud fetch");
+        }
+
+        const data = await res.json();
+        // Actualizar el estado de productos con los datos obtenidos
+
+        setuserdata(data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const {papu_credits, country, state, zip, company, address, city} = userdata
+    setPapuCreditos(papu_credits)
+    setCountry(country)
+    setState(state)
+    setZip(zip)
+    setCompany(company)
+    setAddress(address)
+    setCity(city)
+  }, [userdata])
+  
+
   const pedidoTotal = () => {
     return pedido.reduce(
       (total, item) => total + (item.priceWithDiscount || 0) * item.quantity,
@@ -76,9 +127,21 @@ export const ConfirmarCompra = () => {
       const result = await res.json();
 
       if (result.success) {
-        alert('Compra registrada con éxito');
+        Swal.fire({
+          icon: "success",
+          title: "The order was placed successfully",
+          text: "Enjoy your products!",
+          showConfirmButton: false,
+          timer: 2500
+        });        
       } else {
-        alert('Error al registrar compra');
+        Swal.fire({
+          icon: "error",
+          title: "There was an error placing the order",
+          text: "Try again",
+          showConfirmButton: false,
+          timer: 2500
+        });
       }
 
     } catch (error) {
@@ -101,34 +164,34 @@ export const ConfirmarCompra = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div className="md:col-span-2">
             <label className="block text-gray-700">Company Name (Optional)</label>
-            <input type="text" className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Company Name" />
+            <input type="text" value={company} className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Company Name" />
           </div>
           <div className="md:col-span-2">
             <label className="block text-gray-700">Address</label>
-            <input type="text" className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Address" />
+            <input type="text" value={address} className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Address" />
           </div>
           <div>
             <label className="block text-gray-700">Country</label>
-            <input type="text" className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Country" />
+            <input type="text" value={country} className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Country" />
           </div>
           <div>
-            <label className="block text-gray-700">Region/State</label>
-            <input type="text" className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Region/State" />
+            <label className="block text-gray-700">State</label>
+            <input type="text" value={state} className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="State" />
           </div>
           <div>
             <label className="block text-gray-700">City</label>
-            <input type="text" className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="City" />
+            <input type="text" value={city} className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="City" />
           </div>
           <div>
             <label className="block text-gray-700">Zip Code</label>
-            <input type="text" className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Zip Code" />
+            <input type="text" value={zip} className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Zip Code" />
           </div>
         </div>
         <div className="mt-6">
           <h2 className="text-xl font-bold mb-2">PapuCreditos</h2>
           <div className="flex items-center text-lg text-gray-700">
             <FontAwesomeIcon icon={faDollarSign} className="mr-2 text-green-500" />
-            <span className="font-bold">{papuCreditos.toLocaleString()}</span>
+            <span className="font-bold">{papuCreditos}</span>
             <span className="ml-2 text-sm">USD</span>
           </div>
         </div>

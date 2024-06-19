@@ -239,6 +239,7 @@ export const Shop = () => {
     setCurrentPage(1)
   }, [dataOrdenado])
   
+  
 
   return (
     <>
