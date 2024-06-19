@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Swal from "sweetalert2";
 import JustValidate from 'just-validate';
 import { useAuth } from '../components/AuthProvider';
 import { Header } from '../components/Header';
@@ -79,9 +80,20 @@ export const EditProfile = () => {
       });
       const result = await response.json();
       if (result.success) {
-        alert('Information updated successfully');
+        Swal.fire({
+          icon: "success",
+          title: "You information was succesfully updated",
+          showConfirmButton: false,
+          timer: 2500
+        });
       } else {
-        alert('Failed to update information');
+        Swal.fire({
+          icon: "error",
+          title: "There was an error trying to update your information",
+          text: "Try again",
+          showConfirmButton: false,
+          timer: 2500
+        });
       }
     } catch (error) {
       console.error('Error saving user info:', error);
