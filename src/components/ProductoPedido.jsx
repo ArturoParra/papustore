@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
-export const ProductoPedido = ({item}) => {
+export const ProductoPedido = ({item, quantityBuynow}) => {
 
     const { thumbnail, quantity, title, priceWithDiscount } = item
-    console.log(item)
+    console.log(quantityBuynow)
     
   return (
     <>
@@ -17,7 +17,7 @@ export const ProductoPedido = ({item}) => {
           {title}
         </div>
         <div>
-          {quantity} x <span className="text-primary">$ {priceWithDiscount} USD</span>
+          {quantityBuynow ? quantityBuynow : quantity} x <span className="text-primary">$ {priceWithDiscount} USD</span>
         </div>
       </div>
     </>

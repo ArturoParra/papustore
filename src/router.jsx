@@ -19,7 +19,7 @@ export const AppRouter = () => {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path='/' element={<IndexPage />} />
+          <Route exact path='/' element={<IndexPage />} />
           <Route path='/carrito' element={<ShoppingCart />} />
           <Route path='/tienda' element={<Shop />} />
           <Route path='/perfil' element={<UserProfile />} />
@@ -29,6 +29,7 @@ export const AppRouter = () => {
           <Route path='/form' element={<FormularioInicio />} />
           <Route path='/adminForm' element={<FormularioAdministrator />} />
           <Route path='/pedido' element={<ConfirmarCompra />} />
+          <Route path='/pedido/:id/:quantity' element={<ConfirmarCompra />} />
           <Route path='/edit-profile' element={<EditProfile />} /> {/* Añadir la ruta para EditProfile */}
         </Routes>
       </AuthProvider>
