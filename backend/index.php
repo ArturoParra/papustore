@@ -97,17 +97,29 @@ function consultaProductos($conn)
  * @param string $id The ID of the product to retrieve.
  * @return array|null The associative array representing the product, or null if not found.
  */
-function consultaProductoIndividual($conn, $id)
+function consultaProductoIndividual($conn, $id, $flag)
 {
     $sql = "SELECT * FROM products WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $id);
     $stmt->execute();
     $res = $stmt->get_result();
-    if ($res->num_rows > 0) {
-        return $res->fetch_assoc();
-    } else {
-        return null;
+    if($flag){
+        if ($res->num_rows > 0) {
+            $productos = array();
+            while ($row = $res->fetch_assoc()) {
+                $productos[] = $row;
+            }
+            return $productos;
+        } else {
+            return array();
+        }
+    }else{
+        if ($res->num_rows > 0) {
+            return $res->fetch_assoc();
+        } else {
+            return null;
+        }
     }
 }
 
@@ -563,6 +575,89 @@ function agregarCompra($conn, $email, $total, $pedido)
     }
 }
 
+function agregarCompraIndividual($conn, $email, $total, $pedido, $quantity)
+{
+    // Preparar la declaración para insertar en purchase_history
+    $stmt = $conn->prepare("INSERT INTO purchase_history (email, total) VALUES (?, ?)");
+    if (!$stmt) {
+        return ["success" => false, "message" => "Error en prepare: " . $conn->error];
+    }
+    $stmt->bind_param("sd", $email, $total);
+
+    // Preparar la declaración para actualizar IDs
+    $stmt2 = $conn->prepare("UPDATE IDs SET id = id + 1");
+    if (!$stmt2) {
+        return ["success" => false, "message" => "Error en prepare: " . $conn->error];
+    }
+
+    // Ejecutar ambas declaraciones
+    if ($stmt->execute() && $stmt2->execute()) {
+
+        // Preparar la declaración para seleccionar el ID actualizado
+        $stmt3 = $conn->prepare("SELECT id FROM IDs");
+        if (!$stmt3) {
+            return ["success" => false, "message" => "Error en prepare: " . $conn->error];
+        }
+
+        // Ejecutar la declaración y obtener el resultado
+        if ($stmt3->execute()) {
+            $result = $stmt3->get_result();
+            $row = $result->fetch_assoc();
+            $purchase_id = $row['id'];
+
+            // Preparar la declaración para insertar en purchase_details
+            $stmt4 = $conn->prepare("INSERT INTO purchase_details (purchase_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)");
+            if (!$stmt4) {
+                return ["success" => false, "message" => "Error en prepare: " . $conn->error];
+            }
+
+            // Iterar sobre el pedido y vincular los parámetros
+            foreach ($pedido as $item) {
+                $product_id = $item->id;
+                $unit_price = $item->priceWithDiscount;
+
+                $stmt7 = $conn->prepare("UPDATE products SET stock = stock - ?, total_sales = total_sales + ? WHERE id = ?");
+                if (!$stmt7) {
+                    return ["success" => false, "message" => "Error en prepare: " . $conn->error];
+                }
+                $stmt7->bind_param("iii", $quantity, $quantity, $product_id);
+                if (!$stmt7->execute()) {
+                    return ["success" => false, "message" => "Error al actualizar stock: " . $stmt4->error];
+                }
+
+                $stmt4->bind_param("iiid", $purchase_id, $product_id, $quantity, $unit_price);
+                if (!$stmt4->execute()) {
+                    return ["success" => false, "message" => "Error al insertar en purchase_details: " . $stmt4->error];
+                }
+            }
+
+            $stmt5 = $conn->prepare("DELETE FROM shopping_cart WHERE email = ?");
+            if (!$stmt5) {
+                return ["success" => false, "message" => "Error en prepare: " . $conn->error];
+            }
+            $stmt5->bind_param("s", $email);
+            if (!$stmt5->execute()) {
+                return ["success" => false, "message" => "Error al borrar del carrito: " . $stmt5->error];
+            }
+
+            $stmt6 = $conn->prepare("UPDATE user_data SET purchases = purchases + 1, papu_credits = papu_credits - ? WHERE email = ?");
+            if (!$stmt6) {
+                return ["success" => false, "message" => "Error en prepare: " . $conn->error];
+            }
+            $stmt6->bind_param("ds", $total, $email);
+            if (!$stmt6->execute()) {
+                return ["success" => false, "message" => "Error al borrar del carrito: " . $stmt6->error];
+            }
+
+            return ["success" => true];
+        } else {
+            return ["success" => false, "message" => "Error al ejecutar SELECT id: " . $stmt3->error];
+        }
+    } else {
+        return ["success" => false, "message" => "Error al ejecutar INSERT o UPDATE: " . $stmt->error . " / " . $stmt2->error];
+    }
+}
+
 /**
  * Updates the user data in the database.
  *
@@ -756,8 +851,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     break;
                 case 'consultaProductoIndividual':
-                    if (isset($jsonData->id)) {
-                        $productos = consultaProductoIndividual($conn, $jsonData->id);
+                    if (isset($jsonData->id, $jsonData->flag)) {
+                        $productos = consultaProductoIndividual($conn, $jsonData->id, $jsonData->flag);
                         header('Content-Type: application/json');
                         echo json_encode($productos);
                     }
@@ -783,6 +878,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         // Llamar a la función agregarCompra con el pedido
                         $resultado = agregarCompra($conn, $jsonData->email, $jsonData->total, $pedido);
+
+                        // Enviar la respuesta
+                        header('Content-Type: application/json');
+                        echo json_encode($resultado);
+                    }
+                    break;
+                case 'agregarCompraIndividual':
+                    if (isset($jsonData->email, $jsonData->total, $jsonData->pedido, $jsonData->quantity)) {
+                        // Decodificar el pedido
+                        $pedido = $jsonData->pedido;
+
+                        // Llamar a la función agregarCompra con el pedido
+                        $resultado = agregarCompraIndividual($conn, $jsonData->email, $jsonData->total, $pedido, $jsonData->quantity);
 
                         // Enviar la respuesta
                         header('Content-Type: application/json');
