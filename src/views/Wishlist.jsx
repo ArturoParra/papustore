@@ -6,6 +6,8 @@ import { faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons'; //
 import { ProductoWishlist } from '../components/ProductoWishlist'; // Importa el componente ProductoWishlist desde '../components/ProductoWishlist'
 import { useAuth } from '../components/AuthProvider'; // Importa el componente useAuth desde '../components/AuthProvider'
 import { useEffect, useState } from 'react'; // Importa useEffect y useState desde la biblioteca 'react'
+import { Link } from "react-router-dom";
+import { fas } from "@fortawesome/free-solid-svg-icons";
 
 export const Wishlist = () => {
   // Extraer el email del usuario autenticado
@@ -13,6 +15,8 @@ export const Wishlist = () => {
 
   // Estado de la lista de deseos
   const [wishlist, setWishlist] = useState([]);
+
+  const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
 
   // Efecto para obtener los productos de la lista de deseos
   useEffect(() => {
@@ -93,6 +97,11 @@ export const Wishlist = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
         {/* Contenedor del contenido de la lista de deseos */}
         <div className="bg-white p-4 md:p-8 rounded-lg shadow-md w-full max-w-5xl">
+        <Link to="/tienda">
+                <button className="flex font-semibold text-sm text-black items-center sm:justify-start w-full sm:w-auto mb-4">
+                  <span>{IconoFlecha} BACK TO SHOP</span>
+                </button>
+              </Link>
           <h1 className="text-2xl font-bold mb-4">Wishlist</h1> {/* Título de la lista de deseos */}
           <div className="overflow-x-auto">
             {/* Mapeo de los productos de la lista de deseos */}

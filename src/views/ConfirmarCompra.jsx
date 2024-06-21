@@ -7,6 +7,8 @@ import { ProductoPedido } from "../components/ProductoPedido";
 import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDollarSign } from "@fortawesome/free-solid-svg-icons";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 export const ConfirmarCompra = () => {
   const { userEmail } = useAuth();
@@ -29,6 +31,8 @@ export const ConfirmarCompra = () => {
   const formRef = useRef(null); // Ref for the form
 
   const navigate = useNavigate();
+
+  const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
 
   useEffect(() => {
     if (id) {
@@ -274,6 +278,11 @@ export const ConfirmarCompra = () => {
       <div className="bg-gray-100 p-8 flex flex-col lg:flex-row">
         {/* Billing Information */}
         <form ref={formRef} onSubmit={placeOrder} className="bg-white p-8 rounded-lg shadow-md w-full lg:w-2/3 mb-8 lg:mb-0 lg:mr-8">
+        <Link to="/carrito">
+                <button className="flex font-semibold text-sm text-black items-center sm:justify-start w-full sm:w-auto mb-4">
+                  <span>{IconoFlecha} BACK TO CART</span>
+                </button>
+              </Link>
           <h2 className="text-2xl font-bold mb-6">Billing Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="md:col-span-2">
