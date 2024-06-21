@@ -4,6 +4,11 @@ import JustValidate from 'just-validate';
 import { useAuth } from '../components/AuthProvider';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+
+
 
 export const EditProfile = () => {
   const { userEmail } = useAuth();
@@ -23,6 +28,9 @@ export const EditProfile = () => {
     region: '',
     city: ''
   });
+
+  const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
+
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -184,6 +192,11 @@ export const EditProfile = () => {
       <Header />
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-12 px-4">
         <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-4xl mb-8">
+        <Link to="/perfil">
+                <button className="flex font-semibold text-sm text-black items-center sm:justify-start w-full sm:w-auto mb-4">
+                  <span>{IconoFlecha} BACK TO PERFIL</span>
+                </button>
+              </Link>
           <form id="edit-profile-form" className="space-y-4">
             <div className="flex flex-col md:flex-row gap-8">
               <div className="w-full md:w-1/2">
