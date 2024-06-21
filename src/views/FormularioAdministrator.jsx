@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import JustValidate from 'just-validate';
 import Swal from "sweetalert2"; 
 import { Header } from '../components/Header';  
@@ -9,6 +9,11 @@ import { useAuth } from '../components/AuthProvider';
 export const FormularioAdministrator = () => {
   const navigate = useNavigate();  
   const { setIsAuthenticated } = useAuth();  
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const verificarAdministrador = async (adminuser, password) => {
     try {
@@ -41,8 +46,8 @@ export const FormularioAdministrator = () => {
     window.scrollTo(0, 0)
   }, [])
 
-    useEffect(() => {
-      const validator = new JustValidate('#login-form');
+  useEffect(() => {
+    const validator = new JustValidate('#login-form');
 
     validator
       .addField('#adminuser', [
@@ -77,8 +82,7 @@ export const FormularioAdministrator = () => {
     return () => {
       validator.destroy();
     };
-    }, [])
-    
+  }, [])
 
   return (
     <>
@@ -109,13 +113,22 @@ export const FormularioAdministrator = () => {
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
                 PASSWORD
               </label>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="password"
-                type="password"
-                name="password"
-                placeholder="Password"
-              />
+              <div className="relative">
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-0 px-3 py-2 text-sm text-gray-700"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between">
