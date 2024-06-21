@@ -4,12 +4,16 @@ import { Footer } from '../components/Footer';
 import Order from '../components/Order';
 import { useAuth } from '../components/AuthProvider';
 import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { fas } from "@fortawesome/free-solid-svg-icons";
 
 export const UserProfile = () => {
   const { userEmail } = useAuth();
   const [userInfo, setUserInfo] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
   const navigate = useNavigate(); // Inicializar useNavigate
+  const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
 
   useEffect(() => {
     // Fetch user information
@@ -61,6 +65,11 @@ export const UserProfile = () => {
       <Header />
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-12 px-4">
         <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-4xl mb-8">
+        <Link to="/tienda">
+                <button className="flex font-semibold text-sm text-black items-center sm:justify-start w-full sm:w-auto mb-4">
+                  <span>{IconoFlecha} BACK TO SHOP</span>
+                </button>
+              </Link>
           <div className="flex flex-col md:flex-row gap-8">
             <div className="w-full md:w-1/2">
               <h2 className="text-xl font-bold mb-4">ACCOUNT INFORMATION</h2>

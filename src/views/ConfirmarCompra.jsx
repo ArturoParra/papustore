@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Swal from "sweetalert2";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
@@ -7,6 +7,8 @@ import { ProductoPedido } from "../components/ProductoPedido";
 import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDollarSign } from "@fortawesome/free-solid-svg-icons";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
@@ -38,7 +40,11 @@ export const ConfirmarCompra = () => {
   const [lastname, setlastname] = useState("")
   const [phone, setPhone] = useState("")
 
+  const formRef = useRef(null); // Ref for the form
+
   const navigate = useNavigate();
+
+  const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
 
   useEffect(() => {
     if (id) {
@@ -179,9 +185,33 @@ export const ConfirmarCompra = () => {
     let truncado = Math.floor(temp * 100) / 100;
     setTotal(truncado)
   }, [tax])
-  
 
-  const placeOrder = async () => {
+
+  const placeOrder = async (event) => {
+    event.preventDefault(); // Evita que el formulario se envíe automáticamente
+
+    const addressInput = document.getElementById("address");
+    const countryInput = document.getElementById("country");
+    const stateInput = document.getElementById("state");
+    const cityInput = document.getElementById("city");
+    const zipInput = document.getElementById("zip");
+
+    if (
+      !addressInput.value ||
+      !countryInput.value ||
+      !stateInput.value ||
+      !cityInput.value ||
+      !zipInput.value
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Validation failed",
+        text: "Please fill in all required fields",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+      return;
+    }
     if (papuCreditos > subTotal) {
       try {
         if (id) {
@@ -348,16 +378,23 @@ export const ConfirmarCompra = () => {
       <Header />
       <div className="bg-gray-100 p-8 flex flex-col lg:flex-row">
         {/* Billing Information */}
-        <div className="bg-white p-8 rounded-lg shadow-md w-full lg:w-2/3 mb-8 lg:mb-0 lg:mr-8">
+        <form ref={formRef} onSubmit={placeOrder} className="bg-white p-8 rounded-lg shadow-md w-full lg:w-2/3 mb-8 lg:mb-0 lg:mr-8">
+        <Link to="/carrito">
+                <button className="flex font-semibold text-sm text-black items-center sm:justify-start w-full sm:w-auto mb-4">
+                  <span>{IconoFlecha} BACK TO CART</span>
+                </button>
+              </Link>
           <h2 className="text-2xl font-bold mb-6">Billing Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="md:col-span-2">
               <label className="block text-gray-700">
-                Company Name (Optional)
+                Address 
               </label>
               <input
                 type="text"
-                value={company}
+                id="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
                 className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder="Company Name"
               />
@@ -366,7 +403,9 @@ export const ConfirmarCompra = () => {
               <label className="block text-gray-700">Country</label>
               <input
                 type="text"
+                id="country"
                 value={country}
+                onChange={(e) => setCountry(e.target.value)}
                 className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder="Country"
               />
@@ -375,7 +414,9 @@ export const ConfirmarCompra = () => {
               <label className="block text-gray-700">State</label>
               <input
                 type="text"
+                id="state"
                 value={state}
+                onChange={(e) => setState(e.target.value)}
                 className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder="State"
               />
@@ -384,7 +425,9 @@ export const ConfirmarCompra = () => {
               <label className="block text-gray-700">City</label>
               <input
                 type="text"
+                id="city"
                 value={city}
+                onChange={(e) => setCity(e.target.value)}
                 className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder="City"
               />
@@ -393,7 +436,9 @@ export const ConfirmarCompra = () => {
               <label className="block text-gray-700">Zip Code</label>
               <input
                 type="text"
+                id="zip"
                 value={zip}
+                onChange={(e) => setZip(e.target.value)}
                 className="mt-1 block w-full rounded-md border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder="Zip Code"
               />
@@ -410,7 +455,13 @@ export const ConfirmarCompra = () => {
               <span className="ml-2 text-sm">USD</span>
             </div>
           </div>
-        </div>
+          <button
+            type="submit"
+            className="mt-6 w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            PLACE ORDER
+          </button>
+        </form>
         {/* Order Summary */}
         <div className="bg-white p-8 rounded-lg shadow-md w-full lg:w-1/3">
           <h2 className="text-2xl font-bold mb-6">Order Summary</h2>

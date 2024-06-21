@@ -2,8 +2,6 @@ DROP DATABASE IF EXISTS papustore;
 CREATE DATABASE IF NOT EXISTS papustore;
 USE papustore;
 
-select * from products;
-
 -- Table where user data is registered
 CREATE TABLE IF NOT EXISTS user_data (
     email           VARCHAR(100)    NOT NULL PRIMARY KEY,
@@ -124,6 +122,11 @@ CREATE TABLE IF NOT EXISTS purchase_history (
     email       VARCHAR(100) NOT NULL,
     date        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     total       DECIMAL(10, 2) NOT NULL,
+    country         VARCHAR(100),   -- Optional country
+    state           VARCHAR(100),   -- Optional state
+    zip             VARCHAR(20),    -- Optional zip code
+    address         VARCHAR(255),   -- Optional address
+    city   			VARCHAR(100),   -- Optional city
     FOREIGN KEY (email) REFERENCES user_data(email)
 );
 
