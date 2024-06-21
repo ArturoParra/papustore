@@ -42,7 +42,7 @@ export const SidebarFiltros = ({
 
         <SidebarContext.Provider value={{ expanded, handleCheckboxChange }}>
           <ul
-            className={`overflow-y-auto fixed max-h-screen lg:max-h-max z-40 flex-1 px-3 max-w-max transform transition duration-500 lg:static lg:translate-x-0 lg:justify-normal lg:px-3 lg:bg-slate-200 lg:rounded-lg ${
+            className={`overflow-y-auto fixed max-h-screen lg:max-h-max z-40 flex-1 px-3 transform transition duration-500 lg:static lg:translate-x-0 lg:justify-normal lg:px-3 lg:bg-slate-200 lg:rounded-lg ${
               expanded
                 ? "bg-slate-200 translate-x-0"
                 : "bg-none -translate-x-full"
