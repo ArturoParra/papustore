@@ -13,6 +13,7 @@ import { FormularioInicio } from './views/FormularioInicio';
 import { AuthProvider } from './components/AuthProvider'; // Ajusta la ruta según sea necesario
 import { ConfirmarCompra } from './views/ConfirmarCompra';
 import { EditProfile } from './views/EditProfile'; // Importa el componente EditProfile
+import { PurchaseHistory } from './views/PurchaseHistory';
 
 export const AppRouter = () => {
   return (
@@ -31,6 +32,7 @@ export const AppRouter = () => {
           <Route path='/pedido' element={<ConfirmarCompra />} />
           <Route path='/pedido/:id/:quantity' element={<ConfirmarCompra />} />
           <Route path='/edit-profile' element={<EditProfile />} /> {/* Añadir la ruta para EditProfile */}
+          <Route path='/purchasehistory/:id' element={<PurchaseHistory />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

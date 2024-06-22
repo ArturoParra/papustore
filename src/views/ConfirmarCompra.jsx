@@ -226,6 +226,11 @@ export const ConfirmarCompra = () => {
               total: subTotal,
               pedido: pedido,
               quantity: quantity,
+              country: country,
+              state: state,
+              zip: zip,
+              address: address,
+              city: city,
             }),
           });
 
@@ -259,6 +264,11 @@ export const ConfirmarCompra = () => {
               email: userEmail,
               total: total,
               pedido: pedido,
+              country: country,
+              state: state,
+              zip: zip,
+              address: address,
+              city: city,
             }),
           });
 
