@@ -473,7 +473,7 @@ function consultaPedidosRecientes($conn, $email)
         $pedidos = array();
         while ($row = $res->fetch_assoc()) {
             $pedidos[] = [
-                'id' => '#' . $row['id'],
+                'id' => $row['id'],
                 'date' => date('M d, Y H:i', strtotime($row['date'])),
                 'total' => '$' . number_format($row['total'], 2) . ' (' . $row['products'] . ' Products)'
             ];
@@ -492,14 +492,13 @@ function consultaPedidosRecientes($conn, $email)
  * @param float $total The total amount of the purchase.
  * @return array An associative array with the success status and an optional error message.
  */
-function agregarCompra($conn, $email, $total, $pedido)
-{
+function agregarCompra($conn, $email, $total, $pedido, $country, $state, $zip, $address, $city){
     // Preparar la declaración para insertar en purchase_history
-    $stmt = $conn->prepare("INSERT INTO purchase_history (email, total) VALUES (?, ?)");
+    $stmt = $conn->prepare("INSERT INTO purchase_history (email, total, country, state, zip, address, city) VALUES (?, ?, ?, ?, ?, ?, ?)");
     if (!$stmt) {
         return ["success" => false, "message" => "Error en prepare: " . $conn->error];
     }
-    $stmt->bind_param("sd", $email, $total);
+    $stmt->bind_param("sdsssss", $email, $total, $country, $state, $zip, $address, $city);
 
     // Preparar la declaración para actualizar IDs
     $stmt2 = $conn->prepare("UPDATE IDs SET id = id + 1");
@@ -576,14 +575,13 @@ function agregarCompra($conn, $email, $total, $pedido)
     }
 }
 
-function agregarCompraIndividual($conn, $email, $total, $pedido, $quantity)
-{
+function agregarCompraIndividual($conn, $email, $total, $pedido, $quantity, $country, $state, $zip, $address, $city){
     // Preparar la declaración para insertar en purchase_history
-    $stmt = $conn->prepare("INSERT INTO purchase_history (email, total) VALUES (?, ?)");
+    $stmt = $conn->prepare("INSERT INTO purchase_history (email, total, country, state, zip, address, city) VALUES (?, ?, ?, ?, ?, ?, ?)");
     if (!$stmt) {
         return ["success" => false, "message" => "Error en prepare: " . $conn->error];
     }
-    $stmt->bind_param("sd", $email, $total);
+    $stmt->bind_param("sdsssss", $email, $total, $country, $state, $zip, $address, $city);
 
     // Preparar la declaración para actualizar IDs
     $stmt2 = $conn->prepare("UPDATE IDs SET id = id + 1");
@@ -814,6 +812,41 @@ function consultaTopDiez($conn)
     }
 }
 
+function getPurchaseHistory($conn, $email, $id) {
+    // Consulta para obtener los detalles de la compra
+    $sql = "SELECT email, date, total, country, state, zip, address, city 
+            FROM purchase_history 
+            WHERE email = ? AND purchase_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("si", $email, $id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    
+    if ($res->num_rows > 0) {
+        $purchase = $res->fetch_assoc();
+
+        // Consulta para obtener los detalles de los productos comprados
+        $sqlDetails = "SELECT pd.product_id, pd.quantity, pd.unit_price, p.title, p.thumbnail 
+                       FROM purchase_details pd 
+                       JOIN products p ON pd.product_id = p.id 
+                       WHERE pd.purchase_id = ?";
+        $stmtDetails = $conn->prepare($sqlDetails);
+        $stmtDetails->bind_param("i", $id);
+        $stmtDetails->execute();
+        $resDetails = $stmtDetails->get_result();
+        
+        $products = [];
+        while ($row = $resDetails->fetch_assoc()) {
+            $products[] = $row;
+        }
+        
+        $purchase['products'] = $products;
+
+        return $purchase;
+    } else {
+        return null;
+    }
+}
 
 /**
  * This code block checks if the current request method is OPTIONS.
@@ -853,6 +886,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($jsonData !== null && isset($jsonData->functionName)) {
             $functionName = $jsonData->functionName;
             switch ($functionName) {
+                case 'getPurchaseHistory':
+                    if (isset($jsonData->email) && isset($jsonData->id)) {
+                        $purchaseHistory = getPurchaseHistory($conn, $jsonData->email, $jsonData->id);
+                        header('Content-Type: application/json');
+                        echo json_encode($purchaseHistory);
+                    }
+                    break;
                 case 'agregarComentario':
                     if (isset($jsonData->email, $jsonData->name, $jsonData->product_id, $jsonData->comment, $jsonData->rating)) {
                         $resultado = agregarComentario($conn, $jsonData->email, $jsonData->name, $jsonData->product_id, $jsonData->comment, $jsonData->rating);
@@ -979,12 +1019,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     break;
                 case 'agregarCompra':
-                    if (isset($jsonData->email, $jsonData->total, $jsonData->pedido)) {
+                    if (isset($jsonData->email, $jsonData->total, $jsonData->pedido, $jsonData->country, $jsonData->state, $jsonData->zip, $jsonData->address, $jsonData->city)) {
                         // Decodificar el pedido
                         $pedido = $jsonData->pedido;
 
                         // Llamar a la función agregarCompra con el pedido
-                        $resultado = agregarCompra($conn, $jsonData->email, $jsonData->total, $pedido);
+                        $resultado = agregarCompra($conn, $jsonData->email, $jsonData->total, $pedido, $jsonData->country, $jsonData->state, $jsonData->zip, $jsonData->address, $jsonData->city);
 
                         // Enviar la respuesta
                         header('Content-Type: application/json');
@@ -992,12 +1032,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     break;
                 case 'agregarCompraIndividual':
-                    if (isset($jsonData->email, $jsonData->total, $jsonData->pedido, $jsonData->quantity)) {
+                    if (isset($jsonData->email, $jsonData->total, $jsonData->pedido, $jsonData->quantity, $jsonData->country, $jsonData->state, $jsonData->zip, $jsonData->address, $jsonData->city)) {
                         // Decodificar el pedido
                         $pedido = $jsonData->pedido;
 
                         // Llamar a la función agregarCompra con el pedido
-                        $resultado = agregarCompraIndividual($conn, $jsonData->email, $jsonData->total, $pedido, $jsonData->quantity);
+                        $resultado = agregarCompraIndividual($conn, $jsonData->email, $jsonData->total, $pedido, $jsonData->quantity, $jsonData->country, $jsonData->state, $jsonData->zip, $jsonData->address, $jsonData->city);
 
                         // Enviar la respuesta
                         header('Content-Type: application/json');

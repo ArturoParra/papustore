@@ -194,7 +194,7 @@ export const EditProfile = () => {
         <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-4xl mb-8">
         <Link to="/perfil">
                 <button className="flex font-semibold text-sm text-black items-center sm:justify-start w-full sm:w-auto mb-4">
-                  <span>{IconoFlecha} BACK TO PERFIL</span>
+                  <span>{IconoFlecha} BACK TO PROFILE</span>
                 </button>
               </Link>
           <form id="edit-profile-form" className="space-y-4">
