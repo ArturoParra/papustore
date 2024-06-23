@@ -104,7 +104,7 @@ function consultaProductoIndividual($conn, $id, $flag)
     $stmt->bind_param("s", $id);
     $stmt->execute();
     $res = $stmt->get_result();
-    if($flag){
+    if ($flag) {
         if ($res->num_rows > 0) {
             $productos = array();
             while ($row = $res->fetch_assoc()) {
@@ -114,7 +114,7 @@ function consultaProductoIndividual($conn, $id, $flag)
         } else {
             return array();
         }
-    }else{
+    } else {
         if ($res->num_rows > 0) {
             return $res->fetch_assoc();
         } else {
@@ -154,6 +154,7 @@ function consultaImagenes($conn, $id)
  * @param mysqli $conn The database connection object.
  * @return array An array of products in the shopping cart.
  */
+//! Esta función creo que no se usa
 function consultarCarrito($conn)
 {
     $sql = "SELECT * FROM shopping_cart";
@@ -707,6 +708,112 @@ function agregarComentario($conn, $email, $name, $product_id, $comment, $rating)
     }
 }
 
+function consultaVentasPorCategoria($conn)
+{
+    $sql = "SELECT p.category, SUM(pd.quantity) AS quantity, SUM(pd.quantity * pd.unit_price) AS total FROM purchase_details pd LEFT JOIN products p ON pd.product_id = p.id GROUP BY p.category";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error al preparar la consulta: " . $conn->error);
+        return array();
+    }
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $ventas = array();
+        while ($row = $res->fetch_assoc()) {
+            $ventas[] = $row;
+        }
+        return $ventas;
+    } else {
+        return array();
+    }
+
+}
+
+function consultaVentasTotales($conn)
+{
+    $sql = "SELECT SUM(total) as total from purchase_history";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error al preparar la consulta: " . $conn->error);
+        return 0;
+    }
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $ventas = array();
+        while ($row = $res->fetch_assoc()) {
+            $ventas[] = $row;
+        }
+        return $ventas;
+    } else {
+        return array();
+    }
+}
+
+function consultaComprasTotales($conn)
+{
+    $sql = "SELECT id from IDs";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error al preparar la consulta: " . $conn->error);
+        return 0;
+    }
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $ventas = array();
+        while ($row = $res->fetch_assoc()) {
+            $ventas[] = $row;
+        }
+        return $ventas;
+    } else {
+        return array();
+    }
+}
+
+function consultaArticulosVendidos($conn)
+{
+    $sql = "SELECT SUM(quantity) AS quantity FROM purchase_details";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error al preparar la consulta: " . $conn->error);
+        return 0;
+    }
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $ventas = array();
+        while ($row = $res->fetch_assoc()) {
+            $ventas[] = $row;
+        }
+        return $ventas;
+    } else {
+        return array();
+    }
+}
+
+function consultaTopDiez($conn)
+{
+    $sql = "SELECT title, thumbnail, category, total_sales FROM products ORDER BY total_sales DESC LIMIT 10";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error al preparar la consulta: " . $conn->error);
+        return 0;
+    }
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $ventas = array();
+        while ($row = $res->fetch_assoc()) {
+            $ventas[] = $row;
+        }
+        return $ventas;
+    } else {
+        return array();
+    }
+}
+
 
 /**
  * This code block checks if the current request method is OPTIONS.
@@ -910,6 +1017,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         header('Content-Type: application/json');
                         echo json_encode($resultado);
                     }
+                    break;
+                case 'consultaVentasPorCategoria':
+                    $resultado = consultaVentasPorCategoria($conn);
+                    header('Content-Type: application/json');
+                    echo json_encode($resultado);
+                    break;
+                case 'consultaVentasTotales':
+                    $resultado = consultaVentasTotales($conn);
+                    header('Content-Type: application/json');
+                    echo json_encode($resultado);
+                    break;
+                case 'consultaComprasTotales':
+                    $resultado = consultaComprasTotales($conn);
+                    header('Content-Type: application/json');
+                    echo json_encode($resultado);
+                    break;
+                case 'consultaArticulosVendidos':
+                    $resultado = consultaArticulosVendidos($conn);
+                    header('Content-Type: application/json');
+                    echo json_encode($resultado);
+                    break;
+                case 'consultaTopDiez':
+                    $resultado = consultaTopDiez($conn);
+                    header('Content-Type: application/json');
+                    echo json_encode($resultado);
                     break;
                 default:
                     error_log("Función no válida");

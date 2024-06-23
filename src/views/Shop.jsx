@@ -106,7 +106,6 @@ export const Shop = () => {
         setData(res);
       } catch (error) {
         console.error("Error al obtener los datos:", error);
-        // Manejar el error adecuadamente, por ejemplo, mostrando un mensaje al usuario
       }
     };
     
@@ -160,24 +159,6 @@ export const Shop = () => {
           filters.includes(item.category) && filters.includes(item.brand)
       );
       res = res2.length > 0 ? intersection(res, res2) : res;
-
-      // Filtrar los productos sin la propiedad "brand" si "Otras marcas" está activo
-      if (filters.includes("")) {
-        const sinMarca = Object.values(data).filter(
-          (item) => !item.hasOwnProperty("brand")
-        );
-        // Si solo "Otras marcas" está activo, mostrar todos los productos sin marca
-        if (filters.length === 1) {
-          res = sinMarca;
-        } else {
-          // Filtrar productos sin marca que coincidan con las otras categorías seleccionadas
-          const categoriaFiltro = filters.filter((f) => f !== "");
-          const sinMarcaFiltrado = sinMarca.filter((item) =>
-            categoriaFiltro.includes(item.category)
-          );
-          res = intersection(res, sinMarcaFiltrado);
-        }
-      }
     }
 
     // Si no hay coincidencias, devolver un array vacío
@@ -344,7 +325,7 @@ export const Shop = () => {
               <SidebarItem texto="Longines" value="Longines" />
               <SidebarItem texto="Rolex" value="Rolex" />
               <SidebarItem texto="Amazon" value="Amazon" />
-              <SidebarItem texto="Otras marcas" value="" />
+              <SidebarItem texto="Other brands" value="" />
 
               <ReactSlider
                   className="horizontal-slider"

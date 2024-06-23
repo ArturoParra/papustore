@@ -223,7 +223,7 @@ export const ConfirmarCompra = () => {
             body: JSON.stringify({
               functionName: "agregarCompraIndividual",
               email: userEmail,
-              total: subTotal,
+              total: total,
               pedido: pedido,
               quantity: quantity,
             }),
@@ -456,7 +456,7 @@ export const ConfirmarCompra = () => {
             </div>
           </div>
           <button
-            type="submit"
+          onClick={handleOrder}
             className="mt-6 w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
             PLACE ORDER
@@ -492,12 +492,6 @@ export const ConfirmarCompra = () => {
               <div>$ {total} USD</div>
             </div>
           </div>
-          <button
-            onClick={handleOrder}
-            className="mt-6 w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            PLACE ORDER
-          </button>
         </div>
       </div>
       <Footer />
