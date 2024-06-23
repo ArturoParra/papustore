@@ -1,11 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Swal from "sweetalert2";
 import { useAuth } from './AuthProvider';
 
 // Componente ProductoShoppingCart que recibe props: item, incrementQuantity, decrementQuantity, removeItem
 export const ProductoShoppingCart = ({ item, incrementQuantity, decrementQuantity, removeItem }) => {
   // Asignar valores predeterminados si las propiedades están indefinidas
-  const {id, title, thumbnail, quantity, priceWithDiscount} = item;
+  const {id, title, thumbnail, quantity, priceWithDiscount, stock} = item;
   const { userEmail } = useAuth();
+  const [flag, setflag] = useState(false)
+  const [producto, setProducto] = useState({})
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,6 +37,58 @@ export const ProductoShoppingCart = ({ item, incrementQuantity, decrementQuantit
 
     fetchData();
   }, [quantity]);
+
+  useEffect(() => {
+    if (id) {
+      const fetchData = async () => {
+        try {
+          const res = await fetch("/api/index.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              functionName: "consultaProductoIndividual",
+              id: id,
+              flag: flag,
+            }),
+          });
+
+          if (!res.ok) {
+            throw new Error("Error en la solicitud fetch");
+          }
+
+          const data = await res.json();
+          // Actualizar el estado de productos con los datos obtenidos
+
+          setProducto(data);
+        } catch (error) {
+          console.error("Error: ", error);
+        }
+      };
+
+      fetchData();
+    }
+  }, [userEmail]);
+
+  useEffect(() => {
+    console.log(producto)
+  }, [producto])
+  
+
+  useEffect(() => {
+    if(quantity > producto.stock){
+      decrementQuantity(id)
+      Swal.fire({
+        icon: "warning",
+        title: `Cannot add more ${title}`,
+        text: "There is not enough stock for this product",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  }, [quantity])
+  
 
   return (
     // Contenedor principal con clases de Tailwind CSS para estilo y diseño responsivo
