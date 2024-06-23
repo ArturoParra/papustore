@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { ProductoShoppingCart } from "../components/ProductoShoppingCart";
 import { useAuth } from "../components/AuthProvider";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 
 export const ShoppingCart = () => {
+  const navigate = useNavigate();
   const { userEmail } = useAuth();
   const [cart, setCart] = useState([]);
 
-  const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
+  const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft} />;
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,9 +99,21 @@ export const ShoppingCart = () => {
     );
   };
 
-  const subTotal = cartTotal();
-  const tax = 61.99;
-  const total = subTotal + tax;
+  const handleCheckoutNav = () => {
+    if (cart.length > 0) {
+      navigate("/pedido");
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "Cannot proceed to checkout",
+        text: "Add some products to your shopping cart first",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+    }
+  };
+
+  const total = cartTotal();
 
   return (
     <>
@@ -107,7 +121,7 @@ export const ShoppingCart = () => {
       <div className="container mx-auto mt-10 p-4 sm:p-8">
         <div className="flex flex-col lg:flex-row shadow-md my-10">
           <div className="w-full lg:w-3/4 bg-white px-4 sm:px-10 py-10">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-5 space-y-4 sm:space-y-0 sm:space-x-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-5 space-y-4 sm:space-y-0 sm:space-x-4">
               <Link to="/tienda">
                 <button className="flex font-semibold text-sm text-black items-center sm:justify-start w-full sm:w-auto">
                   <span>{IconoFlecha} BACK TO SHOP</span>
@@ -117,20 +131,26 @@ export const ShoppingCart = () => {
             <div className="flex justify-between border-b pb-8">
               <h1 className="font-semibold text-2xl">SHOPPING CART</h1>
             </div>
-            <div className="hidden sm:flex mt-10 mb-5">
-              <h3 className="font-semibold text-gray-600 text-xs uppercase w-2/5">
-                PRODUCT DETAILS
-              </h3>
-              <h3 className="font-semibold text-center text-gray-600 text-xs uppercase w-1/4">
-                QUANTITY
-              </h3>
-              <h3 className="font-semibold text-center text-gray-600 text-xs uppercase w-1/4">
-                PRICE
-              </h3>
-              <h3 className="font-semibold text-center text-gray-600 text-xs uppercase w-1/4">
-                TOTAL
-              </h3>
-            </div>
+            {cart.length == 0 ? (
+              <p className="font-bold text-3xl mt-10 text-center">
+                There are no products in your cart{" "}
+              </p>
+            ) : (
+              <div className="hidden sm:flex mt-10 mb-5">
+                <h3 className="font-semibold text-gray-600 text-xs uppercase w-2/5">
+                  PRODUCT DETAILS
+                </h3>
+                <h3 className="font-semibold text-center text-gray-600 text-xs uppercase w-1/4">
+                  QUANTITY
+                </h3>
+                <h3 className="font-semibold text-center text-gray-600 text-xs uppercase w-1/4">
+                  PRICE
+                </h3>
+                <h3 className="font-semibold text-center text-gray-600 text-xs uppercase w-1/4">
+                  TOTAL
+                </h3>
+              </div>
+            )}
             {cart.map((item) => (
               <ProductoShoppingCart
                 key={item.id}
@@ -146,29 +166,18 @@ export const ShoppingCart = () => {
             id="summary"
             className="w-full lg:w-1/4 px-4 sm:px-8 py-10 bg-gray-100 mt-10 lg:mt-0"
           >
-            <h1 className="font-semibold text-2xl border-b pb-8">
-              ORDER SUMMARY
-            </h1>
-            <div className="flex justify-between mt-10 mb-5">
-              <span className="font-semibold text-sm uppercase">SUBTOTAL</span>
-              <span className="font-semibold text-sm">
-                ${subTotal.toFixed(2)}
-              </span>
-            </div>
-            <div className="flex justify-between mt-10 mb-5">
-              <span className="font-semibold text-sm uppercase">TAX</span>
-              <span className="font-semibold text-sm">${tax}</span>
-            </div>
-            <div className="border-t mt-8">
+            <h1 className="font-semibold text-2xl">Cart Summary</h1>
+            <div className="mt-8">
               <div className="flex font-semibold justify-between py-6 text-sm uppercase">
                 <span>TOTAL</span>
                 <span>${total.toFixed(2)}</span>
               </div>
-              <Link to="/pedido">
-              <button className="bg-orange-500 font-semibold hover:bg-orange-600 py-3 text-sm text-white uppercase w-full">
+              <button
+                onClick={handleCheckoutNav}
+                className="bg-orange-500 font-semibold hover:bg-orange-600 py-3 text-sm text-white uppercase w-full"
+              >
                 CHECKOUT
               </button>
-              </Link>
             </div>
           </div>
         </div>
