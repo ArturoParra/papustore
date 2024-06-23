@@ -294,52 +294,53 @@ export const VistaProducto = () => {
 
   const submitComment = async () => {
     if (isAuthenticated) {
-      try {
-        const response = await fetch("/api/index.php", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            functionName: "agregarComentario",
-            email: userEmail,
-            name: "Nombre del usuario", // Aquí deberías pasar el nombre del usuario autenticado
-            product_id: id,
-            comment: newComment,
-            rating: newRating,
-          }),
-        });
-        const result = await response.json();
-        if (result.success) {
-          Swal.fire({
-            position: "top-end",
-            icon: "success",
-            toast: "true",
-            title: "Review added",
-            text: "Thank you for your feedback",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-          setNewComment("");
-          setNewRating(0);
-        } else {
-          Swal.fire({
-            position: "top-end",
-            icon: "error",
-            toast: "true",
-            title: "Review couldn't be added",
-            text: "Try again",
-            showConfirmButton: false,
-            timer: 1500,
-          });
+        try {
+            const response = await fetch("/api/index.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    functionName: "agregarComentario",
+                    email: userEmail,
+                    name: "Nombre del usuario", // Aquí deberías pasar el nombre del usuario autenticado
+                    product_id: id,
+                    comment: newComment,
+                    rating: newRating,
+                }),
+            });
+            const result = await response.json();
+            if (result.success) {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    toast: "true",
+                    title: "Review added",
+                    text: "Thank you for your feedback",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+                setNewComment("");
+                setNewRating(0);
+            } else {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "error",
+                    toast: "true",
+                    title: "Review couldn't be added",
+                    text: result.message || "Try again",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+            }
+        } catch (error) {
+            console.error("Error al agregar el comentario:", error);
         }
-      } catch (error) {
-        console.error("Error al agregar el comentario:", error);
-      }
     } else {
-      alert("Log in to add a comment");
+        alert("Log in to add a comment");
     }
-  };
+};
+
 
   const addToWishlist = async () => {
     if (isAuthenticated) {
@@ -585,36 +586,8 @@ export const VistaProducto = () => {
             </div>
           </div>
         </div>
-        {/* Sección de comentarios */}
-        <div className="bg-white p-4 md:p-8 rounded-lg shadow-md w-full max-w-4xl">
-          <h3 className="text-lg font-bold mb-2">Comments</h3>
-          {comments.length > 0 ? (
-            comments.map((comment, index) => (
-              <div key={index} className="mb-4 border p-4 rounded">
-                <div className="flex flex-col mb-2">
-                  <span className="font-semibold">
-                    {comment.name} ({comment.email})
-                  </span>
-                  <div className="text-orange-500">
-                    {Array(comment.rating)
-                      .fill()
-                      .map((_, i) => (
-                        <FontAwesomeIcon key={i} icon={fas.faStar} />
-                      ))}
-                  </div>
-                </div>
-                <p className="text-gray-600">{comment.comment}</p>
-                <small className="text-gray-500">
-                  {new Date(comment.date).toLocaleDateString()}
-                </small>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-600">No comments yet.</p>
-          )}
-        </div>
         {isAuthenticated && (
-          <div className="bg-white p-4 md:p-8 rounded-lg shadow-md w-full max-w-4xl mt-4">
+          <div className="bg-white p-4 md:p-8 rounded-lg shadow-md w-full max-w-4xl mb-8">
             <h3 className="text-lg font-bold mb-2">Add a Comment</h3>
             <textarea
               value={newComment}
@@ -643,6 +616,34 @@ export const VistaProducto = () => {
             </button>
           </div>
         )}
+        {/* Sección de comentarios */}
+        <div className="bg-white p-4 md:p-8 rounded-lg shadow-md w-full max-w-4xl">
+          <h3 className="text-lg font-bold mb-2">Comments</h3>
+          {comments.length > 0 ? (
+            comments.map((comment, index) => (
+              <div key={index} className="mb-4 border p-4 rounded">
+                <div className="flex flex-col mb-2">
+                  <span className="font-semibold">
+                    {comment.name} ({comment.email})
+                  </span>
+                  <div className="text-orange-500">
+                    {Array(comment.rating)
+                      .fill()
+                      .map((_, i) => (
+                        <FontAwesomeIcon key={i} icon={fas.faStar} />
+                      ))}
+                  </div>
+                </div>
+                <p className="text-gray-600">{comment.comment}</p>
+                <small className="text-gray-500">
+                  {new Date(comment.date).toLocaleDateString()}
+                </small>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-600">No comments yet.</p>
+          )}
+        </div>
       </div>
       <Footer />
     </>

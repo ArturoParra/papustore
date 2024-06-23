@@ -689,8 +689,44 @@ function updateCarrito($conn, $email, $quantity, $id)
     }
 }
 
-function agregarComentario($conn, $email, $name, $product_id, $comment, $rating)
-{
+function agregarComentario($conn, $email, $name, $product_id, $comment, $rating) {
+    // Verificar si el usuario ha comprado el producto
+    $sqlCheckPurchase = "SELECT COUNT(*) FROM purchase_details pd 
+                         JOIN purchase_history ph ON pd.purchase_id = ph.purchase_id
+                         WHERE ph.email = ? AND pd.product_id = ?";
+    $stmtCheck = $conn->prepare($sqlCheckPurchase);
+    if (!$stmtCheck) {
+        error_log("Error preparing statement: " . $conn->error);
+        return ["success" => false, "message" => "Error preparing statement"];
+    }
+    $stmtCheck->bind_param("si", $email, $product_id);
+    $stmtCheck->execute();
+    $stmtCheck->bind_result($purchaseCount);
+    $stmtCheck->fetch();
+    $stmtCheck->close();
+
+    if ($purchaseCount == 0) {
+        return ["success" => false, "message" => "You have not purchased this product"];
+    }
+
+    // Verificar si el usuario ya ha dejado un comentario para este producto
+    $sqlCheckComment = "SELECT COUNT(*) FROM comments WHERE email = ? AND product_id = ?";
+    $stmtCheck = $conn->prepare($sqlCheckComment);
+    if (!$stmtCheck) {
+        error_log("Error preparing statement: " . $conn->error);
+        return ["success" => false, "message" => "Error preparing statement"];
+    }
+    $stmtCheck->bind_param("si", $email, $product_id);
+    $stmtCheck->execute();
+    $stmtCheck->bind_result($commentCount);
+    $stmtCheck->fetch();
+    $stmtCheck->close();
+
+    if ($commentCount > 0) {
+        return ["success" => false, "message" => "You have already commented on this product"];
+    }
+
+    // Insertar comentario
     $sql = "INSERT INTO comments (email, name, product_id, comment, rating, date) VALUES (?, ?, ?, ?, ?, NOW())";
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
@@ -705,6 +741,7 @@ function agregarComentario($conn, $email, $name, $product_id, $comment, $rating)
         return ["success" => false, "message" => "Error executing statement"];
     }
 }
+
 
 function consultaVentasPorCategoria($conn)
 {
