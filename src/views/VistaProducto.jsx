@@ -15,7 +15,7 @@ export const VistaProducto = () => {
   const [BackRes, setBackRes] = useState({}); // Estado para almacenar la respuesta de la solicitud al servidor
   const [BackImages, setBackImages] = useState([]); // Estado para almacenar la respuesta de la solicitud al servidor
   const [comments, setComments] = useState([]); // Estado para almacenar los comentarios del servidor
-  const [flag, setFlag] = useState(false) //Bandera para la consulta de producto individual
+  const [flag, setFlag] = useState(false); //Bandera para la consulta de producto individual
   const { id } = useParams();
 
   const [title, setTitle] = useState("");
@@ -28,6 +28,7 @@ export const VistaProducto = () => {
   const [returnPolicy, setreturnPolicy] = useState("");
   const [shippingInformation, setshippingInformation] = useState("");
   const [warrantyInformation, setwarrantyInformation] = useState("");
+  const [stock, setStock] = useState("");
   const [weight, setWeight] = useState(0);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
@@ -55,7 +56,7 @@ export const VistaProducto = () => {
           body: JSON.stringify({
             functionName: "consultaProductoIndividual",
             id: id,
-            flag: flag
+            flag: flag,
           }),
         });
 
@@ -198,6 +199,7 @@ export const VistaProducto = () => {
       width,
       height,
       depth,
+      stock,
     } = BackRes;
     setTitle(title);
     setDescription(description);
@@ -206,6 +208,7 @@ export const VistaProducto = () => {
     setdiscountPercentage(discountPercentage);
     setBrand(brand);
     setRating(rating);
+    setStock(stock);
     setreturnPolicy(returnPolicy);
     setshippingInformation(shippingInformation);
     setwarrantyInformation(warrantyInformation);
@@ -214,44 +217,69 @@ export const VistaProducto = () => {
     setWidth(width);
     setDepth(depth);
   }, [BackRes]); // Ejecutar el efecto cuando cambie BackRes
+  
+  useEffect(() => {
+    console.log(stock)
+  }, [stock])
+  
 
   const addToCart = async () => {
     if (isAuthenticated) {
-      try {
-        const response = await fetch("/api/index.php", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            functionName: "insertarCarrito",
-            email: userEmail,
-            product_id: id,
-            quantity: quantity,
-          }),
-        });
-        const result = await response.json();
-        if (result.success) {
+      if(stock > 0){
+        if(stock >= quantity){
+          try {
+            const response = await fetch("/api/index.php", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                functionName: "insertarCarrito",
+                email: userEmail,
+                product_id: id,
+                quantity: quantity,
+              }),
+            });
+            const result = await response.json();
+            if (result.success) {
+              Swal.fire({
+                position: "top-end",
+                icon: "success",
+                toast: "true",
+                title: "Product added to cart",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+            } else {
+              Swal.fire({
+                position: "top-end",
+                icon: "error",
+                toast: "true",
+                title: "Product couldn't be added to cart",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+            }
+          } catch (error) {
+            console.error("Error al añadir el producto al carrito:", error);
+          }
+        }else{
           Swal.fire({
-            position: "top-end",
-            icon: "success",
-            toast: "true",
-            title: "Product added to cart",
+            icon: "warning",
+            title: "Cannot add to cart",
+            text: "There are not enough products in stock",
             showConfirmButton: false,
-            timer: 1500,
-          });
-        } else {
-          Swal.fire({
-            position: "top-end",
-            icon: "error",
-            toast: "true",
-            title: "Product couldn't be added to cart",
-            showConfirmButton: false,
-            timer: 1500,
+            timer: 2500,
           });
         }
-      } catch (error) {
-        console.error("Error al añadir el producto al carrito:", error);
+      }else{
+        Swal.fire({
+          icon: "warning",
+          title: "Cannot add to cart",
+          text: "This product is out of stock",
+          showConfirmButton: false,
+          timer: 2500,
+        });
       }
     } else {
       Swal.fire({
@@ -310,6 +338,85 @@ export const VistaProducto = () => {
       }
     } else {
       alert("Log in to add a comment");
+    }
+  };
+
+  const addToWishlist = async () => {
+    if (isAuthenticated) {
+      try {
+        // Verificar si el producto ya está en la wishlist
+        const responseCheck = await fetch("/api/index.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            functionName: "verificarProductoWishlist",
+            email: userEmail,
+            product_id: id,
+          }),
+        });
+        const resultCheck = await responseCheck.json();
+
+        if (resultCheck) {
+          Swal.fire({
+            position: "top-end",
+            icon: "warning",
+            toast: "true",
+            title: "This product is already in your wishlist",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } else {
+          // Si no existe, procede a insertarlo
+          const responseInsert = await fetch("/api/index.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              functionName: "insertarWishlist",
+              email: userEmail,
+              product_id: id,
+            }),
+          });
+          const resultInsert = await responseInsert.json();
+
+          if (resultInsert.success) {
+            Swal.fire({
+              position: "top-end",
+              icon: "success",
+              toast: "true",
+              title: "Product added to wishlist",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            setIsInWishlist(true); // Actualiza el estado para reflejar que el producto está ahora en la wishlist
+          } else {
+            Swal.fire({
+              position: "top-end",
+              icon: "error",
+              toast: "true",
+              title: "Product couldn't be added to wishlist",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          }
+        }
+      } catch (error) {
+        console.error(
+          "Error al añadir el producto a la lista de deseos:",
+          error
+        );
+      }
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "Cannot add to wishlist",
+        text: "Please log in into your account to add products to your wishlist",
+        showConfirmButton: false,
+        timer: 2500,
+      });
     }
   };
 
@@ -401,9 +508,15 @@ export const VistaProducto = () => {
                 {discountPercentage}% OFF
               </div>
               <div className="mb-4">
-                <span className="text-gray-600">AVAILABILITY:</span>{" "}
-                <span className="text-green-500">
-                  {/* {availabilityStatus} */}
+                <span className="text-gray-600 flex">
+                  AVAILABILITY:
+                  {stock > 10 ? (
+                    <p className="text-green-700 font-semibold ml-1"> IN STOCK</p>
+                  ) : stock < 10 && stock > 0 ? (
+                    <p className="text-yellow-700 font-semibold ml-1"> LOW STOCK</p>
+                  ) : (
+                    <p className="text-red-700 font-semibold ml-1"> OUT OF STOCK</p>
+                  )}
                 </span>
               </div>
               <div className="flex items-center mb-4">
@@ -436,7 +549,7 @@ export const VistaProducto = () => {
                 </Link>
               </div>
               <div className="flex items-center space-x-4 mb-4">
-                <button className="text-gray-600">ADD TO WISHLIST</button>
+                <button onClick={addToWishlist} className="text-gray-600">ADD TO WISHLIST</button>
               </div>
             </div>
           </div>
