@@ -14,6 +14,7 @@ import { AuthProvider } from './components/AuthProvider'; // Ajusta la ruta segÃ
 import { ConfirmarCompra } from './views/ConfirmarCompra';
 import { EditProfile } from './views/EditProfile'; // Importa el componente EditProfile
 import { PurchaseHistory } from './views/PurchaseHistory';
+import { EditarProductos } from './views/EditarProductos';
 
 export const AppRouter = () => {
   return (
@@ -34,6 +35,7 @@ export const AppRouter = () => {
           <Route path='/pedido/:id/:quantity' element={<ConfirmarCompra />} />
           <Route path='/edit-profile' element={<EditProfile />} /> {/* AÃ±adir la ruta para EditProfile */}
           <Route path='/purchasehistory/:id' element={<PurchaseHistory />} />
+          <Route path='/adminproductos' element={<EditarProductos />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
