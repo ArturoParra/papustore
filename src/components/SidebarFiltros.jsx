@@ -68,8 +68,26 @@ export const SidebarFiltros = ({
   );
 };
 
-export const SidebarItem = ({ value, texto, handleCheckboxChange }) => {
+export const SidebarItem = ({ value, texto, category, handleCheckboxChange }) => {
   const { expanded } = useContext(SidebarContext);
+  const [isChecked, setisChecked2] = useState(false);
+
+  useEffect(() =>
+  {
+    if (category && category === value)
+    {
+      setisChecked2(true);
+    } 
+    else
+    {
+      setisChecked2(false);
+    }
+  }, [category, value]);
+
+  const handleCheckboxClick = (event) => {
+    setisChecked2(!isChecked);
+  };
+
   return (
     <li className={`relative flex items-center py-2 px-3 my-1 ml-3`}>
       <span className={` overflow-hidden transition-all `}>
@@ -79,6 +97,8 @@ export const SidebarItem = ({ value, texto, handleCheckboxChange }) => {
           value={value}
           className={` appearance-none w-4 h-4 border border-gray-300 rounded bg-gray-100 checked:bg-primary checked:border-primary focus:outline-none `}
           onChange={handleCheckboxChange}
+          onClick={handleCheckboxClick}
+          checked={isChecked}
         />
         <style jsx>{`
           input[type="checkbox"] {
@@ -106,3 +126,4 @@ export const SidebarItem = ({ value, texto, handleCheckboxChange }) => {
     </li>
   );
 };
+

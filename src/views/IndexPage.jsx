@@ -1,6 +1,6 @@
 import { Footer } from "../components/Footer"
 import { Header } from "../components/Header"
-import { Ofertas } from "../components/Ofertas"
+import { Ofertas } from "../views/Ofertas"
 import { Shop } from "./Shop"
 import { AdministratorMode } from "./AdministratorMode"
 import { FormularioAdministrator } from "./FormularioAdministrator"
@@ -15,7 +15,7 @@ export const IndexPage = () => {
   return (
     <>
       <Header/>
-      <Shop/>
+      <Ofertas/>
       <Footer/>
     </>
   )
