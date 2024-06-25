@@ -7,9 +7,14 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import "../styles/Radio.css";
 import ReactSlider from "react-slider";
+import { useParams } from 'react-router-dom';
 
 // Componente principal de la tienda
-export const Shop = () => {
+export const Shop = ( ) => {
+
+  let { category } = useParams();
+  
+
   // Estado para los filtros aplicados
   const [filter, setFilter] = useState([]);
   // Estado para los datos del producto (inicialmente del archivo JSON)
@@ -34,6 +39,23 @@ export const Shop = () => {
   //TODO: condicionar que arreglo se va a mostra (el filtrado o el original) también debería probar esto dentro del useEffect de los filtros
   const paginatedData = dataOrdenado.slice(startIdx, startIdx + itemsPerPage)
   const totalPages = Math.ceil(dataOrdenado.length / itemsPerPage)
+
+
+  useEffect(() => {
+    const filtrarPorCategoria = () => {
+      if (category)
+      {
+        setFilter([category]);
+      } 
+      else
+      {
+        // Si no hay categoría en la URL, mostrar todos los productos
+        setdataFiltrado(data);
+      }
+    };
+    filtrarPorCategoria();
+  }, [category, data]);
+  
 
   useEffect(() => {
     console.log("Set prices")
@@ -80,10 +102,10 @@ export const Shop = () => {
             // Manejar la respuesta aquí
 
             const data = await res.json(); // Parsea la respuesta a JSON
-        // Calcula el nuevo valor de maxPrice desde los datos recibidos
-        const values = data.map(item => item.price);
-        const newMaxPrice = Math.max(...values);
-        setmaxPrice(newMaxPrice)
+            // Calcula el nuevo valor de maxPrice desde los datos recibidos
+            const values = data.map(item => item.price);
+            const newMaxPrice = Math.max(...values);
+            setmaxPrice(newMaxPrice)
 
             // Procesar los datos recibidos
             // Por ejemplo, si recibes datos en formato JSON, puedes hacer lo siguiente:
@@ -281,17 +303,17 @@ export const Shop = () => {
               </div>
               {/* Filtros de categorías */}
               <p className="text-base font-light text-primary">Category</p>
-              <SidebarItem texto="Laptops" value="laptops" />
-              <SidebarItem texto="Beauty" value="beauty" />
-              <SidebarItem texto="Fragrances" value="fragrances" />
-              <SidebarItem texto="Furniture" value="furniture" />
-              <SidebarItem texto="Groceries" value="groceries" />
-              <SidebarItem texto="Home Decoration" value="home-decoration" />
-              <SidebarItem texto="Kitchen Accessories" value="kitchen-accessories"/>
-              <SidebarItem texto="Men's shirts" value="mens-shirts" />
-              <SidebarItem texto="Men's shoes" value="mens-shoes" />
-              <SidebarItem texto="Men's watches" value="mens-watches" />
-              <SidebarItem texto="Mobile accessories" value="mobile-accessories"/>
+              <SidebarItem texto="Laptops" value="laptops" category={category} />
+              <SidebarItem texto="Beauty" value="beauty" category={category} />
+              <SidebarItem texto="Fragrances" value="fragrances" category={category} />
+              <SidebarItem texto="Furniture" value="furniture" category={category} />
+              <SidebarItem texto="Groceries" value="groceries" category={category} />
+              <SidebarItem texto="Home Decoration" value="home-decoration" category={category} />
+              <SidebarItem texto="Kitchen Accessories" value="kitchen-accessories" category={category}/>
+              <SidebarItem texto="Men's shirts" value="mens-shirts" category={category} />
+              <SidebarItem texto="Men's shoes" value="mens-shoes" category={category} />
+              <SidebarItem texto="Men's watches" value="mens-watches" category={category} />
+              <SidebarItem texto="Mobile accessories" value="mobile-accessories" category={category}/>
               {/* Filtros de marcas */}
               <p className="text-base font-light text-primary">Brand</p>
               <SidebarItem texto="Apple" value="Apple" />

@@ -1,11 +1,4 @@
 import * as React from "react";
-import { Mventas } from "./Principal/Mventas";
-import { Cventas } from "./Principal/Cventas";
-import { Dventas } from "./Principal/Dventas";
-import { Bmedio } from "./Principal/Bmedio";
-import { Accesorios } from "./Principal/Accesorios";
-import { Bfinal } from "./Principal/Bfinal";
-import { Productos } from "./Principal/Productos";
 
 import { useEffect } from "react";
 
@@ -14,6 +7,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 
 
+// Importaciones para componentes
+import { Mventas } from "../components/Principal/Mventas";
+import { Cventas } from "../components/Principal/Cventas";
+import { Dventas } from "../components/Principal/Dventas";
+import { Bmedio } from "../components/Principal/Bmedio";
+import { Otrasc } from "../components/Principal/Otrasc";
+import { Bfinal } from "../components/Principal/Bfinal";
+import { Productos } from "../components/Principal/Productos";
 
 export function Ofertas() {
   // Definicion de los iconos
@@ -24,15 +25,10 @@ export function Ofertas() {
     <FontAwesomeIcon className="my-auto" icon={fas.faCircle} />
   );
 
-
-  // Estado para almacenar las mejores ofertas y el indice de la oferta actual
-  const [mejoresOfertas, setMejoresOfertas] = React.useState([]);
-  const [indiceOfertaActual, setIndiceOfertaActual] = React.useState(0);
-
-  // Estado para almacennar la mejor laptop y el mejor accesorio
-  const [mejorLaptop, setMejorLaptop] = React.useState({});
-  const [mejorAccesorio, setMejorAccesorio] = React.useState({});
   
+  // Estado para guardar todos los productos
+  const [productos, setProductos] = React.useState([]);
+
   useEffect(() =>
   {
     // Función para obtener datos del servidor y convertirlos a JSON
@@ -86,13 +82,10 @@ export function Ofertas() {
         {
           throw new Error("La respuesta no es un array");
         }
-
-        // Mostar los datos obtenidos
-        console.log("Datos obtenidos:", res);
-
-        filtrarProductos(res);
-        obtenerCategorias(res);
-        
+        else
+        {
+         setProductos(res); 
+        }
       }
       catch (error) // Capturar errores
       {
@@ -104,77 +97,210 @@ export function Ofertas() {
     getData();
   }, []); // Dependencia vacía para que el efecto se ejecute solo una vez
   
-  
-  // Funcion para filtrar los productos (3 mejores ofertas)
-  const filtrarProductos = (productos) =>
-  {
-    // Verificar si productos es un array
-    if (!Array.isArray(productos))
-    {
-      throw new Error("El argumento no es un array");
-    }
 
-    // Ordernar los productos por discountPercentage de forma descendente
-    productos.sort((a, b) => b.discountPercentage - a.discountPercentage);
+  // Estado para almacenar las mejores ofertas y el indice de la oferta actual
+  const [mejoresOfertas, setMejoresOfertas] = React.useState([]);
+
+  // Estado para almacenar el producto mas caro
+  const [productoMasCaro, setProductoMasCaro] = React.useState({});
+
+  useEffect(() => {
+    // Filtrar el producto mas caro
+    const productomasCaro = productos.filter((producto) => producto.stock > 0).sort((a, b) => b.price - a.price)[0];
+
+    // Guardar el producto en el estado
+    setProductoMasCaro(productomasCaro);
+
+    // Ordenar los productos por descuento
+    const productosordenados = productos.sort((a, b) => b.discountPercentage - a.discountPercentage);
 
     // Filtrar los productos que tienen stock y obtener los 3 primeros
-    const mejoresofertas = productos.filter((producto) => producto.stock > 0).slice(0, 3);
-    setMejoresOfertas(mejoresofertas);
-
+    const mejoresofertasgenerales = productosordenados.filter((producto) => producto.stock > 0).slice(0, 3);
+    setMejoresOfertas(mejoresofertasgenerales);
 
     // Obtener la mejor laptop
-    const mejorlaptop = productos.filter((producto) => producto.category === "laptops" && producto.stock > 0)[0];
-    // Si no se encuentra la mejor laptop
-    if (!mejorlaptop)
+    const mejorofertalaptop = productos.filter((producto) => producto.category === "laptops" && producto.stock > 0)[0];
+
+    if(!mejorofertalaptop) // Si no hay laptops en stock
     {
-      // Buscar la cuarta mejor oferta
-      const cuartamejoroferta = productos.filter((producto) => producto.stock > 0)[3];
-      setMejorLaptop(cuartamejoroferta);
+      // Bucar la cuarta mejor oferta general
+      const cuartamejoroferta = productosordenados.filter((producto) => producto.stock > 0)[3];
+      setMejoresOfertas((mejoresOfertas) => [...mejoresOfertas, cuartamejoroferta]);
     }
-    else
+    else // Si hay laptops en stock
     {
-      setMejorLaptop(mejorlaptop);
+      setMejoresOfertas((mejoresOfertas) => [...mejoresOfertas, mejorofertalaptop]);
     }
 
     // Obtener el mejor accesorio
     const mejoraccesorio = productos.filter((producto) => producto.category === "mobile-accessories" && producto.stock > 0)[0];
-    // Si no se encuentra el mejor accesorio ni la mejor laptop
-    if (!mejoraccesorio && !mejorlaptop)
-    {
-      // Buscar la quinta mejor oferta
-      const quintamejoroferta = productos.filter((producto) => producto.stock > 0)[4];
-      setMejorAccesorio(quintamejoroferta);
-    }
-    else if (!mejoraccesorio) // Si no se encuentra el mejor accesorio
-    {
-      // Buscar la cuarta mejor oferta
-      const cuartamejoroferta = productos.filter((producto) => producto.stock > 0)[3];
-      setMejorAccesorio(cuartamejoroferta);
-    }
-    else
-    {
-      setMejorAccesorio(mejoraccesorio);
-    }
 
-    console.log("Mejor laptop:", mejorlaptop);
-    console.log("Mejor accesorio:", mejoraccesorio);
-    console.log("Mejores ofertas:", mejoresofertas);
+    if(!mejoraccesorio && !mejorofertalaptop) // Si no hay accesorios ni laptops en stock
+    {
+      // Bucar la quinta mejor oferta general
+      const quintamejoroferta = productosordenados.filter((producto) => producto.stock > 0)[4];
+      setMejoresOfertas((mejoresOfertas) => [...mejoresOfertas, quintamejoroferta]);
+    }
+    else if(!mejoraccesorio) // Si no hay accesorios en stock pero si laptops
+    {
+      // Buscar la cuarta mejor oferta general
+      const cuartamejoroferta = productosordenados.filter((producto) => producto.stock > 0)[3];
+      setMejoresOfertas((mejoresOfertas) => [...mejoresOfertas, cuartamejoroferta]);
+    }
+    else // Si hay accesorios en stock
+    {
+      setMejoresOfertas((mejoresOfertas) => [...mejoresOfertas, mejoraccesorio]);
+    }
+  }, [productos]);
 
-    // Devolver las mejores ofertas
-    return mejoresofertas;
-  };
+
+  // Estado para almacenar las mejores ventas
+  const [mejoresVentas, setMejoresVentas] = React.useState([]);
+
+  useEffect(() =>
+  {
+    // Filtrar los productos que no estan en mejores ofertas
+    const productosrestantes = productos.filter((producto) => !mejoresOfertas.includes(producto) && productoMasCaro !== producto && producto.stock > 0);
+
+    // Ordenar los productos restantes por ventas
+    const productosordenados = productosrestantes.sort((a, b) => b.total_sales - a.total_sales);
+
+    // Tomar los primeros 9 productos
+    const mejoresventas = productosordenados.slice(0, 9);
+
+    // Guardar los productos en el estado
+    setMejoresVentas(mejoresventas);
+  
+  }, [mejoresOfertas]);
+
+
+  // Estado para almacenar las ventas destacadas
+  const [ventasDestacadas, setVentasDestacadas] = React.useState([]);
+
+  useEffect(() => {
+
+    // Filtrar los productos que no estan en mejores ofertas ni en mejores ventas
+    const productosrestantes = productos.filter((producto) => !mejoresOfertas.includes(producto) && !mejoresVentas.includes(producto) && producto.stock > 0);
+
+    // Agrupar los productos restantes por categoria
+    const productosporcategoria = productosrestantes.reduce((acumulador, producto) => 
+    {
+      if (!acumulador[producto.category]) // Si la categoria no existe en el acumulador
+      {
+        acumulador[producto.category] = [];
+      }
+
+      acumulador[producto.category].push(producto); // Agregar el producto a la categoria
+      return acumulador;
+    }, {});
+
+    // Obtener el productos mas vendido de cada categoria
+    const ventasdestacadas = Object.values(productosporcategoria).map((productos) => productos.sort((a, b) => b.total_sales - a.total_sales)[0]);
+
+    // Guardar los productos en el estado
+    setVentasDestacadas(ventasdestacadas);
+
+  }, [mejoresVentas]);
+
+
+  // Estado para almacenar los productos del banner medio
+  const [productosBannerMedio, setProductosBannerMedio] = React.useState([]);
+
+  useEffect(() =>
+  {
+    // Filtrar los productos que no estan en mejores ofertas, mejores ventas ni ventas destacadas
+    const productosrestantes = productos.filter((producto) => !mejoresOfertas.includes(producto) && !mejoresVentas.includes(producto) && !ventasDestacadas.includes(producto) && producto.stock > 0);
+    
+    // Seleccionar una categoria aleatoria
+    const categoria1 = productosrestantes[Math.floor(Math.random() * productosrestantes.length)]?.category;
+
+    // Obtener las categorias restantes
+    const categoriasrestantes = productosrestantes.filter((producto) => producto?.category !== categoria1);
+
+    // Seleccionar una segunda categoria aleatoria
+    const categoria2 = categoriasrestantes[Math.floor(Math.random() * categoriasrestantes.length)]?.category;
+
+    // Obtener un producto aleatorio de cada categoria
+    const producto1 = productosrestantes.find((producto) => producto.category === categoria1);
+    const producto2 = productosrestantes.find((producto) => producto.category === categoria2);
+
+    // Guardar los productos en el estado
+    setProductosBannerMedio([producto1, producto2]);
+    
+  }, [ventasDestacadas]);
+
+
+  // Estado para almacenar los productos mas vendidos de otras categorias
+  const [ventasOtrasCategorias, setVentasOtrasCategorias] = React.useState([]);
+  
+
+  useEffect(() =>
+  {
+    // Filtrar los productos que no estan en mejores ofertas, mejores ventas, ventas destacadas ni en el banner medio
+    const productosrestantes = productos.filter((producto) => !mejoresOfertas.includes(producto) && !mejoresVentas.includes(producto) && !ventasDestacadas.includes(producto) && !productosBannerMedio.includes(producto) && producto.stock > 0);
+    
+    // Agrupar los productos restantes por categoria
+    const productosporcategoria = productosrestantes.reduce((acumulador, producto) => 
+      {
+        if (!acumulador[producto.category]) // Si la categoria no existe en el acumulador
+        {
+          acumulador[producto.category] = [];
+        }
+  
+        acumulador[producto.category].push(producto); // Agregar el producto a la categoria
+        return acumulador;
+      }, {});
+
+    // Obtener el productos mas vendido de cada categoria
+    const ventasotrascategorias = Object.values(productosporcategoria).map((productos) => productos.sort((a, b) => b.total_sales - a.total_sales)[0]);
+
+    // Guardar los productos en el estado
+    setVentasOtrasCategorias(ventasotrascategorias);
+    
+  }, [productosBannerMedio]);
+
+  // Estado para almacenar todos los productos restantes finales
+  const [productosFinales, setProductosFinales] = React.useState([]);
+
+  useEffect(() =>
+  {
+    const productosrestantes = productos.filter((producto) => producto !== productoMasCaro && !mejoresOfertas.includes(producto) && !mejoresVentas.includes(producto) && !ventasDestacadas.includes(producto) && !productosBannerMedio.includes(producto) && !ventasOtrasCategorias.includes(producto) && producto.stock > 0);
+
+    setProductosFinales(productosrestantes);
+  }, [ventasOtrasCategorias]);
+
+
+
+  // Estado para almacenar el indice de la oferta mostrada
+  const [indiceOfertaActual, setIndiceOfertaActual] = React.useState(0);
 
   // Temporizador para cambiar automaticamente la oferta
   useEffect(() =>
   {
     const timer = setTimeout(() => 
     {
-      setIndiceOfertaActual((indice) => (indice + 1) % mejoresOfertas.length);
+      setIndiceOfertaActual((indice) => (indice + 1) % (mejoresOfertas.length - 2));
     }, 3000); // cambiar cada 3 segundos
 
     return () => clearTimeout(timer); // Limpiar el temporizador cuando el componente se desmonte
   }, [indiceOfertaActual, mejoresOfertas]); // Dependencias del efecto
 
+
+  // Funciones para el manejo de productos
+  const handleBestDiscount = () =>
+  {
+    window.location.href = `/producto/${mejoresOfertas[indiceOfertaActual]?.id}`;
+  };
+
+  const handleThirdDiscount = () =>
+  {
+    window.location.href = `/producto/${mejoresOfertas[3]?.id}`;
+  }
+
+  const handleFourdDiscount = () =>
+  {
+    window.location.href = `/producto/${mejoresOfertas[4]?.id}`;
+  }
 
   
   
@@ -185,7 +311,7 @@ export function Ofertas() {
         {/* Definicion del diseño segun el tamaño de la pantalla */}
         <div className="flex flex-col sm:flex-row">
           {/* Definicion del contenedor de la oferta uno */}
-          <div className="flex flex-col bg-gray-100 rounded-xl w-full p-3 xs:p-5 sm:w-2/3">
+          <div className="flex flex-col bg-gray-100 rounded-xl w-full h-full p-3 xs:p-5 sm:w-2/3">
             {/* Renderizado de las tres mejores ofertas por tiempo */}
             <div className="flex w-full my-auto items-center ">
               {/* Columna izquierda subcontenedor de la oferta uno */}
@@ -197,11 +323,14 @@ export function Ofertas() {
                   <div className="flex justify-center text-center font-bold text-sm py-4 xs:text-base sm:text-sm md:text-lg lg:text-xl xl:text-2xl xxl:text-3xl">
                     {mejoresOfertas[indiceOfertaActual]?.title}
                   </div>
-                  <div className="text-justify text-xs xs:text-sm sm:text-xs md:leading-normal md:text-[15.5px] lg:text-[20.2px] xl:text-[25px] xxl:text-[33px]">
-                    {mejoresOfertas[indiceOfertaActual]?.description}
-                  </div>
+                  {mejoresOfertas[indiceOfertaActual]?.description && (
+                    <div className="text-justify text-xs xs:text-sm sm:text-xs md:leading-normal md:text-[15.5px] lg:text-[20.2px] xl:text-[25px] xxl:text-[33px]">
+                      {mejoresOfertas[indiceOfertaActual]?.description.substring(0, 140)}
+                      {mejoresOfertas[indiceOfertaActual]?.description.length > 140 && '...'}
+                    </div>
+                  )}
                   <div>
-                    <button className="flex bg-orange-400 text-white justify-center rounded-xl font-bold uppercase p-1.5 mt-4 text-[10px] xs:text-xs sm:text-[10px] md:text-sm lg:text-base xl:text-xl xxl:text-2xl">
+                    <button className="flex bg-orange-400 text-white justify-center rounded-xl font-bold uppercase p-1.5 mt-4 text-[10px] xs:text-xs sm:text-[10px] md:text-sm lg:text-base xl:text-xl xxl:text-2xl" onClick={handleBestDiscount}>
                       BUY NOW<div className="ml-0.5">{IconoFlecha}</div>
                     </button>
                   </div>
@@ -210,12 +339,12 @@ export function Ofertas() {
 
               {/* Columna derecha subcontenedor de la oferta uno */}
               <div className="flex flex-col m-auto w-1/2 relative">
-                <div className="flex absolute w-1/4 aspect-1 justify-center items-center right-0 bg-blue-500 border-2 border-white  text-white rounded-full text-[8px] xs:text-[11px] xs:border-1 sm:text-[10px] sm:border-2 md:text-xs md:border-3 lg:text-base lg:border-4 xl:text-lg xl:border-5 xxl:text-xl xxl:border-6">
+                <div className="flex absolute w-1/4 h-1/4 aspect-1 justify-center items-center right-0 bg-blue-500 border-2 border-white  text-white rounded-full text-[8px] xs:text-[11px] xs:border-1 sm:text-[10px] sm:border-2 md:text-xs md:border-3 lg:text-base lg:border-4 xl:text-lg xl:border-5 xxl:text-xl xxl:border-6">
                   ${mejoresOfertas[indiceOfertaActual]?.price}
                 </div>
                 <img
                   srcSet={mejoresOfertas[indiceOfertaActual]?.thumbnail}
-                  className="grow aspect-square bg-transparent pl-2.5"
+                  className="grow aspect-square bg-transparent pl-2.5 object-cover"
                 />
               </div>
             </div>
@@ -223,7 +352,7 @@ export function Ofertas() {
             {/* Selector de la oferta mostrada */}
             <div className="flex mx-auto gap-3 mt-4 text-xs xs:gap-4 sm:gap-5 sm:text-sm md:gap-6 md:text-base lg:gap-7 lg:text-lg xl:gap-8 xl:text-xl xxl:text-2xl">
             {
-              mejoresOfertas.map((_, index) => (
+              mejoresOfertas.slice(0, 3).map((_, index) => (
                 <div key={index} className={`text-${index === indiceOfertaActual ? 'black' : 'gray'}-400`}>{IconoCirculo}</div>
               ))
             }
@@ -244,10 +373,10 @@ export function Ofertas() {
                     </div>
                     {/* Producto ofertado */}
                     <div className="text-center font-semibold text-sm mt-1.5 xs:text-xl sm:text-[11px] sm:leading-normal md:text-xs lg:text-base xl:text-lg xxl:text-2xl">
-                      {mejorLaptop.title}
+                      {mejoresOfertas[3]?.title}
                     </div>
                     {/* Boton comprar ahora */}
-                    <button className="flex bg-orange-400 justify-center rounded-xl font-bold uppercase p-1.5 my-2 text-[10px] xs:text-xs sm:p-1 sm:text-[6px] md:text-[8px] lg:text-[11px] xl:text-sm xxl:text-base">
+                    <button className="flex bg-orange-400 justify-center rounded-xl font-bold uppercase p-1.5 my-2 text-[10px] xs:text-xs sm:p-1 sm:text-[6px] md:text-[8px] lg:text-[11px] xl:text-sm xxl:text-base" onClick={handleThirdDiscount}>
                       BUY NOW<div className="ml-0.5">{IconoFlecha}</div>
                     </button>
                   </div>
@@ -260,11 +389,11 @@ export function Ofertas() {
                 <div className="flex flex-col font-bold h-full">
                     {/* Descuento en porcentaje */}
                     <div className="justify-center self-end bg-amber-300 px-2 py-1.5 mr-6 text-[8px] xs:text-[10px] sm:py-0.5 sm:mr-2 sm:text-[8px] md:text-[10px] lg:text-xs xl:text-sm xxl:text-base">
-                      {mejorLaptop.discountPercentage}% OFF
+                      {mejoresOfertas[3]?.discountPercentage}% OFF
                     </div>
                     {/* Imagen del producto */}
                     <img
-                      srcSet={mejorLaptop.thumbnail}
+                      srcSet={mejoresOfertas[3]?.thumbnail}
                       className="rounded-ee-lg w-full h-full"
                     />
                   </div>
@@ -277,18 +406,18 @@ export function Ofertas() {
                   <div className="flex flex-col w-1/2">
                     <img
                       loading="lazy"
-                      srcSet={mejorAccesorio.thumbnail}
+                      srcSet={mejoresOfertas[4]?.thumbnail}
                       className="my-auto aspect-square"
                     />
                   </div>
                   <div className="flex flex-col ml-1 w-1/2 items-center">
                     <div className="text-center font-semibold text-sm xs:text-base sm:text-xs md:text-base lg:text-lg xl:text-2xl xxl:text-3xl">
-                      {mejorAccesorio.title}
+                      {mejoresOfertas[4]?.title}
                     </div>
                     <div className="text-center text-sky-400 mt-3 text-base xs:text-lg sm:text-sm md:text-base lg:text-lg xl:text-2xl xxl:text-3xl">
-                      ${mejorAccesorio.price}
+                      ${mejoresOfertas[3]?.price}
                     </div>
-                    <button className="flex bg-orange-400 text-white justify-center rounded-xl font-bold uppercase p-1.5 mt-2 text-[10px] xs:text-xs sm:text-[6px] md:text-[9px] lg:text-[11px] xl:text-sm xxl:text-base">
+                    <button className="flex bg-orange-400 text-white justify-center rounded-xl font-bold uppercase p-1.5 mt-2 text-[10px] xs:text-xs sm:text-[6px] md:text-[9px] lg:text-[11px] xl:text-sm xxl:text-base" onClick={handleFourdDiscount}>
                       BUY NOW<div className="ml-0.5">{IconoFlecha}</div>
                     </button>
                   </div>
@@ -384,14 +513,14 @@ export function Ofertas() {
           </div>
         </div>
       </div>
-      <Mventas/>
-      {/* Enviar los productos obtenidos a Cventas */}
-      <Cventas/>
-      <Dventas/>
-      <Bmedio/>
-      <Accesorios/>
-      <Bfinal/>
-      <Productos/>
+      
+      <Mventas productosmasVendidos={mejoresVentas} />
+      <Cventas productos={productos}/>
+      <Dventas ventasDestacadas={ventasDestacadas} productos={productos}/>
+      <Bmedio productos = {productosBannerMedio} />
+      <Otrasc ventasOtrasCategorias={ventasOtrasCategorias} productos={productos}/>
+      <Bfinal producto = {productoMasCaro}/>
+      <Productos productos = {productosFinales} />
     </div>
   );
 }

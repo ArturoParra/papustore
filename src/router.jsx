@@ -23,6 +23,7 @@ export const AppRouter = () => {
           <Route exact path='/' element={<IndexPage />} />
           <Route path='/carrito' element={<ShoppingCart />} />
           <Route path='/tienda' element={<Shop />} />
+          <Route path="/tienda/:category" element={<Shop />} />
           <Route path='/perfil' element={<UserProfile />} />
           <Route path='/favoritos' element={<Wishlist />} />
           <Route path='/producto/:id' element={<VistaProducto />} />
