@@ -392,7 +392,7 @@ export const ConfirmarCompra = () => {
   return (
     <>
       <Header />
-      <div className="bg-gray-100 p-8 flex flex-col lg:flex-row">
+      <div className="bg-gray-100 p-8 flex flex-col lg:flex-row mt-11">
         {/* Billing Information */}
         <form ref={formRef} onSubmit={placeOrder} className="bg-white p-8 rounded-lg shadow-md w-full lg:w-2/3 mb-8 lg:mb-0 lg:mr-8">
         <Link to="/carrito">
@@ -400,11 +400,11 @@ export const ConfirmarCompra = () => {
                   <span>{IconoFlecha} BACK TO CART</span>
                 </button>
               </Link>
-          <h2 className="text-2xl font-bold mb-6">Billing Information</h2>
+          <h2 className="text-2xl font-bold mb-6">BILLING INFORMATION</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="md:col-span-2">
               <label className="block text-gray-700">
-                Address 
+                ADDRESS 
               </label>
               <input
                 type="text"
@@ -416,7 +416,7 @@ export const ConfirmarCompra = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700">Country</label>
+              <label className="block text-gray-700">COUNTRY</label>
               <input
                 type="text"
                 id="country"
@@ -427,7 +427,7 @@ export const ConfirmarCompra = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700">State</label>
+              <label className="block text-gray-700">STATE</label>
               <input
                 type="text"
                 id="state"
@@ -438,7 +438,7 @@ export const ConfirmarCompra = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700">City</label>
+              <label className="block text-gray-700">CITY</label>
               <input
                 type="text"
                 id="city"
@@ -449,7 +449,7 @@ export const ConfirmarCompra = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700">Zip Code</label>
+              <label className="block text-gray-700">ZIP CODE</label>
               <input
                 type="text"
                 id="zip"
@@ -461,7 +461,7 @@ export const ConfirmarCompra = () => {
             </div>
           </div>
           <div className="mt-6">
-            <h2 className="text-xl font-bold mb-2">PapuCreditos</h2>
+            <h2 className="text-xl font-bold mb-2">PAPUCREDITS</h2>
             <div className="flex items-center text-lg text-gray-700">
               <FontAwesomeIcon
                 icon={faDollarSign}
@@ -480,7 +480,7 @@ export const ConfirmarCompra = () => {
         </form>
         {/* Order Summary */}
         <div className="bg-white p-8 rounded-lg shadow-md w-full lg:w-1/3">
-          <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
+          <h2 className="text-2xl font-bold mb-6">ORDER SUMMARY</h2>
           <div className="mb-4">
             {pedido.map((item) => (
               <ProductoPedido
@@ -492,19 +492,19 @@ export const ConfirmarCompra = () => {
           </div>
           <div className="border-t pt-4">
             <div className="flex justify-between mb-2">
-              <div>Subtotal</div>
+              <div>SUBTOTAL</div>
               <div>$ {subTotal} USD</div>
             </div>
             <div className="flex justify-between mb-2">
-              <div>Shipping</div>
+              <div>SHIPPING</div>
               <div>Free</div>
             </div>
             <div className="flex justify-between mb-2">
-              <div>Tax</div>
+              <div>TAX</div>
               <div>$ {tax} USD</div>
             </div>
             <div className="flex justify-between font-bold text-lg">
-              <div>Total</div>
+              <div>TOTAL</div>
               <div>$ {total} USD</div>
             </div>
           </div>

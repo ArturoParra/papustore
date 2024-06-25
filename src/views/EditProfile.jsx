@@ -196,7 +196,7 @@ export const EditProfile = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-12 px-4">
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-12 px-4 mt-14">
         <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-4xl mb-8">
         <Link to="/perfil">
                 <button className="flex font-semibold text-sm text-black items-center sm:justify-start w-full sm:w-auto mb-4">

@@ -165,7 +165,7 @@ export const Producto = ({ producto }) => {
 
   return (
     <>
-      <div className="border border-slate-200 rounded-md p-3 shadow-md max-h-fit content-end justify-items-stretch">
+      <div className="border border-slate-200 rounded-md p-3 shadow-md max-h-fit content-end justify-items-stretch bg-white">
         <Link to={{ pathname: `/producto/${id}` }}>
           <img
             className="object-cover mx-auto my-auto"
