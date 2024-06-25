@@ -25,6 +25,9 @@ export function Ofertas() {
     <FontAwesomeIcon className="my-auto" icon={fas.faCircle} />
   );
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   
   // Estado para guardar todos los productos
   const [productos, setProductos] = React.useState([]);

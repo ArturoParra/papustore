@@ -110,8 +110,12 @@ export const Wishlist = () => {
                 </button>
               </Link>
           <h1 className="text-2xl font-bold mb-4">Wishlist</h1> {/* Título de la lista de deseos */}
-          <div className="overflow-x-auto">
+          <div>
             {/* Mapeo de los productos de la lista de deseos */}
+            { wishlist.length == 0 && (<p className="font-bold text-3xl mt-10 text-center">
+                There are no products in your wishlist{" "}
+              </p>)
+            }
             {wishlist.map((item) => (
               <ProductoWishlist 
                 key={item.id} 

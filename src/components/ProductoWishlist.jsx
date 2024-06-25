@@ -129,8 +129,8 @@ export const ProductoWishlist = ({ item, removeItem }) => {
             ADD TO CART {IconoCarrito}
           </button>
           {/* Botón para eliminar el producto de la wishlist */}
-          <button className="text-gray-600" onClick={() => removeItem(id)}>
-            ✖
+          <button className="text-white bg-primary rounded-md hover:bg-orange-700 p-2" onClick={() => removeItem(id)}>
+            X
           </button>
         </div>
       </div>

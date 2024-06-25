@@ -31,7 +31,7 @@ export const AdministratorMode = () => {
   const [totalOrders, settotalOrders] = useState([]);
   const [articles, setArticles] = useState([]);
   const [topDiez, settopDiez] = useState([]);
-  const { isAuthenticatedadmin } = useAuth()
+  const { isAuthenticatedadmin, setIsAuthenticatedadmin } = useAuth()
   const navigate = useNavigate()
 
   const options = {
@@ -352,20 +352,17 @@ export const AdministratorMode = () => {
           </table>
         </section>
         <section className="bg-white p-5 rounded-lg shadow-md w-full max-w-4xl">
-          <button
-            onClick={printReport}
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded mb-2 hover:bg-blue-700"
-          >
-            Imprimir Reporte de Ventas
-          </button>
-          <button className="w-full bg-blue-500 text-white py-2 px-4 rounded mb-2 hover:bg-blue-700">
-            Cerrar Sesión
-          </button>
           <Link to = "/adminproductos">
-            <button className="w-full bg-blue-500 text-white py-2 px-4 rounded mb-2 hover:bg-blue-700">
+            <button className="w-full bg-primary text-white py-2 px-4 rounded mb-2 hover:bg-orange-700">
               Editar Productos
             </button>
           </Link>
+          <button onClick={() => {
+            setIsAuthenticatedadmin(false)
+            navigate("/")
+          }} className="w-full bg-primary text-white py-2 px-4 rounded mb-2 hover:bg-orange-700">
+            Cerrar Sesión
+          </button>
         </section>
       </main>
       <Footer />
