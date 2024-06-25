@@ -11,6 +11,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { Link } from "react-router-dom";
 
 ChartJS.register(
   CategoryScale,
@@ -350,9 +351,11 @@ export const AdministratorMode = () => {
           <button className="w-full bg-blue-500 text-white py-2 px-4 rounded mb-2 hover:bg-blue-700">
             Cerrar Sesión
           </button>
-          <button className="w-full bg-blue-500 text-white py-2 px-4 rounded mb-2 hover:bg-blue-700">
-            Editar Productos
-          </button>
+          <Link to = "/adminproductos">
+            <button className="w-full bg-blue-500 text-white py-2 px-4 rounded mb-2 hover:bg-blue-700">
+              Editar Productos
+            </button>
+          </Link>
         </section>
       </main>
       <Footer />
