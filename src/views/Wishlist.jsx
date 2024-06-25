@@ -101,7 +101,7 @@ export const Wishlist = () => {
     <>
       <Header /> {/* Renderiza el componente Header */}
       {/* Contenedor principal */}
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 mt-12">
         {/* Contenedor del contenido de la lista de deseos */}
         <div className="bg-white p-4 md:p-8 rounded-lg shadow-md w-full max-w-5xl">
         <Link to="/tienda">

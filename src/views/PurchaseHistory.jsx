@@ -53,7 +53,8 @@ export const PurchaseHistory = () => {
   return (
     <>
       <Header />
-      <div className="container mx-auto mt-10 p-4 sm:p-8 flex justify-center">
+      <div className="mx-auto mt-10 p-4 sm:p-8 flex justify-center bg-gray-100">
+      <div className="container mx-auto p-4 sm:p-8 flex justify-center">
         <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-md">
           <div className="mb-10">
             <Link to="/perfil">
@@ -119,6 +120,7 @@ export const PurchaseHistory = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
       <Footer />
     </>

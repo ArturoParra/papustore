@@ -254,7 +254,7 @@ export const AdministratorMode = () => {
   return (
     <div>
       <Header />
-      <main className="p-5 flex flex-col items-center gap-5 mt-10">
+      <main className="p-5 flex flex-col items-center gap-5 mt-10 bg-gray-100">
         <h1 className="text-3xl font-bold mb-5">Perfil del Administrador</h1>
         <section className="bg-white p-5 rounded-lg shadow-md w-full max-w-4xl">
           <h2 className="text-2xl font-semibold mb-4">

@@ -248,7 +248,7 @@ export const Shop = ( ) => {
     <>
       {/* Renderización del header */}
       <Header />
-      <div className="lg:p-2">
+      <div className="lg:p-2 bg-gray-100">
         <div className="grid gap-4 lg:grid-cols-12">
           <div className="min-h-24 rounded-lg hidden lg:inline lg:col-span-1"></div>
           <div className="min-h-24 rounded-lg lg:col-span-2 lg:inline">

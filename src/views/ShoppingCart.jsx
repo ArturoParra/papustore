@@ -124,9 +124,10 @@ export const ShoppingCart = () => {
   return (
     <>
       <Header />
+      <div className="p-4 mt-14 bg-gray-100">
       <div className="container mx-auto mt-10 p-4 sm:p-8">
         <div className="flex flex-col lg:flex-row shadow-md my-10">
-          <div className="w-full lg:w-3/4 bg-white px-4 sm:px-10 py-10">
+          <div className="w-full lg:w-3/4 bg-white px-4 sm:px-10 py-10 rounded-md">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-5 space-y-4 sm:space-y-0 sm:space-x-4">
               <Link to="/tienda">
                 <button className="flex font-semibold text-sm text-black items-center sm:justify-start w-full sm:w-auto">
@@ -170,7 +171,7 @@ export const ShoppingCart = () => {
 
           <div
             id="summary"
-            className="w-full lg:w-1/4 px-4 sm:px-8 py-10 bg-gray-100 mt-10 lg:mt-0"
+            className="w-full lg:w-1/4 px-4 sm:px-8 py-10 bg-white mt-10 lg:mt-0 rounded-md"
           >
             <h1 className="font-semibold text-2xl">Cart Summary</h1>
             <div className="mt-8">
@@ -180,13 +181,14 @@ export const ShoppingCart = () => {
               </div>
               <button
                 onClick={handleCheckoutNav}
-                className="bg-orange-500 font-semibold hover:bg-orange-600 py-3 text-sm text-white uppercase w-full"
+                className="bg-orange-500 font-semibold hover:bg-orange-600 py-3 text-sm text-white uppercase w-full rounded-md"
               >
                 CHECKOUT
               </button>
             </div>
           </div>
         </div>
+      </div>
       </div>
       <Footer />
     </>
