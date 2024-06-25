@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../components/AuthProvider';
 
 const EditarProductoForm = ({ productId, onClose }) => {
+    const { id } = useParams()
+    const navigate = useNavigate()
+    const { isAuthenticatedadmin } = useAuth()
+    const [flag, setflag] = useState(false)
     const [product, setProduct] = useState({
         title: '',
         description: '',
@@ -24,6 +30,12 @@ const EditarProductoForm = ({ productId, onClose }) => {
     });
 
     useEffect(() => {
+        if(!isAuthenticatedadmin){
+          navigate("/")
+        }
+      }, [])
+
+    useEffect(() => {
         const fetchProduct = async () => {
             try {
                 const res = await fetch("/api/index.php", {
@@ -32,8 +44,9 @@ const EditarProductoForm = ({ productId, onClose }) => {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        functionName: "getProductById",
-                        productId: productId
+                        functionName: "consultaProductoIndividual",
+                        id: id,
+                        flag: flag
                     }),
                 });
 

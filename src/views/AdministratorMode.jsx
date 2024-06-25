@@ -11,7 +11,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../components/AuthProvider";
 
 ChartJS.register(
   CategoryScale,
@@ -30,10 +31,19 @@ export const AdministratorMode = () => {
   const [totalOrders, settotalOrders] = useState([]);
   const [articles, setArticles] = useState([]);
   const [topDiez, settopDiez] = useState([]);
+  const { isAuthenticatedadmin } = useAuth()
+  const navigate = useNavigate()
 
   const options = {
     responsive: true,
   };
+
+  useEffect(() => {
+    if(!isAuthenticatedadmin){
+      navigate("/")
+    }
+  }, [])
+  
 
   useEffect(() => {
     const fetchData = async () => {

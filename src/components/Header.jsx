@@ -3,13 +3,14 @@ import logo from "../assets/logo-papustore.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { useMediaQuery } from "@react-hook/media-query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 import Swal from "sweetalert2";
 
 export function Header() {
-  const lg = useMediaQuery("(min-width: 1024px)");
-  const { isAuthenticated, setIsAuthenticated, userEmail, setUserEmail } = useAuth(); // Usar el contexto de autenticación
+  const navigate = useNavigate()
+  const lg = useMediaQuery("(min-width: 1024px)")
+  const { isAuthenticated, setIsAuthenticated, userEmail, setUserEmail } = useAuth() // Usar el contexto de autenticación
 
   const IconoLupa = <FontAwesomeIcon icon={fas.faSearch} />;
   const IconoHerramientas = <FontAwesomeIcon icon={fas.faGripLines} />;
@@ -27,10 +28,11 @@ export function Header() {
 
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUserEmail('');
-    localStorage.setItem('isAuthenticated', false); // Asegura que el estado de autenticación sea persistente
-    localStorage.setItem('userEmail', ''); // Asegura que el email se vacíe
+    setIsAuthenticated(false)
+    setUserEmail('')
+    localStorage.setItem('isAuthenticated', false) // Asegura que el estado de autenticación sea persistente
+    localStorage.setItem('userEmail', '') // Asegura que el email se vacíe
+    navigate("/")
   };
 
 

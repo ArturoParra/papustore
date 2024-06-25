@@ -18,7 +18,7 @@ import { width } from "@fortawesome/free-brands-svg-icons/fa42Group";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export const ConfirmarCompra = () => {
-  const { userEmail } = useAuth();
+  const { userEmail, isAuthenticated } = useAuth();
   const [pedido, setPedido] = useState([]);
   const [subTotal, setsubTotal] = useState(0);
   const [total, setTotal] = useState(0)
@@ -45,6 +45,12 @@ export const ConfirmarCompra = () => {
   const navigate = useNavigate();
 
   const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
+
+  useEffect(() => {
+    if(!isAuthenticated){
+      navigate("/")
+    }
+  }, [])
 
   useEffect(() => {
     if (id) {

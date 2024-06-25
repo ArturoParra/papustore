@@ -10,7 +10,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 
 export const ShoppingCart = () => {
   const navigate = useNavigate();
-  const { userEmail } = useAuth();
+  const { userEmail, isAuthenticated } = useAuth();
   const [cart, setCart] = useState([]);
 
   const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft} />;
@@ -18,6 +18,12 @@ export const ShoppingCart = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    if(!isAuthenticated){
+      navigate("/")
+    }
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
