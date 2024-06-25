@@ -13,6 +13,12 @@ export const FormularioInicio = () => {
   const navigate = useNavigate();  
   const { setIsAuthenticated, setUserEmail } = useAuth();
 
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   useEffect(() => {
     if (isSignUp && !signupValidator.current) {
       signupValidator.current = new JustValidate('#signup-form', {
@@ -157,7 +163,13 @@ export const FormularioInicio = () => {
         });
       }
     } catch (error) {
-      console.error('Error al registrar el usuario:', error);
+      Swal.fire({
+        icon: "error",
+        title: "Error trying to register",
+        text: "Try again",
+        showConfirmButton: false,
+        timer: 2500
+      });
     }
   };
 
@@ -176,7 +188,7 @@ export const FormularioInicio = () => {
       if (result.success) {
         setIsAuthenticated(true);
         setUserEmail(email); // Guardar el correo electrónico
-        navigate('/tienda');
+        navigate('/');
       } else {
         Swal.fire({
           icon: "error",
@@ -262,16 +274,25 @@ export const FormularioInicio = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="signup-password">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="login-password">
                   PASSWORD
                 </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="signup-password"
-                  type="password"
-                  name="password"
-                  placeholder="8+ Characters"
-                />
+                <div className="relative">
+                  <input
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    id="signup-password"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="Password"
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute inset-y-0 right-0 px-3 py-2 text-sm text-gray-700"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
               </div>
 
               <div>
@@ -325,15 +346,21 @@ export const FormularioInicio = () => {
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="login-password">
                   PASSWORD
                 </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="login-password"
-                  type="password"
-                  name="login_password"
-                  placeholder="Password"
-                />
-                <div className="text-right mt-2">
-                  <a href="#" className="text-sm text-orange-500">FORGOT PASSWORD</a>
+                <div className="relative">
+                  <input
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    id="login-password"
+                    type={showPassword ? "text" : "password"}
+                    name="login_password"
+                    placeholder="Password"
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute inset-y-0 right-0 px-3 py-2 text-sm text-gray-700"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
                 </div>
               </div>
 

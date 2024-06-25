@@ -9,11 +9,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 
 export const UserProfile = () => {
-  const { userEmail } = useAuth();
+  const { userEmail, isAuthenticated } = useAuth();
   const [userInfo, setUserInfo] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
   const navigate = useNavigate(); // Inicializar useNavigate
   const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
+
+  useEffect(() => {
+    if(!isAuthenticated){
+      navigate("/")
+    }
+  }, [])
 
   useEffect(() => {
     // Fetch user information

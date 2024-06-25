@@ -4,14 +4,15 @@ import JustValidate from 'just-validate';
 import { useAuth } from '../components/AuthProvider';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 
 
 
 export const EditProfile = () => {
-  const { userEmail } = useAuth();
+  const { userEmail, isAuthenticated } = useAuth();
+  const navigate = useNavigate()
   const [userInfo, setUserInfo] = useState({
     email: '',
     first_name: '',
@@ -31,6 +32,11 @@ export const EditProfile = () => {
 
   const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
 
+  useEffect(() => {
+    if(!isAuthenticated){
+      navigate("/")
+    }
+  }, [])
 
   useEffect(() => {
     const fetchUserInfo = async () => {

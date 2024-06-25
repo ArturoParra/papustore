@@ -6,17 +6,24 @@ import { faSearch, faShoppingCart } from '@fortawesome/free-solid-svg-icons'; //
 import { ProductoWishlist } from '../components/ProductoWishlist'; // Importa el componente ProductoWishlist desde '../components/ProductoWishlist'
 import { useAuth } from '../components/AuthProvider'; // Importa el componente useAuth desde '../components/AuthProvider'
 import { useEffect, useState } from 'react'; // Importa useEffect y useState desde la biblioteca 'react'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 
 export const Wishlist = () => {
   // Extraer el email del usuario autenticado
-  const { userEmail } = useAuth();
+  const { userEmail, isAuthenticated } = useAuth();
+  const navigate = useNavigate()
 
   // Estado de la lista de deseos
   const [wishlist, setWishlist] = useState([]);
 
   const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
+
+  useEffect(() => {
+    if(!isAuthenticated){
+      navigate("/")
+    }
+  }, [])
 
   // Efecto para obtener los productos de la lista de deseos
   useEffect(() => {

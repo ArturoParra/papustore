@@ -15,6 +15,7 @@ import { ConfirmarCompra } from './views/ConfirmarCompra';
 import { EditProfile } from './views/EditProfile'; // Importa el componente EditProfile
 import { PurchaseHistory } from './views/PurchaseHistory';
 import { EditarProductos } from './views/EditarProductos';
+import EditarProductoForm from './views/EditarProductoForm';
 
 export const AppRouter = () => {
   return (
@@ -36,6 +37,7 @@ export const AppRouter = () => {
           <Route path='/edit-profile' element={<EditProfile />} /> {/* Añadir la ruta para EditProfile */}
           <Route path='/purchasehistory/:id' element={<PurchaseHistory />} />
           <Route path='/adminproductos' element={<EditarProductos />} />
+          <Route path='/editproducto/:id' element={<EditarProductoForm />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

@@ -10,7 +10,7 @@
  * 
  * @see https://www.php.net/manual/en/errorfunc.configuration.php
  */
-ini_set('display_errors', 0);
+ini_set('display_errors', 0); 
 ini_set('log_errors', 1);
 ini_set('error_log', 'errores.log');
 
@@ -884,6 +884,8 @@ function getPurchaseHistory($conn, $email, $id) {
         return null;
     }
 }
+
+
 
 /**
  * This code block checks if the current request method is OPTIONS.

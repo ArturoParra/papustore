@@ -12,13 +12,18 @@ export const AuthProvider = ({ children }) => {
     return localStorage.getItem('userEmail') || '';
   });
 
+  const [isAuthenticatedadmin, setIsAuthenticatedadmin] = useState(() => {
+    return localStorage.getItem('isAuthenticatedadmin') === 'true';
+  });
+
   useEffect(() => {
     localStorage.setItem('isAuthenticated', isAuthenticated);
+    localStorage.setItem('isAuthenticatedadmin', isAuthenticatedadmin);
     localStorage.setItem('userEmail', userEmail);
-  }, [isAuthenticated, userEmail]);
+  }, [isAuthenticated, userEmail, isAuthenticatedadmin]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, userEmail, setUserEmail }}>
+    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, setIsAuthenticatedadmin, isAuthenticatedadmin, userEmail, setUserEmail }}>
       {children}
     </AuthContext.Provider>
   );
