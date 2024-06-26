@@ -21,7 +21,13 @@ export const ShoppingCart = () => {
 
   useEffect(() => {
     if(!isAuthenticated){
-      navigate("/")
+      Swal.fire({
+        icon: "warning",
+        title: "Log in to see your cart",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+      setTimeout(() => { navigate("/tienda") }, 2500)
     }
   }, [])
 
