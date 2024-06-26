@@ -885,7 +885,34 @@ function getPurchaseHistory($conn, $email, $id) {
     }
 }
 
-
+function updateProducto($conn, $product, $realPrice){
+    $id = $product->id;
+    $title = $product->title;
+    $desc = $product->description;
+    $category = $product->category;
+    $price = $product->price;
+    $discount = $product->discountPercentage;
+    $priceWithDiscount = $realPrice;
+    $stock = $product->stock;
+    $brand = $product->brand;
+    $weight = $product->weight;
+    $width = $product->width;
+    $height = $product->height;
+    $depth = $product->depth;
+    $warranty = $product->warrantyInformation;
+    $shipping = $product->shippingInformation;
+    $return = $product->returnPolicy;
+    $thumbnail = $product->thumbnail;
+    $sql = "UPDATE products SET title = ?, description = ?, category = ?, price = ?, discountPercentage = ?, priceWithDiscount = ?, stock = ?, brand = ?, weight = ?, width = ?, height = ?, depth = ?, warrantyInformation = ?, shippingInformation = ?, returnPolicy = ?, thumbnail = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssdddisiiiissssi", $title, $desc, $category, $price, $discount, $realPrice, $stock, $brand, $weight, $width, $height, $depth, $warranty, $shipping, $return, $thumbnail, $id);
+    if ($stmt->execute()) {
+        return ["success" => true];
+    } else {
+        error_log("Error executing statement: " . $stmt->error);
+        return ["success" => false, "message" => "Error executing statement"];
+    }
+}
 
 /**
  * This code block checks if the current request method is OPTIONS.
@@ -1121,6 +1148,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $resultado = consultaTopDiez($conn);
                     header('Content-Type: application/json');
                     echo json_encode($resultado);
+                    break;
+                case 'updateProducto':
+                    if(isset($jsonData->product, $jsonData->realPrice)){
+                        $product = $jsonData->product;
+                        $resultado = updateProducto($conn, $product, $jsonData->realPrice);
+                    header('Content-Type: application/json');
+                    echo json_encode($resultado);
+                    }
                     break;
                 default:
                     error_log("Función no válida");
