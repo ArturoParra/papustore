@@ -117,7 +117,7 @@ const EditarProductoForm = ({ productId, onClose }) => {
               <span>{IconoFlecha} BACK TO PRODUCT LIST</span>
             </button>
           </Link>
-          <form id="edit-profile-form" className="space-y-4">
+          <form id="edit-profile-form" className="space-y-4" onSubmit={handleSubmit}>
             <div className="flex flex-col md:flex-row gap-8">
               <div className="w-full md:w-1/2">
                 <h2 className="text-xl font-bold mb-4">ACCOUNT INFORMATION</h2>
@@ -127,12 +127,11 @@ const EditarProductoForm = ({ productId, onClose }) => {
                       TITLE
                     </label>
                     <input
-                      type="title"
+                      type="text"
                       name="title"
                       value={product.title}
                       onChange={handleChange}
                       className="mt-1 block w-full p-2 bg-gray-100"
-                      readOnly
                     />
                   </div>
                   <div>
@@ -198,7 +197,6 @@ const EditarProductoForm = ({ productId, onClose }) => {
                       value={product.stock}
                       onChange={handleChange}
                       className="mt-1 block w-full p-2 bg-gray-100"
-                      readOnly
                     />
                   </div>
                   <div>
@@ -210,8 +208,8 @@ const EditarProductoForm = ({ productId, onClose }) => {
                       name="brand"
                       id="brand"
                       value={product.brand}
+                      onChange={handleChange}
                       className="mt-1 block w-full p-2 bg-gray-100"
-                      readOnly
                     />
                   </div>
                 </div>
@@ -250,8 +248,8 @@ const EditarProductoForm = ({ productId, onClose }) => {
                     </label>
                     <input
                       type="number"
-                      id="HEIGHT"
-                      name="HEIGHT"
+                      id="height"
+                      name="height"
                       value={product.height}
                       onChange={handleChange}
                       className="mt-1 block w-full p-2 bg-gray-100"
@@ -263,8 +261,8 @@ const EditarProductoForm = ({ productId, onClose }) => {
                     </label>
                     <input
                       type="number"
-                      id="DEPTH"
-                      name="DEPTH"
+                      id="depth"
+                      name="depth"
                       value={product.depth}
                       onChange={handleChange}
                       className="mt-1 block w-full p-2 bg-gray-100"
@@ -277,7 +275,7 @@ const EditarProductoForm = ({ productId, onClose }) => {
                     <input
                       type="text"
                       id="warranty"
-                      name="warranty"
+                      name="warrantyInformation"
                       value={product.warrantyInformation}
                       onChange={handleChange}
                       className="mt-1 block w-full p-2 bg-gray-100"
@@ -290,7 +288,7 @@ const EditarProductoForm = ({ productId, onClose }) => {
                     <input
                       type="text"
                       id="shipping"
-                      name="shipping"
+                      name="shippingInformation"
                       value={product.shippingInformation}
                       onChange={handleChange}
                       className="mt-1 block w-full p-2 bg-gray-100"
@@ -303,7 +301,7 @@ const EditarProductoForm = ({ productId, onClose }) => {
                     <input
                       type="text"
                       id="return"
-                      name="return"
+                      name="returnPolicy"
                       value={product.returnPolicy}
                       onChange={handleChange}
                       className="mt-1 block w-full p-2 bg-gray-100"
