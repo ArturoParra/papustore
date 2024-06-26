@@ -59,7 +59,6 @@ export const Wishlist = () => {
 
         const data = await res.json();
         // Actualizar el estado de productos con los datos obtenidos
-        console.log(data);
 
         setWishlist(data);
       } catch (error) {

@@ -70,10 +70,6 @@ export const ProductoShoppingCart = ({ item, incrementQuantity, decrementQuantit
       fetchData();
     }
   }, [userEmail]);
-
-  useEffect(() => {
-    console.log(producto)
-  }, [producto])
   
 
   useEffect(() => {

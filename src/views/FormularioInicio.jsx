@@ -175,7 +175,6 @@ export const FormularioInicio = () => {
 
   const verificarUsuario = async (email, password) => {
     try {
-      console.log('Enviando datos:', { email, password }); 
       const response = await fetch('/api/index.php', {
         method: 'POST',
         headers: {
@@ -184,7 +183,6 @@ export const FormularioInicio = () => {
         body: JSON.stringify({ functionName: 'consultaUsuarios', email, password }),
       });
       const result = await response.json();
-      console.log('Respuesta del servidor:', result); 
       if (result.success) {
         setIsAuthenticated(true);
         setUserEmail(email); // Guardar el correo electrónico

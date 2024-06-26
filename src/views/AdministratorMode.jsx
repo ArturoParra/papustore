@@ -135,9 +135,6 @@ export const AdministratorMode = () => {
         }
 
         const data = await res.json();
-
-        console.log(data);
-
         settotalOrders(data.map((item) => item.id));
       } catch (error) {
         console.error("Error:", error);
@@ -166,8 +163,6 @@ export const AdministratorMode = () => {
 
         const data = await res.json();
 
-        console.log(data);
-
         setArticles(data.map((item) => item.quantity));
       } catch (error) {
         console.error("Error:", error);
@@ -195,8 +190,6 @@ export const AdministratorMode = () => {
         }
 
         const data = await res.json();
-
-        console.log(data);
 
         settopDiez(data);
       } catch (error) {
@@ -242,10 +235,6 @@ export const AdministratorMode = () => {
       setSalesData(dataGraficos);
     }
   }, [changeChart]);
-
-  useEffect(() => {
-    console.log(totalSales);
-  }, [totalSales]);
 
   const handlechangeChart = () => {
     setchangeChart(!changeChart);

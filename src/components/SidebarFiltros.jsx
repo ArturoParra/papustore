@@ -54,7 +54,7 @@ export const SidebarFiltros = ({
                 className=" p-2 rounded-lg bg-gray-400 hover:bg-gray-800 lg:hidden"
                 onClick={() => setExpanded((curr) => !curr)}
               >
-                cerrar
+                Close
               </button>
             </div>
             {React.Children.map(
