@@ -87,7 +87,7 @@ export const ProductoShoppingCart = ({ item, incrementQuantity, decrementQuantit
         timer: 1500,
       });
     }
-  }, [quantity])
+  }, [producto, quantity])
   
 
   return (
