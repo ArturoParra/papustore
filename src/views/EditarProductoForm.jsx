@@ -41,6 +41,10 @@ const EditarProductoForm = ({ productId, onClose }) => {
   }, []);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const fetchProduct = async () => {
       try {
         const res = await fetch("/api/index.php", {

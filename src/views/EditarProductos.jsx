@@ -13,6 +13,10 @@ export const EditarProductos = () => {
   const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft}/>
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     if(!isAuthenticatedadmin){
       navigate("/")
     }

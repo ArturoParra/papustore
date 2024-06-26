@@ -8,6 +8,8 @@ import { useAuth } from '../components/AuthProvider'; // Importa el componente u
 import { useEffect, useState } from 'react'; // Importa useEffect y useState desde la biblioteca 'react'
 import { Link, useNavigate } from "react-router-dom";
 import { fas } from "@fortawesome/free-solid-svg-icons";
+import Swal from "sweetalert2";
+
 
 export const Wishlist = () => {
   // Extraer el email del usuario autenticado
@@ -21,7 +23,13 @@ export const Wishlist = () => {
 
   useEffect(() => {
     if(!isAuthenticated){
-      navigate("/")
+      Swal.fire({
+        icon: "warning",
+        title: "Log in to see your wishlist",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+      setTimeout(() => { navigate("/tienda") }, 2500)
     }
   }, [])
 
