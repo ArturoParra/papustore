@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../components/AuthProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,11 +13,12 @@ const EditarProductoForm = ({ productId, onClose }) => {
   const IconoFlecha = <FontAwesomeIcon icon={fas.faArrowLeft} />;
   const { isAuthenticatedadmin } = useAuth();
   const [flag, setflag] = useState(false);
+  const [realPrice, setrealPrice] = useState(0)
   const [product, setProduct] = useState({
     title: "",
     description: "",
     category: "",
-    price: 0,
+    price: realPrice,
     discountPercentage: 0,
     priceWithDiscount: 0,
     rating: 0,
@@ -33,6 +35,12 @@ const EditarProductoForm = ({ productId, onClose }) => {
     thumbnail: "",
     total_sales: 0,
   });
+  
+  useEffect(() => {
+    const price = product.price - (product.price * (product.discountPercentage/100))
+    setrealPrice(price.toFixed(2))
+  }, [product.price, product.discountPercentage])
+  
 
   useEffect(() => {
     if (!isAuthenticatedadmin) {
@@ -91,8 +99,9 @@ const EditarProductoForm = ({ productId, onClose }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          functionName: "updateProduct",
+          functionName: "updateProducto",
           product: product,
+          realPrice: realPrice
         }),
       });
 
@@ -102,12 +111,28 @@ const EditarProductoForm = ({ productId, onClose }) => {
 
       const data = await res.json();
       if (data.success) {
-        onClose();
+        Swal.fire({
+            icon: "success",
+            title: "Product information was successfully updated",
+            showConfirmButton: false,
+            timer: 2500,
+          });
+          setTimeout(() => { navigate("/adminproductos") }, 2500)
       } else {
-        console.error("Error al actualizar el producto");
+        Swal.fire({
+            icon: "error",
+            title: "Could not update the product information",
+            showConfirmButton: false,
+            timer: 2500,
+          });
       }
     } catch (error) {
-      console.error("Error:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Could not update the product information",
+            showConfirmButton: false,
+            timer: 2500,
+          });
     }
   };
 
@@ -121,7 +146,7 @@ const EditarProductoForm = ({ productId, onClose }) => {
               <span>{IconoFlecha} BACK TO PRODUCT LIST</span>
             </button>
           </Link>
-          <form id="edit-profile-form" className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="flex flex-col md:flex-row gap-8">
               <div className="w-full md:w-1/2">
                 <h2 className="text-xl font-bold mb-4">ACCOUNT INFORMATION</h2>
@@ -187,6 +212,18 @@ const EditarProductoForm = ({ productId, onClose }) => {
                       name="discountPercentage"
                       value={product.discountPercentage}
                       onChange={handleChange}
+                      className="mt-1 block w-full p-2 bg-gray-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      PRICE WITH DISCOUNT
+                    </label>
+                    <input
+                      type="number"
+                      id="discountPercentage"
+                      name="discountPercentage"
+                      value={realPrice}
                       className="mt-1 block w-full p-2 bg-gray-100"
                     />
                   </div>
