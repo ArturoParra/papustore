@@ -1,35 +1,49 @@
 .on-fire {
-    overflow: hidden;
-    white-space: nowrap;
-    position: relative;
-    margin-left: 15px;
-    border-right: 2px solid transparent;
-    animation: escribir 2s steps(240, end) infinite;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  margin-left: 15px;
+  border-right: 2px solid transparent;
+  animation: escribir 2s steps(240, end) infinite;
 }
 
 @keyframes escribir {
-    0% {
-        width: 0;
-        border-color: transparent;
-    }
-    100% {
-        width: 100%;
-    }
+  0% {
+      width: 0;
+      border-color: transparent;
+  }
+  100% {
+      width: 100%;
+  }
 }
 
 
 @keyframes twinkle {
-    0%, 100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.8;
-      transform: scale(1.3);
-    }
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
   }
-  
-  .twinkle {
-    animation: twinkle 1.5s infinite ease-in-out;
+  50% {
+    opacity: 0.8;
+    transform: scale(1.3);
   }
-  
+}
+
+.twinkle {
+  animation: twinkle 1.5s infinite ease-in-out;
+}
+
+@keyframes error {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1.5;
+    transform: scale(1.05);
+  }
+}
+
+.error {
+  animation: error 3s infinite ease-in-out;
+}
