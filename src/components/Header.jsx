@@ -153,13 +153,9 @@ export function Header() {
   }, [productos]);
 
 
-  // Definir las categorias a mostrar
-  const [MostrarCategorias, SetMostrarCategorias] = useState(false);
+  
 
-  const ClicCategorias = (event) => {
-    event.stopPropagation();
-    SetMostrarCategorias(!MostrarCategorias);
-  };
+  
 
   // Definir las categorias
   const [CategoriaSeleccionada, SetCategoriaSeleccionada] = useState("");
@@ -181,32 +177,35 @@ export function Header() {
     SetElementoSobre(CategoriaSeleccionada);
   };
 
+  // Estado para controlar si se deben mostrar las categorias
+  const [MostrarCategorias, SetMostrarCategorias] = useState(false);
+  
+  const iconocategoria = useRef(null);
+
   useEffect(() => {
-    // Función para manejar el clic fuera del dropdown
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        if (event.target.id !== 'dropdownOpener') {
-          SetMostrarCategorias(false);
-        }
-        if (event.target.id !== 'dropdownOpenerP') {
-          SetMostrarCategorias(true);
-        }
+      if (
+        (iconocategoria.current && !iconocategoria.current.contains(event.target)) &&
+        (dropdownRef.current && !dropdownRef.current.contains(event.target))
+      ) {
+        SetMostrarCategorias(false);
       }
     };
-
-    // Agregar el listener al montar el componente
-    document.addEventListener("mouseup", handleClickOutside);
-
-    // Limpiar el listener al desmontar el componente
+  
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mouseup", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+  
 
+  const ClicCategorias = () => {
+    SetMostrarCategorias(!MostrarCategorias);
+  };
 
 
   const dropdownRef = useRef(null);
-
+  
   useEffect(() => {
     if (MostrarCategorias) {
       const dropdownWidth = dropdownRef.current?.offsetWidth;
@@ -286,14 +285,10 @@ export function Header() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-
-
-  
   
 
   return (
-    <header ref={headerRef} className="flex top-0 left-0 fixed w-full z-50 mb-14 flex-col bg-black">
+    <header className="flex top-0 left-0 fixed w-full z-50 mb-14 flex-col bg-black">
       {lg ? (
         <div className="flex justify-between items-center lg:px-12 lg:py-2">
           <div>
@@ -304,8 +299,8 @@ export function Header() {
 
 
           <div className="relative">
-            <div className="justify-center bg-white px-5 py-2 rounded-xl cursor-pointer" onClick={ClicCategorias}>
-              <span id='dropdownOpener' onClick={ClicCategorias}>
+            <div className="justify-center bg-white px-5 py-2 rounded-xl cursor-pointer" onClick={ClicCategorias} ref={iconocategoria}>
+              <span id='dropdownOpener'>
                 Categories
               </span>
             </div>
@@ -392,12 +387,12 @@ export function Header() {
               <img
                 src={logo}
                 alt="papustore"
-                className="xss:w-14 xss:h-8 xs:w-12 xs:h-6 sm:w-14 sm:h-8 md:w-16 md:h-8"
+                className="xss:w-12 xss:h-8 xs:w-12 xs:h-6 sm:w-14 sm:h-8 md:w-16 md:h-8"
               />
             </Link>
           </div>
 
-          <div className="relative xss:w-2/3 xs:w-2/3 sm:w-2/3 md:w-3/4" ref={searchRef}>
+          <div className="relative xss:w-1/2 xs:w-2/3 sm:w-2/3 md:w-3/4" ref={searchRef}>
             <div className="flex items-center bg-white rounded-xl font-bold xss:p-1 xss:text-[9px] xs:p-1  xs:text-xs sm:p-1.5  sm:text-sm md:p-2 md:text-sm" onClick={handleSearchClick}>
               <input
                 type="text"
@@ -417,13 +412,11 @@ export function Header() {
           </div>
 
 
-
-
           {isAuthenticated ? (
             <>
               <button
                 onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-700 transition duration-300 ease-in-out rounded-md p-1 mx-2 text-white text-sm"
+                className="bg-red-500 hover:bg-red-700 transition duration-300 ease-in-out rounded-md p-1 mx-2 text-white text-[8px] sm:text-sm"
               >
                 Logout
               </button>
@@ -432,7 +425,7 @@ export function Header() {
             <Link to="/form">
               <button
                 type="button"
-                className="bg-primary hover:bg-orange-700 transition duration-300 ease-in-out rounded-md p-1 mx-2 text-white text-sm"
+                className="bg-primary hover:bg-orange-700 transition duration-300 ease-in-out rounded-md p-1 mx-2 text-white text-[8px] sm:text-sm"
               >
                 Log In
               </button>
@@ -450,18 +443,18 @@ export function Header() {
 
       <div>
         {MostrarHerramientas && (
-          <div className="flex justify-between items-center text-white xss:px-1 xss:text-xs xs:px-2 xs:text-md sm:px-3 sm:text-lg md:px-4 md:text-lg">
+          <div className="flex justify-between items-center text-white xss:mt-1 xss:px-3 xss:text-xs xs:mt-1 xs:px-2 xs:text-md sm:mt-0 sm:px-3 sm:text-lg md:px-4 md:text-lg">
 
             <div className="relative text-black">
-              <div className="justify-center cursor-pointer" onClick={(event) => ClicCategorias(event)}>
-                <span className="text-white" id='dropdownOpenerP' onClick={ClicCategorias}>
+              <div className="justify-center cursor-pointer">
+                <span className="text-white" id='dropdownOpenerP' onClick={ClicCategorias} ref={iconocategoria}>
                   {IconoCatego}
                 </span>
               </div>
 
               {/* Selector de categorias */}
               {MostrarCategorias && (
-                <div ref={dropdownRef} className="flex flex-col bg-white p-1 absolute gap-1 mt-1.5 rounded-md">
+                <div  className="flex flex-col bg-white p-1 absolute gap-1 mt-1.5 rounded-md" ref={dropdownRef}>
                   {categorias.map((Categoria, Indice) => (
                     <div className="relative" key={Indice}>
                       <div

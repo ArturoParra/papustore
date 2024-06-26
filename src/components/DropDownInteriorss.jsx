@@ -100,10 +100,10 @@ export function DropDownInteriorss({ Categoria, Productos })
 
   return (
     // Contenedor del dropdown
-    <div className="flex gap-5 bg-white shadow-md rounded-lg p-1">
+    <div className="flex flex-col w-1/2 sm:w-full sm:flex-row gap-5 bg-white shadow-md rounded-lg p-1">
       
       {/* Dropdown de las marcas */}
-    <div ref={marcasRef} className="flex flex-col p-2 w-1/4">
+    <div ref={marcasRef} className="flex flex-col p-2 w-full sm:w-1/4">
       <div className="text-center justify-center items-center mb-1">Brands</div>
       {/* Mapear las marcas */}
       
@@ -125,7 +125,7 @@ export function DropDownInteriorss({ Categoria, Productos })
 
 
       {/* Productos de la categoria seleccionada o filtrados por marca */}
-      <div className="p-2 w-3/4">
+      <div className="p-2 w-full sm:w-3/4">
         <div>Products</div>
         <div className="flex flex-col p-1 overflow-y-auto" style={{ maxHeight: 'calc(3 * 6em)' }}>
           {/* Mapear los productos de la categoria seleccionada */}

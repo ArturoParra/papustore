@@ -314,7 +314,7 @@ export function Ofertas() {
         {/* Definicion del diseño segun el tamaño de la pantalla */}
         <div className="flex flex-col sm:flex-row">
           {/* Definicion del contenedor de la oferta uno */}
-          <div className="flex flex-col bg-gray-100 rounded-xl w-full h-full p-3 xs:p-5 sm:w-2/3">
+          <div className="flex flex-col bg-gray-100 rounded-xl w-full xss:h-[420px] xs:h-96 sm:h-[390px] md:h-96 lg:h-full p-3 xs:p-5 sm:w-2/3">
             {/* Renderizado de las tres mejores ofertas por tiempo */}
             <div className="flex w-full my-auto items-center ">
               {/* Columna izquierda subcontenedor de la oferta uno */}
