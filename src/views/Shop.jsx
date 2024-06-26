@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { SidebarFiltros, SidebarItem } from "../components/SidebarFiltros";
 import { Producto } from "../components/Producto";
-//TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
-//import { products } from "../data/db.json";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import "../styles/Radio.css";
@@ -17,9 +15,6 @@ export const Shop = ( ) => {
 
   // Estado para los filtros aplicados
   const [filter, setFilter] = useState([]);
-  // Estado para los datos del producto (inicialmente del archivo JSON)
-  //TODO: Cambiar la lógica del producto, esto tiene que venir la de BD
-  //TODO: borrar el JSON del proyecto
   const [data, setData] = useState([]);
   const [dataFiltrado, setdataFiltrado] = useState([]);
   const [dataOrdenado, setdataOrdenado] = useState([]);
@@ -35,8 +30,6 @@ export const Shop = ( ) => {
 
   // Cálculo de los índices para la paginación
   const startIdx = (currentPage - 1) * itemsPerPage
-  //TODO: hacer pasar data por un filtro y luego por la paginación
-  //TODO: condicionar que arreglo se va a mostra (el filtrado o el original) también debería probar esto dentro del useEffect de los filtros
   const paginatedData = dataOrdenado.slice(startIdx, startIdx + itemsPerPage)
   const totalPages = Math.ceil(dataOrdenado.length / itemsPerPage)
 
@@ -58,16 +51,13 @@ export const Shop = ( ) => {
   
 
   useEffect(() => {
-    console.log("Set prices")
     const setprices = () => {
 
       // Cálculo del valor máximo y mínimo de los precios
       const values = Object.values(data).map((obj) => obj.price)
       const maxValue = Math.max(...values)
       const minValue = Math.min(...values)
-      console.log(minValue)
-      console.log(maxValue)
-  
+
       if (!isNaN(maxValue) && maxValue !== Infinity && maxValue !== -Infinity) {
         setmaxPrice(maxValue);
       }
@@ -157,7 +147,6 @@ export const Shop = ( ) => {
     let res = [];
     let res2 = [];
     let res3 = [];
-    console.log(data)
 
     // Filtrar productos por precio
     res3 = Object.values(data).filter((item) => {
@@ -165,7 +154,6 @@ export const Shop = ( ) => {
         item.price - item.price * (item.discountPercentage / 100);
       return realPrice >= minPriceFilter && realPrice <= maxPriceFilter;
     });
-    console.log(res3)
 
     if (filters.length === 0) {
       return res3;
@@ -189,7 +177,6 @@ export const Shop = ( ) => {
     }
 
     res = intersection(res, res3);
-    console.log(res)
     return res;
   };
 
@@ -214,20 +201,16 @@ export const Shop = ( ) => {
     const [min, max] = value
     setminPriceFilter(min)
     setmaxPriceFilter(max)
-    console.log(`Padre onChange: ${JSON.stringify({ value })}`);
   };
 
   // Efecto para filtrar los datos cuando cambian los filtros o los precios
   useEffect(() => {
     filtrado = FuncionFiltrado(data, filter);
-    console.log(filter);
-    console.log(criterio);
     setdataFiltrado(filtrado);
   }, [filter, maxPriceFilter, minPriceFilter]);
 
   // Efecto para ordenar los datos filtrados cuando cambian
   useEffect(() => {
-    console.log(dataFiltrado);
     const temp = ordenarProductos(criterio);
     temp != undefined ? setdataOrdenado(temp) : setdataOrdenado(dataFiltrado);
   }, [dataFiltrado, criterio]);

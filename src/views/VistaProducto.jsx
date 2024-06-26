@@ -183,7 +183,6 @@ export const VistaProducto = () => {
   }, [id]); // Dependencia incluye 'id' para que se ejecute cuando 'id' cambie
 
   useEffect(() => {
-    console.log(BackRes); // Imprimir la respuesta del servidor en la consola
     const {
       title,
       description,
@@ -217,11 +216,7 @@ export const VistaProducto = () => {
     setWidth(width);
     setDepth(depth);
   }, [BackRes]); // Ejecutar el efecto cuando cambie BackRes
-  
-  useEffect(() => {
-    console.log(stock)
-  }, [stock])
-  
+   
 
   const addToCart = async () => {
     if (isAuthenticated) {
@@ -420,10 +415,6 @@ export const VistaProducto = () => {
       });
     }
   };
-
-  useEffect(() => {
-    console.log(comments);
-  }, [comments]);
 
   // Función para cambiar la cantidad del producto
   const handleQuantityChange = (amount) => {

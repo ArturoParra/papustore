@@ -2,9 +2,7 @@ import React, { useState } from "react";
 
 export const ProductoPedido = ({item, quantityBuynow}) => {
 
-    const { thumbnail, quantity, title, priceWithDiscount } = item
-    console.log(quantityBuynow)
-    
+    const { thumbnail, quantity, title, priceWithDiscount } = item    
   return (
     <>
       <div className="flex justify-between items-center mb-4">

@@ -98,7 +98,6 @@ export const ShoppingCart = () => {
 
       // Actualizar el estado del carrito eliminando el producto
       setCart(cart.filter((item) => item.id !== id));
-      console.log("Producto eliminado del carrito:", id);
     } catch (error) {
       console.error("Error:", error);
     }
